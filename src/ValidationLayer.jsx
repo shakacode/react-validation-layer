@@ -11,7 +11,7 @@ import { feedbackStrategies } from './enums/feedbackStrategies';
 //        - Add refs
 //        - Add focus on first invalid node
 
-export default class ValidationLayer extends React.Component {
+export class ValidationLayer extends React.Component {
 
   static propTypes = {
     children: PropTypes.element.isRequired,
@@ -21,7 +21,9 @@ export default class ValidationLayer extends React.Component {
       formConstants.COLLECTION_DATA_TYPE,
     ]),
 
-    handlers: PropTypes.object,
+    handlers: PropTypes.shape({
+      onSubmit: PropTypes.func.isRequired,
+    }).isRequired,
 
     feedbackStrategy: PropTypes.oneOf([
       feedbackStrategies.INSTANT,
@@ -65,8 +67,6 @@ export default class ValidationLayer extends React.Component {
 
     successStatus: PropTypes.string,
     errorStatus  : PropTypes.string,
-
-    onSubmit: PropTypes.func.isRequired,
   };
 
 
@@ -127,7 +127,7 @@ export default class ValidationLayer extends React.Component {
   }
 
 
-  getFormFieldsData(props, options = {}) {
+  getFormFieldsData(props, params = {}) {
     const formFields = {};
 
     for (const field of props.fields) {
@@ -172,15 +172,15 @@ export default class ValidationLayer extends React.Component {
         viewTransform ? viewTransform(domFieldValue) : domFieldValue
       );
 
-      formFields[fieldStateId].checked = !!formFields[fieldStateId].value;
-
       formFields[fieldStateId].disabled = (
-        formUtils.isDefined(options.disableAll) ?
-        options.disableAll :
+        formUtils.isDefined(params.disableAll) ?
+        params.disableAll :
         field.disabled
       );
 
       const formHandlers = {};
+
+      const { onSubmit, ...sharedHandlers } = props.handlers; // eslint-disable-line
 
       const omitOnChange = (
         formUtils.isDefined(field.omitOnChange) ?
@@ -204,7 +204,7 @@ export default class ValidationLayer extends React.Component {
 
       Object.assign(
         formFields[fieldStateId],
-        props.handlers,
+        sharedHandlers,
         field.handlers,
         formHandlers
       );
@@ -381,8 +381,7 @@ export default class ValidationLayer extends React.Component {
 
 
   performSubmit() {
-    console.log('Form is valid!'); // eslint-disable-line no-console
-    this.props.onSubmit(this.handleSuccessPostSubmitAction);
+    this.props.handlers.onSubmit(this.handleSuccessPostSubmitAction);
   }
 
 

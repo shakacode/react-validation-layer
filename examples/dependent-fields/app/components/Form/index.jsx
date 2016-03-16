@@ -33,7 +33,7 @@ export default class Form extends React.Component {
       <form className={styles.form} onSubmit={formHandlers.handleSubmit}>
 
         <div className={this.getClassNamesFor('email')}>
-          <label htmlFor={formFields.getDomIdFor(['email'])}>
+          <label htmlFor={formFields.getDomIdFor('email')}>
             Email
           </label>
           <input
@@ -46,7 +46,7 @@ export default class Form extends React.Component {
         </div>
 
         <div className={this.getClassNamesFor('password')}>
-          <label htmlFor={formFields.getDomIdFor(['password'])}>
+          <label htmlFor={formFields.getDomIdFor('password')}>
             Password
           </label>
           <input
@@ -59,7 +59,7 @@ export default class Form extends React.Component {
         </div>
 
         <div className={this.getClassNamesFor('passwordConfirmation')}>
-          <label htmlFor={formFields.getDomIdFor(['passwordConfirmation'])}>
+          <label htmlFor={formFields.getDomIdFor('passwordConfirmation')}>
             Password Confirmation
           </label>
           <input

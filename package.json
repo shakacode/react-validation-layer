@@ -4,7 +4,7 @@
   "description": "Form validation layer for every React based app",
   "author": "Alex Fedoseev <alex.fedoseev@gmail.com> (https://github.com/alexfedoseev)",
   "license": "MIT",
-  "main": "./lib/ValidationLayer.js",
+  "main": "./lib/index.js",
   "engines": {
     "node": ">=4.2.0"
   },

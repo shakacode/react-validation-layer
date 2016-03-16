@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import ValidationLayer      from 'react-validation-layer';
+import { ValidationLayer }  from 'react-validation-layer';
 
 import Form from '../components/Form';
 
@@ -61,8 +61,10 @@ export default class FormContainer extends React.Component {
         dataKey="articleData"
         feedbackStrategy="onSubmit"
         fields={this.getFormFields()}
-        onSubmit={this.handleSubmit}
-        handlers={{ onChange: props.updateFormState }}
+        handlers={{
+          onChange: props.updateFormState,
+          onSubmit: this.handleSubmit,
+        }}
       >
         <Form {...this.props} />
       </ValidationLayer>

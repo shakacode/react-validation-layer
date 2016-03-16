@@ -28,6 +28,58 @@ export function createFormFields(props, state) {
     return this.fields[fieldId].props;
   }
 
+  function getPropsForCheckbox(...keyPath) {
+    const fieldId = (
+      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
+    );
+    const stateProps = this.fields[fieldId].props;
+
+    return Object.assign({}, stateProps, { checked: !!stateProps.value });
+  }
+
+  function getPropsForRadioButton(keyPath, value) {
+    const fieldId = (
+      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
+    );
+    const stateProps = this.fields[fieldId].props;
+    const radioButtonProps = Object.assign({}, stateProps);
+
+    radioButtonProps.value = value;
+    radioButtonProps.checked = stateProps.value === value;
+
+    if (stateProps.id) {
+      radioButtonProps.id = (
+        formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value)
+      );
+    }
+
+    return radioButtonProps;
+  }
+
+  function getCustomPropsFor(keyPath, { value, comparator, disabled }) {
+    const fieldId = (
+      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
+    );
+    const stateProps = this.fields[fieldId].props;
+    const customProps = Object.assign({}, stateProps);
+
+    if (comparator) {
+      customProps.checked = comparator(stateProps.value);
+    }
+
+    if (disabled) {
+      customProps.disabled = disabled;
+    }
+
+    if (stateProps.id && value) {
+      customProps.id = (
+        formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value)
+      );
+    }
+
+    return customProps;
+  }
+
   function getValidFor(...keyPath) {
     const fieldId = (
       formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
@@ -55,7 +107,13 @@ export function createFormFields(props, state) {
     );
   }
 
-  function getDomIdFor(keyPath, suffix) {
+  function getDomIdFor(...keyPath) {
+    return (
+      formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath)
+    );
+  }
+
+  function getDomIdWithValue(keyPath, value) {
     if (!Array.isArray(keyPath)) {
       throw new Error(
         '`keyPath` passed to `fromFields.getFieldDomId` must be an Array'
@@ -63,17 +121,22 @@ export function createFormFields(props, state) {
     }
 
     return (
-      formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, suffix)
+      formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value)
     );
   }
 
   return {
     fields,
     getPropsFor,
+    getPropsForCheckbox,
+    getPropsForRadioButton,
+    getCustomPropsFor,
     getValidFor,
     getMessageFor,
     getStatusFor,
     getFieldIdFor,
     getDomIdFor,
+    getDomIdForRadioButton: getDomIdWithValue,
+    getCustomDomIdFor     : getDomIdWithValue,
   };
 }

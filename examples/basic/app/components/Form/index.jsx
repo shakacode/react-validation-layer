@@ -33,7 +33,7 @@ export default class Form extends React.Component {
       <form className={styles.form} onSubmit={formHandlers.handleSubmit}>
 
         <div className={this.getClassNamesFor('title')}>
-          <label htmlFor={formFields.getDomIdFor(['title'])}>
+          <label htmlFor={formFields.getDomIdFor('title')}>
             Title
           </label>
           <input
@@ -47,7 +47,7 @@ export default class Form extends React.Component {
 
         <div className={this.getClassNamesFor('content')}>
           <label
-            htmlFor={formFields.getDomIdFor(['content'])}
+            htmlFor={formFields.getDomIdFor('content')}
             className={styles.verticalAlignTop}
           >
             Content
