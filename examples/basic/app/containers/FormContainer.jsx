@@ -66,7 +66,7 @@ export default class FormContainer extends React.Component {
           onSubmit: this.handleSubmit,
         }}
       >
-        <Form {...this.props} />
+        <Form />
       </ValidationLayer>
     );
   }

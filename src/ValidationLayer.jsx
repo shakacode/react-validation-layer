@@ -250,7 +250,10 @@ export class ValidationLayer extends React.Component {
 
     if (e) {
       const handleChange = formUtils.getHandler(field, props, 'onChange');
-      handleChange(domData, e);
+      handleChange(domData, {
+        originalEvent: e,
+        handleSubmit : this.handleSubmit,
+      });
     }
 
     return this.handleFieldValidation(field, domData, e);
@@ -314,7 +317,7 @@ export class ValidationLayer extends React.Component {
       this.formWasSubmitted = true;
     }
 
-    if (e.preventDefault) {
+    if (e && e.preventDefault) {
       e.preventDefault();
     }
 
@@ -403,21 +406,7 @@ export class ValidationLayer extends React.Component {
 
 
   getFormProps() {
-    const { props, state } = this;
-
-    const formFields   = formUtils.createFormFields(props, state);
-    const formHandlers = this.getFormHandlers();
-
-    return { formFields, formHandlers };
-  }
-
-
-  getFormHandlers() {
-    return {
-      handleChange: this.handleCustomChange,
-      handleBlur  : this.handleCustomBlur,
-      handleSubmit: this.handleSubmit,
-    };
+    return { form: formUtils.createFormProps(this) };
   }
 
 

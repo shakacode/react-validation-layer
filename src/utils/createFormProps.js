@@ -1,10 +1,10 @@
 import * as formUtils    from '../utils';
 import { formConstants } from '../enums/formConstants';
 
-export function createFormFields(props, state) {
+export function createFormProps(context) {
   const fields = {};
 
-  for (const fieldStateId of Object.keys(state)) {
+  for (const fieldStateId of Object.keys(context.state)) {
     const { dataType, fieldId } = formUtils.parseFieldStateId(fieldStateId);
 
     if (!fields[fieldId]) {
@@ -12,14 +12,14 @@ export function createFormFields(props, state) {
     }
 
     if (dataType === formConstants.FIELD_DATA_STATE_ID_PREFIX) {
-      fields[fieldId].props = state[fieldStateId];
+      fields[fieldId].props = context.state[fieldStateId];
     } else {
-      fields[fieldId].message = state[fieldStateId].message;
-      fields[fieldId].status  = state[fieldStateId].status;
+      fields[fieldId].message = context.state[fieldStateId].message;
+      fields[fieldId].status  = context.state[fieldStateId].status;
     }
   }
 
-  const singleDataSource = formUtils.singleDataSource(props);
+  const singleDataSource = formUtils.singleDataSource(context.props);
 
   function getPropsFor(...keyPath) {
     const fieldId = (
@@ -127,6 +127,7 @@ export function createFormFields(props, state) {
 
   return {
     fields,
+
     getPropsFor,
     getPropsForCheckbox,
     getPropsForRadioButton,
@@ -138,5 +139,9 @@ export function createFormFields(props, state) {
     getDomIdFor,
     getDomIdForRadioButton: getDomIdWithValue,
     getCustomDomIdFor     : getDomIdWithValue,
+
+    handleChange: context.handleCustomChange,
+    handleBlur  : context.handleCustomBlur,
+    handleSubmit: context.handleSubmit,
   };
 }

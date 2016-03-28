@@ -1,2 +1,2 @@
-export { ValidationLayer } from './ValidationLayer';
-export { formUtils }       from './utils/indexPublic';
+export { ValidationLayer as default } from './ValidationLayer';
+export { formUtils }                  from './utils/indexPublic';

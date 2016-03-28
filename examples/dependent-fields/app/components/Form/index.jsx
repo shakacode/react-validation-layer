@@ -6,68 +6,65 @@ import styles from './styles.scss';
 export default class Form extends React.Component {
 
   static propTypes = {
-    formFields: PropTypes.shape({
+    form: PropTypes.shape({
       getPropsFor : PropTypes.func.isRequired,
       getStatusFor: PropTypes.func.isRequired,
       getDomIdFor : PropTypes.func.isRequired,
-    }),
-
-    formHandlers: PropTypes.shape({
       handleSubmit: PropTypes.func.isRequired,
     }),
   };
 
   getClassNamesFor(field) {
-    const { formFields } = this.props;
+    const { form } = this.props;
 
     return classNames(
       styles.field,
-      styles[formFields.getStatusFor(field)]
+      styles[form.getStatusFor(field)]
     );
   }
 
   render() {
-    const { formFields, formHandlers } = this.props;
+    const { form } = this.props;
 
     return (
-      <form className={styles.form} onSubmit={formHandlers.handleSubmit}>
+      <form className={styles.form} onSubmit={form.handleSubmit}>
 
         <div className={this.getClassNamesFor('email')}>
-          <label htmlFor={formFields.getDomIdFor('email')}>
+          <label htmlFor={form.getDomIdFor('email')}>
             Email
           </label>
           <input
             type="text"
-            {...formFields.getPropsFor('email')}
+            {...form.getPropsFor('email')}
           />
           <span className={styles.message}>
-            {formFields.getMessageFor('email')}
+            {form.getMessageFor('email')}
           </span>
         </div>
 
         <div className={this.getClassNamesFor('password')}>
-          <label htmlFor={formFields.getDomIdFor('password')}>
+          <label htmlFor={form.getDomIdFor('password')}>
             Password
           </label>
           <input
             type="text"
-            {...formFields.getPropsFor('password')}
+            {...form.getPropsFor('password')}
           />
           <span className={styles.message}>
-            {formFields.getMessageFor('password')}
+            {form.getMessageFor('password')}
           </span>
         </div>
 
         <div className={this.getClassNamesFor('passwordConfirmation')}>
-          <label htmlFor={formFields.getDomIdFor('passwordConfirmation')}>
+          <label htmlFor={form.getDomIdFor('passwordConfirmation')}>
             Password Confirmation
           </label>
           <input
             type="text"
-            {...formFields.getPropsFor('passwordConfirmation')}
+            {...form.getPropsFor('passwordConfirmation')}
           />
           <span className={styles.message}>
-            {formFields.getMessageFor('passwordConfirmation')}
+            {form.getMessageFor('passwordConfirmation')}
           </span>
         </div>
 

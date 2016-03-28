@@ -16,7 +16,7 @@ export { fetchProp }                   from './fetchProp';
 export { fetchArgsArray }              from './fetchArgsArray';
 export { normalizeValidationResults }  from './normalizeValidationResults';
 export { applyStrategy }               from './applyStrategy';
-export { createFormFields }            from './createFormFields';
+export { createFormProps }             from './createFormProps';
 export { bindToContext }               from './bindToContext';
 export { resetState }                  from './resetState';
 export { singleDataSource }            from './singleDataSource';
