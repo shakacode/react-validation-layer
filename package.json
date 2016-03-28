@@ -1,6 +1,6 @@
 {
   "name": "react-validation-layer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Form validation layer for every React based app",
   "author": "Alex Fedoseev <alex.fedoseev@gmail.com> (https://github.com/alexfedoseev)",
   "license": "MIT",
