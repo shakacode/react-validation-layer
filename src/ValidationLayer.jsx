@@ -113,6 +113,7 @@ export class ValidationLayer extends React.Component {
     this.changedFields = {};
     this.bluredFields  = {};
 
+    this.isSubmitting = false;
     this.formWasSubmitted = false;
   }
 
@@ -127,7 +128,7 @@ export class ValidationLayer extends React.Component {
   }
 
 
-  getFormFieldsData(props, params = {}) {
+  getFormFieldsData(props) {
     const formFields = {};
 
     for (const field of props.fields) {
@@ -172,11 +173,7 @@ export class ValidationLayer extends React.Component {
         viewTransform ? viewTransform(domFieldValue) : domFieldValue
       );
 
-      formFields[fieldStateId].disabled = (
-        formUtils.isDefined(params.disableAll) ?
-        params.disableAll :
-        field.disabled
-      );
+      formFields[fieldStateId].disabled = this.isSubmitting || field.disabled;
 
       const formHandlers = {};
 
@@ -313,6 +310,8 @@ export class ValidationLayer extends React.Component {
 
 
   handleSubmit(e) {
+    this.isSubmitting = true;
+
     if (!this.formWasSubmitted) {
       this.formWasSubmitted = true;
     }
@@ -321,9 +320,7 @@ export class ValidationLayer extends React.Component {
       e.preventDefault();
     }
 
-    const nextFormFieldsData = (
-      this.getFormFieldsData(this.props, { disableAll: true })
-    );
+    const nextFormFieldsData = this.getFormFieldsData(this.props);
 
     this.setState(nextFormFieldsData, this.handleFormValidation);
   }
@@ -389,18 +386,20 @@ export class ValidationLayer extends React.Component {
 
 
   handleSuccessPostSubmitAction() {
-    const { props, state } = this;
-
-    const nextFormFieldsData = this.getFormFieldsData(props);
-    const resetedState = formUtils.resetState(state, nextFormFieldsData);
-
     this.resetComponent();
+
+    const nextFormFieldsData = this.getFormFieldsData(this.props);
+    const resetedState = formUtils.resetState(this.state, nextFormFieldsData);
+
     this.setState(resetedState);
   }
 
 
   handleFailurePostSubmitAction() {
+    this.isSubmitting = false;
+
     const nextFormFieldsData = this.getFormFieldsData(this.props);
+
     this.setState(nextFormFieldsData);
   }
 
