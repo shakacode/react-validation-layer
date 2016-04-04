@@ -67,6 +67,8 @@ export class ValidationLayer extends React.Component {
 
     successStatus: PropTypes.string,
     errorStatus  : PropTypes.string,
+
+    setFormResetCallback: PropTypes.func,
   };
 
 
@@ -98,6 +100,15 @@ export class ValidationLayer extends React.Component {
   componentWillMount() {
     const nextFormFieldsData = this.getFormFieldsData(this.props);
     this.setState(nextFormFieldsData);
+  }
+
+
+  componentDidMount() {
+    const { setFormResetCallback } = this.props;
+
+    if (setFormResetCallback) {
+      setFormResetCallback(this.handleSuccessPostSubmitAction);
+    }
   }
 
 
