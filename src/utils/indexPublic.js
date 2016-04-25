@@ -1,3 +1,4 @@
-import { getDataFromDom } from './getDataFromDom';
+import { getDataFromDom }             from './getDataFromDom';
+import { normalizeValidationResults } from './normalizeValidationResults';
 
-export const formUtils = { getDataFromDom };
+export const formUtils = { getDataFromDom, normalizeValidationResults };
