@@ -1,7 +1,7 @@
 import * as formUtils    from '../utils';
 import { formConstants } from '../enums/formConstants';
 
-export function resetState(state, nextFormFieldsData) {
+export function resetState(state, nextFormFieldsData, nextVaidationState) {
   const nextState = Object.assign({}, state);
 
   for (const stateKey of Object.keys(nextState)) {
@@ -12,7 +12,7 @@ export function resetState(state, nextFormFieldsData) {
     }
   }
 
-  Object.assign(nextState, nextFormFieldsData);
+  Object.assign(nextState, nextFormFieldsData, nextVaidationState);
 
   return nextState;
 }

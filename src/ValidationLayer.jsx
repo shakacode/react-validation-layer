@@ -86,8 +86,10 @@ export class ValidationLayer extends React.Component {
       'handleDomBlur',
       'handleCustomBlur',
       'handleBlur',
-      'handleFieldValidation',
       'validateField',
+      'handleFieldValidation',
+      'handleInstantFieldsValidation',
+      'handleBatchValidation',
       'handleSubmit',
       'handleFailedFormValidation',
       'performSubmit',
@@ -99,7 +101,10 @@ export class ValidationLayer extends React.Component {
 
   componentWillMount() {
     const nextFormFieldsData = this.getFormFieldsData(this.props);
-    this.setState(nextFormFieldsData);
+    const nextVaidationState = this.handleInstantFieldsValidation(this.props);
+    const nextState = Object.assign({}, nextFormFieldsData, nextVaidationState);
+
+    this.setState(nextState);
   }
 
 
@@ -114,7 +119,10 @@ export class ValidationLayer extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const nextFormFieldsData = this.getFormFieldsData(nextProps);
-    this.setState(nextFormFieldsData);
+    const nextVaidationState = this.handleInstantFieldsValidation(nextProps);
+    const nextState = Object.assign({}, nextFormFieldsData, nextVaidationState);
+
+    this.setState(nextState);
   }
 
 
@@ -143,14 +151,10 @@ export class ValidationLayer extends React.Component {
     const formFields = {};
 
     for (const field of props.fields) {
-      const { dataKey, entity, entityId, attr } = (
-        formUtils.getFieldIdParts(props, field)
-      );
+      const { dataKey, entity, entityId, attr } = formUtils.getFieldIdParts(props, field);
 
       if (this.isMultiEntities && !entityId) {
-        throw new Error(
-          '`isMultiEntities` prop is set to `true`, but entity has no `id`'
-        );
+        throw new Error('`isMultiEntities` prop is set to `true`, but entity has no `id`');
       }
 
       const fieldId = formUtils.buildFieldId(dataKey, entityId, attr);
@@ -161,9 +165,9 @@ export class ValidationLayer extends React.Component {
       formFields[fieldStateId][formConstants.FIELD_ID_DATA_ATTRIBUTE] = fieldId;
 
       const omitDomId = (
-        formUtils.isDefined(field.omitDomId) ?
-        field.omitDomId :
-        props.omitDomId
+        formUtils.isDefined(field.omitDomId)
+        ? field.omitDomId
+        : props.omitDomId
       );
 
       if (!omitDomId) {
@@ -173,15 +177,17 @@ export class ValidationLayer extends React.Component {
 
       const fieldValue = formUtils.fetchProp(entity, attr);
       const domFieldValue = (
-        formUtils.isDefined(fieldValue) && !formUtils.isNull(fieldValue) ?
-        fieldValue :
-        ''
+        formUtils.isDefined(fieldValue) && !formUtils.isNull(fieldValue)
+        ? fieldValue
+        : ''
       );
 
       const viewTransform = field.viewTransform || props.viewTransform;
 
       formFields[fieldStateId].value = (
-        viewTransform ? viewTransform(domFieldValue) : domFieldValue
+        viewTransform
+        ? viewTransform(domFieldValue)
+        : domFieldValue
       );
 
       formFields[fieldStateId].disabled = this.isSubmitting || field.disabled;
@@ -191,9 +197,9 @@ export class ValidationLayer extends React.Component {
       const { onSubmit, ...sharedHandlers } = props.handlers; // eslint-disable-line
 
       const omitOnChange = (
-        formUtils.isDefined(field.omitOnChange) ?
-        field.omitOnChange :
-        props.omitOnChange
+        formUtils.isDefined(field.omitOnChange)
+        ? field.omitOnChange
+        : props.omitOnChange
       );
 
       if (!omitOnChange) {
@@ -201,9 +207,9 @@ export class ValidationLayer extends React.Component {
       }
 
       const omitOnBlur = (
-        formUtils.isDefined(field.omitOnBlur) ?
-        field.omitOnBlur :
-        props.omitOnBlur
+        formUtils.isDefined(field.omitOnBlur)
+        ? field.omitOnBlur
+        : props.omitOnBlur
       );
 
       if (!omitOnBlur) {
@@ -309,14 +315,60 @@ export class ValidationLayer extends React.Component {
   }
 
 
+  validateField(field, domData, e) {
+    return formUtils.applyStrategy(this, field, domData, e);
+  }
+
+
   handleFieldValidation(field, domData, e) {
     const nextState = this.validateField(field, domData, e);
     this.setState(nextState);
   }
 
 
-  validateField(field, domData, e) {
-    return formUtils.applyStrategy(this, field, domData, e);
+  handleInstantFieldsValidation(props) {
+    const context = this;
+    const { fields } = props;
+    const instantFields = fields.filter(field => (
+      formUtils.getStrategy(context, field) === feedbackStrategies.INSTANT
+    ));
+    const { validationState } = this.handleBatchValidation(props, instantFields);
+
+    return validationState;
+  }
+
+
+  handleBatchValidation(props, fields) {
+    const validatableFields = fields || props.fields;
+
+    const validationState = {};
+    let isInvalid = false;
+
+    for (const field of validatableFields) {
+      const { dataKey, entity, entityId, attr } = formUtils.getFieldIdParts(props, field);
+
+      const statuses = formUtils.getDefaultStatuses(props);
+
+      const fieldId = formUtils.buildFieldId(dataKey, entityId, attr);
+      const fieldStateId = formUtils.buildFieldValidationStateId(fieldId);
+
+      const fieldValue = formUtils.fetchProp(entity, attr);
+
+      const fieldValidationState = (
+        formUtils.normalizeValidationResults(field.validate, fieldValue, props)
+      );
+
+      if (!fieldValidationState.valid) {
+        fieldValidationState.status = fieldValidationState.status || statuses.error;
+        if (!isInvalid) isInvalid = true;
+      } else if (fieldValue) {
+        fieldValidationState.status = fieldValidationState.status || statuses.success;
+      }
+
+      validationState[fieldStateId] = fieldValidationState;
+    }
+
+    return { validationState, isInvalid };
   }
 
 
@@ -338,45 +390,7 @@ export class ValidationLayer extends React.Component {
 
 
   handleFormValidation() {
-    const { props } = this;
-
-    const validationState = {};
-
-    let isInvalid = false;
-
-    for (const field of props.fields) {
-      const { dataKey, entity, entityId, attr } = (
-        formUtils.getFieldIdParts(props, field)
-      );
-
-      const statuses = formUtils.getDefaultStatuses(props);
-
-      const fieldId = formUtils.buildFieldId(dataKey, entityId, attr);
-      const fieldStateId = formUtils.buildFieldValidationStateId(fieldId);
-
-      const fieldValue = formUtils.fetchProp(entity, attr);
-
-      const fieldValidationState = (
-        formUtils.normalizeValidationResults(
-          field.validate,
-          fieldValue,
-          this.props
-        )
-      );
-
-      if (!fieldValidationState.valid) {
-        fieldValidationState.status = (
-          fieldValidationState.status || statuses.error
-        );
-        isInvalid = true;
-      } else if (fieldValue) {
-        fieldValidationState.status = (
-          fieldValidationState.status || statuses.success
-        );
-      }
-
-      validationState[fieldStateId] = fieldValidationState;
-    }
+    const { validationState, isInvalid } = this.handleBatchValidation(this.props);
 
     if (isInvalid) {
       this.handleFailedFormValidation(validationState);
@@ -400,7 +414,9 @@ export class ValidationLayer extends React.Component {
     this.resetComponent();
 
     const nextFormFieldsData = this.getFormFieldsData(this.props);
-    const resetedState = formUtils.resetState(this.state, nextFormFieldsData);
+    const nextVaidationState = this.handleInstantFieldsValidation(this.props);
+
+    const resetedState = formUtils.resetState(this.state, nextFormFieldsData, nextVaidationState);
 
     this.setState(resetedState);
   }
