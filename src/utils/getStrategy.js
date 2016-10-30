@@ -1,18 +1,18 @@
-import { feedbackStrategies } from '../enums/feedbackStrategies';
+import * as utils from '../utils';
 
-import { isDefined } from './isDefined';
+import FeedbackStrategy from '../enums/FeedbackStrategy';
 
 export function getStrategy(context, field) {
   const { props } = context;
-  const { INSTANT, INSTANT_CHANGED_ONLY, ON_CHANGE, ON_SUBMIT } = feedbackStrategies;
+  const { INSTANT, INSTANT_TOUCHED_ONLY, ON_CHANGE, ON_SUBMIT } = FeedbackStrategy;
 
-  if ([INSTANT, INSTANT_CHANGED_ONLY].includes(field.feedbackStrategy)) {
+  if ([INSTANT, INSTANT_TOUCHED_ONLY].includes(field.feedbackStrategy)) {
     return field.feedbackStrategy;
   }
 
   if (
-    !isDefined(field.feedbackStrategy)
-    && [INSTANT, INSTANT_CHANGED_ONLY].includes(props.feedbackStrategy)
+    !utils.isDefined(field.feedbackStrategy)
+    && [INSTANT, INSTANT_TOUCHED_ONLY].includes(props.feedbackStrategy)
   ) {
     return props.feedbackStrategy;
   }

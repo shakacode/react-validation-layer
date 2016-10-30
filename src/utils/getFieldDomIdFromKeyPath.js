@@ -1,19 +1,18 @@
-import * as formUtils    from '../utils';
-import { formConstants } from '../enums/formConstants';
+import * as utils from '../utils';
+import Constant from '../enums/Constant';
 
-export function getFieldDomIdFromKeyPath(
-  singleDataSource, keyPath, suffix
-) {
+export function getFieldDomIdFromKeyPath(singleDataSource, keyPath, suffix) {
+  const _ = Constant.FIELD_DOM_ID_DELIMITER;
   const baseDomId = (
-    formUtils
+    utils
       .getFieldIdFromKeyPath(singleDataSource, keyPath)
-      .split(formConstants.FIELD_ID_DELIMITER)
-      .join(formConstants.FIELD_DOM_ID_DELIMITER)
+      .split(Constant.FIELD_ID_DELIMITER)
+      .join(Constant.FIELD_DOM_ID_DELIMITER)
   );
 
   return (
-    suffix ?
-    `${baseDomId}${formConstants.FIELD_DOM_ID_DELIMITER}${suffix}` :
-    baseDomId
+    suffix
+    ? `${baseDomId}${_}${suffix}`
+    : baseDomId
   );
 }

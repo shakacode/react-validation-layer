@@ -1,67 +1,55 @@
-import * as formUtils    from '../utils';
-import { formConstants } from '../enums/formConstants';
+import * as utils from '../utils';
+import Constant from '../enums/Constant';
 
 export function createFormProps(context) {
   const fields = {};
 
   for (const fieldStateId of Object.keys(context.state)) {
-    const { dataType, fieldId } = formUtils.parseFieldStateId(fieldStateId);
+    const { dataType, fieldId } = utils.parseFieldStateId(fieldStateId);
 
-    if (!fields[fieldId]) {
-      fields[fieldId] = {};
-    }
+    if (!fields[fieldId]) fields[fieldId] = {};
 
-    if (dataType === formConstants.FIELD_DATA_STATE_ID_PREFIX) {
+    if (dataType === Constant.FIELD_DATA_STATE_ID_PREFIX) {
       fields[fieldId].props = context.state[fieldStateId];
     } else {
       fields[fieldId].message = context.state[fieldStateId].message;
-      fields[fieldId].status  = context.state[fieldStateId].status;
+      fields[fieldId].status = context.state[fieldStateId].status;
     }
   }
 
-  const singleDataSource = formUtils.singleDataSource(context.props);
+  const singleDataSource = utils.singleDataSource(context.props);
 
   function getPropsFor(...keyPath) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     return this.fields[fieldId].props;
   }
 
-  function getPropsForCheckbox(...keyPath) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+  function getCheckboxPropsFor(...keyPath) {
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     const stateProps = this.fields[fieldId].props;
 
-    return Object.assign({}, stateProps, { checked: !!stateProps.value });
+    return { ...stateProps, checked: !!stateProps.value };
   }
 
-  function getPropsForRadioButton(keyPath, value) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+  function getRadioButtonPropsFor(keyPath, value) {
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     const stateProps = this.fields[fieldId].props;
-    const radioButtonProps = Object.assign({}, stateProps);
+    const radioButtonProps = { ...stateProps };
 
     radioButtonProps.value = value;
     radioButtonProps.checked = stateProps.value === value;
 
     if (stateProps.id) {
-      radioButtonProps.id = (
-        formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value)
-      );
+      radioButtonProps.id = utils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value);
     }
 
     return radioButtonProps;
   }
 
   function getCustomPropsFor(keyPath, { value, comparator, disabled }) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     const stateProps = this.fields[fieldId].props;
-    const customProps = Object.assign({}, stateProps);
+    const customProps = { ...stateProps };
 
     if (comparator) {
       customProps.checked = comparator(stateProps.value);
@@ -72,76 +60,61 @@ export function createFormProps(context) {
     }
 
     if (stateProps.id && value) {
-      customProps.id = (
-        formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value)
-      );
+      customProps.id = utils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value);
     }
 
     return customProps;
   }
 
-  function getValidFor(...keyPath) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+  // TODO: Rename
+  function getValidityFor(...keyPath) {
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     return this.fields[fieldId].valid;
   }
 
   function getMessageFor(...keyPath) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     return this.fields[fieldId].message;
   }
 
   function getStatusFor(...keyPath) {
-    const fieldId = (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+    const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     return this.fields[fieldId].status;
   }
 
   function getFieldIdFor(...keyPath) {
-    return (
-      formUtils.getFieldIdFromKeyPath(singleDataSource, keyPath)
-    );
+    return utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
   }
 
   function getDomIdFor(...keyPath) {
-    return (
-      formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath)
-    );
+    return utils.getFieldDomIdFromKeyPath(singleDataSource, keyPath);
   }
 
   function getDomIdWithValue(keyPath, value) {
     if (!Array.isArray(keyPath)) {
-      throw new Error(
-        '`keyPath` passed to `fromFields.getFieldDomId` must be an Array'
-      );
+      throw new Error('`keyPath` passed to `fromFields.getFieldDomId` must be an Array');
     }
 
-    return (
-      formUtils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value)
-    );
+    return utils.getFieldDomIdFromKeyPath(singleDataSource, keyPath, value);
   }
 
   return {
     fields,
 
     getPropsFor,
-    getPropsForCheckbox,
-    getPropsForRadioButton,
+    getCheckboxPropsFor,
+    getRadioButtonPropsFor,
     getCustomPropsFor,
-    getValidFor,
+    getValidityFor,
     getMessageFor,
     getStatusFor,
     getFieldIdFor,
     getDomIdFor,
     getDomIdForRadioButton: getDomIdWithValue,
-    getCustomDomIdFor     : getDomIdWithValue,
+    getCustomDomIdFor: getDomIdWithValue,
 
     handleChange: context.handleCustomChange,
-    handleBlur  : context.handleCustomBlur,
+    handleBlur: context.handleCustomBlur,
     handleSubmit: context.handleSubmit,
   };
 }

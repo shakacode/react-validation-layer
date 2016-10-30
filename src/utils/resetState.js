@@ -1,13 +1,13 @@
-import * as formUtils    from '../utils';
-import { formConstants } from '../enums/formConstants';
+import * as utils from '../utils';
+import Constant from '../enums/Constant';
 
 export function resetState(state, nextFormFieldsData, nextVaidationState) {
-  const nextState = Object.assign({}, state);
+  const nextState = { ...state };
 
   for (const stateKey of Object.keys(nextState)) {
-    const { dataType } = formUtils.parseFieldStateId(stateKey);
+    const { dataType } = utils.parseFieldStateId(stateKey);
 
-    if (dataType === formConstants.FIELD_VALIDATION_STATE_ID_PREFIX) {
+    if (dataType === Constant.FIELD_VALIDATION_STATE_ID_PREFIX) {
       nextState[stateKey] = {};
     }
   }

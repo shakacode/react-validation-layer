@@ -8,7 +8,7 @@ export default class AppContainer extends React.Component {
     super(props, context);
 
     this.state = {
-      title  : null,
+      title: null,
       content: null,
     };
 

@@ -1,13 +1,11 @@
-import * as formUtils from '../utils';
+import * as utils from '../utils';
 
 export default function onSubmit(context, field, data, statuses) {
   if (context.formWasSubmitted) {
-    const validationState = (
-      formUtils.normalizeValidationResults(
-        field.validate,
-        data.value,
-        context.props
-      )
+    const validationState = utils.normalizeValidationResults(
+      field.validate,
+      data.value,
+      context.props
     );
 
     if (!validationState.valid) {

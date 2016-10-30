@@ -1,5 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import webpack from 'webpack';
-import path    from 'path';
+import path from 'path';
 
 export default {
 
@@ -10,14 +12,21 @@ export default {
   ],
 
   output: {
-    path      : path.resolve('public'),
-    filename  : 'app.js',
+    path: path.resolve('public'),
+    filename: 'app.js',
     publicPath: '/assets/',
   },
 
   devtool: '#cheap-module-eval-source-map',
 
-  resolve: { extensions: ['', '.js', '.jsx'] },
+  resolve: {
+    extensions: ['', '.js', '.jsx'],
+    fallback: path.join(__dirname, 'node_modules'),
+  },
+
+  resolveLoader: {
+    fallback: path.join(__dirname, 'node_modules'),
+  },
 
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
@@ -27,19 +36,19 @@ export default {
   module: {
     loaders: [
       {
-        test   : /\.jsx?$/,
-        loader : 'babel',
+        test: /\.jsx?$/,
+        loader: 'babel',
         exclude: /node_modules/,
       },
       {
-        test   : /\.css$/,
+        test: /\.css$/,
         loaders: [
           'style',
           'css?modules&importLoaders=0&localIdentName=[name]__[local]__[hash:base64:5]',
         ],
       },
       {
-        test   : /\.scss$/,
+        test: /\.scss$/,
         loaders: [
           'style',
           'css?modules&importLoaders=1&localIdentName=[name]__[local]__[hash:base64:5]',

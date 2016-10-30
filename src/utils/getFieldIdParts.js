@@ -1,13 +1,13 @@
-import * as formUtils from '../utils';
+import * as utils from '../utils';
 
 export function getFieldIdParts(props, field) {
   const dataKey = field.dataKey || props.dataKey;
-  const entity  = props[dataKey];
+  const entity = props[dataKey];
 
   const entityId = (
-    props.isMultiEntities ?
-    formUtils.fetchProp(entity, 'id') :
-    null
+    props.isMultiEntities
+    ? utils.fetchProp(entity, 'id')
+    : null
   );
 
   const { attr } = field;

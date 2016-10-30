@@ -1,24 +1,21 @@
 import React, { PropTypes } from 'react';
 
-import * as formUtils         from './utils';
-import { formConstants }      from './enums/formConstants';
-import { feedbackStrategies } from './enums/feedbackStrategies';
+import * as utils from './utils';
+import Constant from './enums/Constant';
+import FeedbackStrategy from './enums/FeedbackStrategy';
 
-// TODO:  - Test stratigies
-//        - Add button props
-//        - Add async validations
-//        - Add collections handling
-//        - Add refs
-//        - Add focus on first invalid node
 
 export class ValidationLayer extends React.Component {
 
   static propTypes = {
-    children: PropTypes.element.isRequired,
+    children: PropTypes.oneOfType([
+      PropTypes.element.isRequired,
+      PropTypes.func.isRequired,
+    ]),
 
-    dataKey : PropTypes.string,
+    dataKey: PropTypes.string,
     dataType: PropTypes.oneOf([
-      formConstants.COLLECTION_DATA_TYPE,
+      Constant.COLLECTION_DATA_TYPE,
     ]),
 
     handlers: PropTypes.shape({
@@ -26,39 +23,43 @@ export class ValidationLayer extends React.Component {
     }).isRequired,
 
     feedbackStrategy: PropTypes.oneOf([
-      feedbackStrategies.INSTANT,
-      feedbackStrategies.ON_SUCCESS,
-      feedbackStrategies.ON_FIRST_BLUR,
-      feedbackStrategies.ON_BLUR_ONLY,
-      feedbackStrategies.ON_SUCCESS_OR_FIRST_BLUR,
-      feedbackStrategies.ON_SUBMIT,
+      FeedbackStrategy.INSTANT,
+      FeedbackStrategy.INSTANT_TOUCHED_ONLY,
+      FeedbackStrategy.ON_CHANGE,
+      FeedbackStrategy.ON_BLUR_ONLY,
+      FeedbackStrategy.ON_FIRST_BLUR,
+      FeedbackStrategy.ON_SUCCESS,
+      FeedbackStrategy.ON_SUCCESS_OR_FIRST_BLUR,
+      FeedbackStrategy.ON_SUBMIT,
     ]),
 
     fields: PropTypes.arrayOf(
       PropTypes.shape({
-        dataKey : PropTypes.string,                   // Can be global
+        dataKey: PropTypes.string,                    // Can be global
         dataType: PropTypes.oneOf([                   // Can be global
-          formConstants.COLLECTION_DATA_TYPE,
+          Constant.COLLECTION_DATA_TYPE,
         ]),
-        attr          : PropTypes.string.isRequired,
-        validate      : PropTypes.func,
-        validateAsync : PropTypes.func,
-        handlers      : PropTypes.object,             // Can be global
-        filter        : PropTypes.func,               // Can be global
-        viewTransform : PropTypes.func,               // Can be global
-        storeTransform: PropTypes.func,               // Can be global
-        omitDomId     : PropTypes.bool,               // Can be global
-        omitRef       : PropTypes.bool,               // Can be global
-        omitOnChange  : PropTypes.bool,               // Can be global
-        omitOnBlur    : PropTypes.bool,               // Can be global
+        attr: PropTypes.string.isRequired,
+        validate: PropTypes.func,
+        validateAsync: PropTypes.func,
+        handlers: PropTypes.object,                   // Can be global
+        filter: PropTypes.func,                       // Can be global
+        transformBeforeStore: PropTypes.func,         // Can be global
+        transformBeforeRender: PropTypes.func,        // Can be global
+        omitDomId: PropTypes.bool,                    // Can be global
+        omitRef: PropTypes.bool,                      // Can be global
+        omitOnChange: PropTypes.bool,                 // Can be global
+        omitOnBlur: PropTypes.bool,                   // Can be global
 
         feedbackStrategy: PropTypes.oneOf([           // Can be global
-          feedbackStrategies.INSTANT,
-          feedbackStrategies.ON_SUCCESS,
-          feedbackStrategies.ON_FIRST_BLUR,
-          feedbackStrategies.ON_BLUR_ONLY,
-          feedbackStrategies.ON_SUCCESS_OR_FIRST_BLUR,
-          feedbackStrategies.ON_SUBMIT,
+          FeedbackStrategy.INSTANT,
+          FeedbackStrategy.INSTANT_TOUCHED_ONLY,
+          FeedbackStrategy.ON_CHANGE,
+          FeedbackStrategy.ON_BLUR_ONLY,
+          FeedbackStrategy.ON_FIRST_BLUR,
+          FeedbackStrategy.ON_SUCCESS,
+          FeedbackStrategy.ON_SUCCESS_OR_FIRST_BLUR,
+          FeedbackStrategy.ON_SUBMIT,
         ]),
       }).isRequired
     ).isRequired,
@@ -66,53 +67,32 @@ export class ValidationLayer extends React.Component {
     isMultiEntities: PropTypes.bool,
 
     successStatus: PropTypes.string,
-    errorStatus  : PropTypes.string,
+    errorStatus: PropTypes.string,
 
-    setFormResetCallback: PropTypes.func,
+    setValidationLayerStateResetCallback: PropTypes.func,
   };
 
 
-  constructor(props, context) {
-    super(props, context);
-
+  constructor(...args) {
+    super(...args);
     this.resetComponent();
-
-    formUtils.bindToContext(this, [
-      'resetComponent',
-      'setBluredField',
-      'handleDomChange',
-      'handleCustomChange',
-      'handleChange',
-      'handleDomBlur',
-      'handleCustomBlur',
-      'handleBlur',
-      'validateField',
-      'handleFieldValidation',
-      'handleInstantFieldsValidation',
-      'handleBatchValidation',
-      'handleSubmit',
-      'handleFailedFormValidation',
-      'performSubmit',
-      'handleSuccessPostSubmitAction',
-      'handleFailurePostSubmitAction',
-    ]);
   }
 
 
   componentWillMount() {
     const nextFormFieldsData = this.getFormFieldsData(this.props);
     const nextVaidationState = this.handleInstantFieldsValidation(this.props);
-    const nextState = Object.assign({}, nextFormFieldsData, nextVaidationState);
+    const nextState = { ...nextFormFieldsData, ...nextVaidationState };
 
     this.setState(nextState);
   }
 
 
   componentDidMount() {
-    const { setFormResetCallback } = this.props;
+    const { setValidationLayerStateResetCallback } = this.props;
 
-    if (setFormResetCallback) {
-      setFormResetCallback(this.handleSuccessPostSubmitAction);
+    if (setValidationLayerStateResetCallback) {
+      setValidationLayerStateResetCallback(this.handleSuccessPostSubmitAction);
     }
   }
 
@@ -120,73 +100,78 @@ export class ValidationLayer extends React.Component {
   componentWillReceiveProps(nextProps) {
     const nextFormFieldsData = this.getFormFieldsData(nextProps);
     const nextVaidationState = this.handleInstantFieldsValidation(nextProps);
-    const nextState = Object.assign({}, nextFormFieldsData, nextVaidationState);
+    const nextState = { ...nextFormFieldsData, ...nextVaidationState };
 
     this.setState(nextState);
   }
 
 
-  resetComponent() {
+  resetComponent = () => {
     this.isMultiEntities = this.props.isMultiEntities;
 
-    this.changedFields = {};
-    this.bluredFields  = {};
+    this.touchedFields = {};
+    this.bluredFields = {};
 
     this.isSubmitting = false;
     this.formWasSubmitted = false;
-  }
+  };
 
 
-  setChangedField(fieldId) {
-    this.changedFields[fieldId] = true;
-  }
+  setTouchedField = (fieldId) => {
+    if (!this.touchedFields[fieldId]) {
+      this.touchedFields[fieldId] = true;
+    }
+  };
 
 
-  setBluredField(fieldId) {
-    this.bluredFields[fieldId] = true;
-  }
+  setBluredField = (fieldId) => {
+    if (!this.bluredFields[fieldId]) {
+      this.bluredFields[fieldId] = true;
+    }
+    this.setTouchedField(fieldId);
+  };
 
 
-  getFormFieldsData(props) {
+  getFormFieldsData = (props) => {
     const formFields = {};
 
     for (const field of props.fields) {
-      const { dataKey, entity, entityId, attr } = formUtils.getFieldIdParts(props, field);
+      const { dataKey, entity, entityId, attr } = utils.getFieldIdParts(props, field);
 
       if (this.isMultiEntities && !entityId) {
         throw new Error('`isMultiEntities` prop is set to `true`, but entity has no `id`');
       }
 
-      const fieldId = formUtils.buildFieldId(dataKey, entityId, attr);
-      const fieldStateId = formUtils.buildFieldDataStateId(fieldId);
+      const fieldId = utils.buildFieldId(dataKey, entityId, attr);
+      const fieldStateId = utils.buildFieldDataStateId(fieldId);
 
       formFields[fieldStateId] = {};
 
-      formFields[fieldStateId][formConstants.FIELD_ID_DATA_ATTRIBUTE] = fieldId;
+      formFields[fieldStateId][Constant.FIELD_ID_DATA_ATTRIBUTE] = fieldId;
 
       const omitDomId = (
-        formUtils.isDefined(field.omitDomId)
+        utils.isDefined(field.omitDomId)
         ? field.omitDomId
         : props.omitDomId
       );
 
       if (!omitDomId) {
-        const fieldDomId = formUtils.buildFieldDomId(dataKey, entityId, attr);
+        const fieldDomId = utils.buildFieldDomId(dataKey, entityId, attr);
         formFields[fieldStateId].id = fieldDomId;
       }
 
-      const fieldValue = formUtils.fetchProp(entity, attr);
+      const fieldValue = utils.fetchProp(entity, attr);
       const domFieldValue = (
-        formUtils.isDefined(fieldValue) && !formUtils.isNull(fieldValue)
+        utils.isDefined(fieldValue) && !utils.isNull(fieldValue)
         ? fieldValue
         : ''
       );
 
-      const viewTransform = field.viewTransform || props.viewTransform;
+      const transformBeforeRender = field.transformBeforeRender || props.transformBeforeRender;
 
       formFields[fieldStateId].value = (
-        viewTransform
-        ? viewTransform(domFieldValue)
+        transformBeforeRender
+        ? transformBeforeRender(domFieldValue)
         : domFieldValue
       );
 
@@ -194,10 +179,10 @@ export class ValidationLayer extends React.Component {
 
       const formHandlers = {};
 
-      const { onSubmit, ...sharedHandlers } = props.handlers; // eslint-disable-line
+      const { onSubmit, ...sharedHandlers } = props.handlers; // eslint-disable-line no-unused-vars
 
       const omitOnChange = (
-        formUtils.isDefined(field.omitOnChange)
+        utils.isDefined(field.omitOnChange)
         ? field.omitOnChange
         : props.omitOnChange
       );
@@ -207,7 +192,7 @@ export class ValidationLayer extends React.Component {
       }
 
       const omitOnBlur = (
-        formUtils.isDefined(field.omitOnBlur)
+        utils.isDefined(field.omitOnBlur)
         ? field.omitOnBlur
         : props.omitOnBlur
       );
@@ -225,137 +210,149 @@ export class ValidationLayer extends React.Component {
     }
 
     return formFields;
-  }
+  };
 
 
-  handleDomChange(e) {
-    const domData = formUtils.getDataFromDom(e);
-    this.handleChange(domData, e);
-  }
+  handleDomChange = (event) => {
+    const domData = utils.getDataFromDom(event);
+    this.handleChange(domData, event);
+  };
 
 
-  handleCustomChange(fieldDomId, value) {
-    const parsedFieldDomId = formUtils.parseFieldId(fieldDomId);
-    const domData = Object.assign({}, parsedFieldDomId, { value });
+  handleCustomChange = (fieldDomId, value) => {
+    const parsedFieldDomId = utils.parseFieldId(fieldDomId);
+    const domData = { ...parsedFieldDomId, value };
     this.handleChange(domData);
-  }
+  };
 
 
-  handleChange(domData, e) {
+  handleChange = (domData, event) => {
+    this.setTouchedField(domData.fieldId);
+
     const { props } = this;
 
-    if (!this.changedFields[domData.fieldId]) {
-      this.setChangedField(domData.fieldId);
-    }
-
-    const field = formUtils.getField(props, domData);
-
+    const field = utils.getField(props, domData);
     const filter = field.filter || props.filter;
 
-    if (filter && domData.value && !filter(domData.value)) {
-      return false;
+    if (
+      filter                           // if filter function provided
+      && domData.value                 // & there's a value (we don't want to filter empty string!)
+      && !filter(domData.value, props) // & filter function returned false
+    ) {
+      return false;                    // then ignoring this update
     }
 
-    const storeTransform = field.storeTransform || props.storeTransform;
+    const transformBeforeStore = field.transformBeforeStore || props.transformBeforeStore;
 
-    if (storeTransform) {
-      domData.value = storeTransform(domData.value);
+    if (transformBeforeStore) {
+      domData.value = transformBeforeStore(domData.value);
     }
 
-    if (e) {
-      const handleChange = formUtils.getHandler(field, props, 'onChange');
+    if (event) {
+      const handleChange = utils.getHandler(field, props, 'onChange');
       handleChange(domData, {
-        originalEvent: e,
-        handleSubmit : this.handleSubmit,
+        originalEvent: event,
+        handleSubmit: this.handleSubmit,
       });
     }
 
-    return this.handleFieldValidation(field, domData, e);
-  }
+    return this.handleFieldValidation(field, domData, event);
+  };
 
 
-  handleDomBlur(e) {
-    const domData = formUtils.getDataFromDom(e);
-    this.handleBlur(domData, e);
-  }
+  handleDomBlur = (event) => {
+    const domData = utils.getDataFromDom(event);
+    this.handleBlur(domData, event);
+  };
 
 
-  handleCustomBlur(fieldDomId, value, e) {
-    const parsedFieldDomId = formUtils.parseFieldId(fieldDomId);
-    const domData = Object.assign({}, parsedFieldDomId, { value });
-    this.handleBlur(domData, e, true);
-  }
+  handleCustomBlur = (fieldDomId, value, event) => {
+    const parsedFieldDomId = utils.parseFieldId(fieldDomId);
+    const domData = { ...parsedFieldDomId, value };
+    this.handleBlur(domData, event, true);
+  };
 
 
-  handleBlur(domData, e, isCustom = false) {
+  handleBlur = (domData, event, isCustom = false) => {
     const { props } = this;
 
-    const field = formUtils.getField(props, domData);
-    const handleBlur = formUtils.getHandler(field, props, 'onBlur');
+    const field = utils.getField(props, domData);
+    const handleBlur = utils.getHandler(field, props, 'onBlur');
 
-    const storeTransform = field.storeTransform || props.storeTransform;
+    const transformBeforeStore = field.transformBeforeStore || props.transformBeforeStore;
 
-    if (storeTransform) {
-      domData.value = storeTransform(domData.value);
+    if (transformBeforeStore) {
+      domData.value = transformBeforeStore(domData.value);
     }
 
     if (!isCustom && handleBlur) {
-      handleBlur(domData, e);
+      handleBlur(domData, event);
     }
 
-    const feedbackStrategy = formUtils.getStrategy(this, field);
+    const feedbackStrategy = utils.getStrategy(this, field);
 
     if (
-      feedbackStrategy === feedbackStrategies.ON_FIRST_BLUR ||
-      feedbackStrategy === feedbackStrategies.ON_BLUR_ONLY ||
-      feedbackStrategy === feedbackStrategies.ON_SUCCESS_OR_FIRST_BLUR
+      feedbackStrategy === FeedbackStrategy.ON_FIRST_BLUR ||
+      feedbackStrategy === FeedbackStrategy.ON_BLUR_ONLY ||
+      feedbackStrategy === FeedbackStrategy.ON_SUCCESS_OR_FIRST_BLUR
     ) {
-      this.handleFieldValidation(field, domData, e);
+      this.handleFieldValidation(field, domData, event);
     }
-  }
+  };
 
 
-  validateField(field, domData, e) {
-    return formUtils.applyStrategy(this, field, domData, e);
-  }
+  validateField = (field, domData, event) => (
+    utils.applyStrategy(this, field, domData, event)
+  );
 
 
-  handleFieldValidation(field, domData, e) {
-    const nextState = this.validateField(field, domData, e);
+  handleFieldValidation = (field, domData, event) => {
+    const nextState = this.validateField(field, domData, event);
     this.setState(nextState);
-  }
+  };
 
 
-  handleInstantFieldsValidation(props) {
+  handleInstantFieldsValidation = (props) => {
     const context = this;
     const { fields } = props;
-    const instantFields = fields.filter(field => (
-      formUtils.getStrategy(context, field) === feedbackStrategies.INSTANT
-    ));
+
+    const instantFields = fields.filter(field => {
+      const strategy = utils.getStrategy(context, field);
+      if (strategy === FeedbackStrategy.INSTANT) return true;
+
+      if (strategy === FeedbackStrategy.INSTANT_TOUCHED_ONLY) {
+        const { dataKey, entityId, attr } = utils.getFieldIdParts(props, field);
+        const fieldId = utils.buildFieldId(dataKey, entityId, attr);
+        if (context.touchedFields[fieldId]) return true;
+      }
+
+      return false;
+    });
+
     const { validationState } = this.handleBatchValidation(props, instantFields);
 
     return validationState;
-  }
+  };
 
 
-  handleBatchValidation(props, fields) {
+  handleBatchValidation = (props, fields) => {
     const validatableFields = fields || props.fields;
 
     const validationState = {};
     let isInvalid = false;
 
     for (const field of validatableFields) {
-      const { dataKey, entity, entityId, attr } = formUtils.getFieldIdParts(props, field);
+      const { dataKey, entity, entityId, attr } = utils.getFieldIdParts(props, field);
 
-      const statuses = formUtils.getDefaultStatuses(props);
+      const statuses = utils.getDefaultStatuses(props);
 
-      const fieldId = formUtils.buildFieldId(dataKey, entityId, attr);
-      const fieldStateId = formUtils.buildFieldValidationStateId(fieldId);
+      const fieldId = utils.buildFieldId(dataKey, entityId, attr);
+      const fieldStateId = utils.buildFieldValidationStateId(fieldId);
 
-      const fieldValue = formUtils.fetchProp(entity, attr);
+      const fieldValue = utils.fetchProp(entity, attr);
 
       const fieldValidationState = (
-        formUtils.normalizeValidationResults(field.validate, fieldValue, props)
+        utils.normalizeValidationResults(field.validate, fieldValue, props)
       );
 
       if (!fieldValidationState.valid) {
@@ -369,27 +366,27 @@ export class ValidationLayer extends React.Component {
     }
 
     return { validationState, isInvalid };
-  }
+  };
 
 
-  handleSubmit(e) {
+  handleSubmit = (event) => {
     this.isSubmitting = true;
 
     if (!this.formWasSubmitted) {
       this.formWasSubmitted = true;
     }
 
-    if (e && e.preventDefault) {
-      e.preventDefault();
+    if (event && event.preventDefault) {
+      event.preventDefault();
     }
 
     const nextFormFieldsData = this.getFormFieldsData(this.props);
 
     this.setState(nextFormFieldsData, this.handleFormValidation);
-  }
+  };
 
 
-  handleFormValidation() {
+  handleFormValidation = () => {
     const { validationState, isInvalid } = this.handleBatchValidation(this.props);
 
     if (isInvalid) {
@@ -397,50 +394,62 @@ export class ValidationLayer extends React.Component {
     } else {
       this.performSubmit();
     }
-  }
+  };
 
 
-  handleFailedFormValidation(validationState) {
+  handleFailedFormValidation = (validationState) => {
     this.setState(validationState, this.handleFailurePostSubmitAction);
-  }
+  };
 
 
-  performSubmit() {
+  performSubmit = () => {
     this.props.handlers.onSubmit(this.handleSuccessPostSubmitAction);
-  }
+  };
 
 
-  handleSuccessPostSubmitAction() {
+  handleSuccessPostSubmitAction = () => {
     this.resetComponent();
 
     const nextFormFieldsData = this.getFormFieldsData(this.props);
     const nextVaidationState = this.handleInstantFieldsValidation(this.props);
 
-    const resetedState = formUtils.resetState(this.state, nextFormFieldsData, nextVaidationState);
+    const resetedState = utils.resetState(this.state, nextFormFieldsData, nextVaidationState);
 
     this.setState(resetedState);
-  }
+  };
 
 
-  handleFailurePostSubmitAction() {
+  handleFailurePostSubmitAction = () => {
     this.isSubmitting = false;
 
     const nextFormFieldsData = this.getFormFieldsData(this.props);
 
     this.setState(nextFormFieldsData);
-  }
+  };
 
 
-  getFormProps() {
-    return { form: formUtils.createFormProps(this) };
-  }
+  printDeprecationWarning = () => {
+    if (this.warned) return;
+
+    // eslint-disable-next-line no-console
+    console.error(
+      '[Validation Layer Warning]: Direct rendering of the children is deprecated. ' +
+      'Use children-as-function way to render your form.'
+    );
+    this.warned = true;
+  };
 
 
   render() {
     const { children } = this.props;
-    const formProps    = this.getFormProps();
+    const formProps = utils.createFormProps(this);
 
-    return React.cloneElement(children, formProps);
+    if (typeof children === 'function') {
+      return children(formProps);
+    }
+
+    this.printDeprecationWarning();
+    return React.cloneElement(children, { form: formProps });
   }
 
 }

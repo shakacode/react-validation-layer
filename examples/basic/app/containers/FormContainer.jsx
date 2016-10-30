@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { ValidationLayer }  from 'react-validation-layer';
+import ValidationLayer from 'react-validation-layer';
 
 import Form from '../components/Form';
 
@@ -7,7 +7,7 @@ export default class FormContainer extends React.Component {
 
   static propTypes = {
     articleData: PropTypes.shape({
-      title  : PropTypes.string,
+      title: PropTypes.string,
       content: PropTypes.string,
     }).isRequired,
     updateFormState: PropTypes.func.isRequired,
@@ -16,11 +16,11 @@ export default class FormContainer extends React.Component {
   getFormFields() {
     return [
       {
-        attr    : 'title',
+        attr: 'title',
         validate: this.validateTitle,
       },
       {
-        attr    : 'content',
+        attr: 'content',
         validate: this.validateContent,
       },
     ];
@@ -29,7 +29,7 @@ export default class FormContainer extends React.Component {
   validateTitle(value) {
     if (!value) {
       return {
-        valid  : false,
+        valid: false,
         message: 'Title is required',
       };
     }
@@ -40,7 +40,7 @@ export default class FormContainer extends React.Component {
   validateContent(value) {
     if (!value) {
       return {
-        valid  : false,
+        valid: false,
         message: 'Content is required',
       };
     }
@@ -49,6 +49,7 @@ export default class FormContainer extends React.Component {
   }
 
   handleSubmit() {
+    // eslint-disable-next-line no-alert, no-undef
     window.alert('Form is valid and submitted!');
   }
 

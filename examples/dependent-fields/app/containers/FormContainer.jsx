@@ -1,15 +1,15 @@
 import React, { PropTypes } from 'react';
-import { ValidationLayer }  from 'react-validation-layer';
+import ValidationLayer from 'react-validation-layer';
 
-import Form            from '../components/Form';
+import Form from '../components/Form';
 import * as validators from '../validators';
 
 export default class FormContainer extends React.Component {
 
   static propTypes = {
     loginData: PropTypes.shape({
-      email               : PropTypes.string,
-      password            : PropTypes.string,
+      email: PropTypes.string,
+      password: PropTypes.string,
       passwordConfirmation: PropTypes.string,
     }).isRequired,
     updateFormState: PropTypes.func.isRequired,
@@ -18,21 +18,25 @@ export default class FormContainer extends React.Component {
   getFormFields() {
     return [
       {
-        attr    : 'email',
+        attr: 'email',
         validate: validators.email,
+        feedbackStrategy: 'onSuccessOrFirstBlur',
       },
       {
-        attr    : 'password',
+        attr: 'password',
         validate: validators.password,
+        feedbackStrategy: 'instantTouchedOnly',
       },
       {
-        attr    : 'passwordConfirmation',
+        attr: 'passwordConfirmation',
         validate: validators.passwordConfirmation,
+        feedbackStrategy: 'instantTouchedOnly',
       },
     ];
   }
 
   handleSubmit() {
+    // eslint-disable-next-line no-alert, no-undef
     window.alert('Form is valid and submitted!');
   }
 
@@ -43,14 +47,13 @@ export default class FormContainer extends React.Component {
       <ValidationLayer
         {...this.props}
         dataKey="loginData"
-        feedbackStrategy="onSuccessOrFirstBlur"
         fields={this.getFormFields()}
         handlers={{
           onChange: props.updateFormState,
           onSubmit: this.handleSubmit,
         }}
       >
-        <Form {...this.props} />
+        {form => <Form {...{ form }} />}
       </ValidationLayer>
     );
   }

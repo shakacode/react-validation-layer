@@ -1,13 +1,11 @@
-import * as formUtils from '../utils';
+import * as utils from '../utils';
 
-export default function onFirstBlur(context, field, data, statuses, e) {
-  if (!e || e.type === 'blur') {
-    const validationState = (
-      formUtils.normalizeValidationResults(
-        field.validate,
-        data.value,
-        context.props
-      )
+export default function onFirstBlur(context, field, data, statuses, event) {
+  if (!event || event.type === 'blur') {
+    const validationState = utils.normalizeValidationResults(
+      field.validate,
+      data.value,
+      context.props
     );
 
     if (!validationState.valid) {

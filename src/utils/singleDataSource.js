@@ -1,9 +1,7 @@
 export function singleDataSource(props) {
   const dataKeys = [];
 
-  if (props.dataKey) {
-    dataKeys.push(props.dataKey);
-  }
+  if (props.dataKey) dataKeys.push(props.dataKey);
 
   for (const field of props.fields) {
     if (field.dataKey && !dataKeys.includes(field.dataKey)) {

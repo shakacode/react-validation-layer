@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import classNames           from 'classnames';
+import classNames from 'classnames';
 
 import styles from './styles.scss';
 
@@ -7,9 +7,9 @@ export default class Form extends React.Component {
 
   static propTypes = {
     form: PropTypes.shape({
-      getPropsFor : PropTypes.func.isRequired,
+      getPropsFor: PropTypes.func.isRequired,
       getStatusFor: PropTypes.func.isRequired,
-      getDomIdFor : PropTypes.func.isRequired,
+      getDomIdFor: PropTypes.func.isRequired,
       handleSubmit: PropTypes.func.isRequired,
     }),
   };

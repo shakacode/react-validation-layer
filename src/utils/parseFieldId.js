@@ -1,7 +1,9 @@
-import { formConstants } from '../enums/formConstants';
+/* eslint-disable key-spacing */
+
+import Constant from '../enums/Constant';
 
 export function parseFieldId(id) {
-  const parsedId = id.split(formConstants.FIELD_ID_DELIMITER);
+  const parsedId = id.split(Constant.FIELD_ID_DELIMITER);
   const isMultiEntities = parsedId.length === 3;
 
   if (isMultiEntities) {

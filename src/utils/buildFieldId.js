@@ -1,7 +1,7 @@
-import { formConstants } from '../enums/formConstants';
+import Constant from '../enums/Constant';
 
 export function buildFieldId(dataKey, entityId, attr) {
-  const _ = formConstants.FIELD_ID_DELIMITER;
+  const _ = Constant.FIELD_ID_DELIMITER;
 
   return (
     entityId ?

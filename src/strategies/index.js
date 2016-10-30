@@ -1,21 +1,23 @@
-import { feedbackStrategies } from '../enums/feedbackStrategies';
+/* eslint-disable key-spacing */
 
-import instant              from './instant';
-import instantChangedOnly   from './instantChangedOnly';
-import onChange             from './onChange';
-import onBlurOnly           from './onBlurOnly';
-import onFirstBlur          from './onFirstBlur';
-import onSubmit             from './onSubmit';
-import onSuccess            from './onSuccess';
+import FeedbackStrategy from '../enums/FeedbackStrategy';
+
+import instant from './instant';
+import instantTouchedOnly from './instantTouchedOnly';
+import onChange from './onChange';
+import onBlurOnly from './onBlurOnly';
+import onFirstBlur from './onFirstBlur';
+import onSuccess from './onSuccess';
 import onSuccessOrFirstBlur from './onSuccessOrFirstBlur';
+import onSubmit from './onSubmit';
 
 export default {
-  [feedbackStrategies.INSTANT]                 : instant,
-  [feedbackStrategies.INSTANT_CHANGED_ONLY]    : instantChangedOnly,
-  [feedbackStrategies.ON_CHANGE]               : onChange,
-  [feedbackStrategies.ON_BLUR_ONLY]            : onBlurOnly,
-  [feedbackStrategies.ON_FIRST_BLUR]           : onFirstBlur,
-  [feedbackStrategies.ON_SUBMIT]               : onSubmit,
-  [feedbackStrategies.ON_SUCCESS]              : onSuccess,
-  [feedbackStrategies.ON_SUCCESS_OR_FIRST_BLUR]: onSuccessOrFirstBlur,
+  [FeedbackStrategy.INSTANT]                 : instant,
+  [FeedbackStrategy.INSTANT_TOUCHED_ONLY]    : instantTouchedOnly,
+  [FeedbackStrategy.ON_CHANGE]               : onChange,
+  [FeedbackStrategy.ON_BLUR_ONLY]            : onBlurOnly,
+  [FeedbackStrategy.ON_FIRST_BLUR]           : onFirstBlur,
+  [FeedbackStrategy.ON_SUCCESS]              : onSuccess,
+  [FeedbackStrategy.ON_SUCCESS_OR_FIRST_BLUR]: onSuccessOrFirstBlur,
+  [FeedbackStrategy.ON_SUBMIT]               : onSubmit,
 };

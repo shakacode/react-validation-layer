@@ -8,8 +8,8 @@ export default class AppContainer extends React.Component {
     super(props, context);
 
     this.state = {
-      email               : null,
-      password            : null,
+      email: null,
+      password: null,
       passwordConfirmation: null,
     };
 

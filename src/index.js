@@ -1,2 +1,6 @@
+// ValidationLayer
 export { ValidationLayer as default } from './ValidationLayer';
-export { formUtils }                  from './utils/indexPublic';
+
+// Public utils
+export { buildFieldDomId } from './utils/buildFieldDomId';
+export { normalizeValidationResults } from './utils/normalizeValidationResults';

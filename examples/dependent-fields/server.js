@@ -1,29 +1,29 @@
-/* eslint no-console: 0 */
+/* eslint-disable no-console, import/no-extraneous-dependencies */
 
-import express              from 'express';
-import bodyParser           from 'body-parser';
-import webpack              from 'webpack';
+import express from 'express';
+import bodyParser from 'body-parser';
+import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
-import config     from './webpack.config';
+import config from './webpack.config';
 import middleware from './dev/middlewares/app';
 
 
 const PORT = 4000;
 
-const server   = express();
+const server = express();
 const compiler = webpack(config);
 
 server.use(webpackDevMiddleware(compiler, {
-  publicPath        : config.output.publicPath,
-  hot               : true,
+  publicPath: config.output.publicPath,
+  hot: true,
   historyApiFallback: true,
-  stats             : {
-    colors  : true,
-    hash    : false,
-    version : false,
-    chunks  : false,
+  stats: {
+    colors: true,
+    hash: false,
+    version: false,
+    chunks: false,
     children: false,
   },
 }));

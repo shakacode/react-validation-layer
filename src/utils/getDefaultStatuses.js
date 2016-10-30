@@ -1,8 +1,8 @@
-import { defaultStatuses } from '../enums/defaultStatuses';
+import DefaultStatus from '../enums/DefaultStatus';
 
 export function getDefaultStatuses(props) {
   return {
-    success: props.successStatus || defaultStatuses.SUCCESS,
-    error  : props.errorStatus || defaultStatuses.ERROR,
+    success: props.successStatus || DefaultStatus.SUCCESS,
+    error: props.errorStatus || DefaultStatus.ERROR,
   };
 }

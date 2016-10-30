@@ -1,13 +1,13 @@
-import * as formUtils from '../utils';
-import strategies     from '../strategies';
+import * as utils from '../utils';
+import strategies from '../strategies';
 
 export function applyStrategy(context, field, data, e) {
   const { props } = context;
 
-  const feedbackStrategy = formUtils.getStrategy(context, field);
-  const statuses = formUtils.getDefaultStatuses(props);
+  const feedbackStrategy = utils.getStrategy(context, field);
+  const statuses = utils.getDefaultStatuses(props);
 
-  const stateKey = formUtils.buildFieldValidationStateId(data.fieldId);
+  const stateKey = utils.buildFieldValidationStateId(data.fieldId);
   const strategy = strategies[feedbackStrategy];
   const validationState = strategy(context, field, data, statuses, e);
 

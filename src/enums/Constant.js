@@ -1,4 +1,6 @@
-export const formConstants = Object.freeze({
+/* eslint-disable key-spacing */
+
+export default Object.freeze({
   COLLECTION_DATA_TYPE               : 'collection',
   FIELD_ID_DATA_ATTRIBUTE            : 'data-fieldid',
   FIELD_ID_DELIMITER                 : '.',
