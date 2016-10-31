@@ -12,6 +12,7 @@ export function createFormProps(context) {
     if (dataType === Constant.FIELD_DATA_STATE_ID_PREFIX) {
       fields[fieldId].props = context.state[fieldStateId];
     } else {
+      fields[fieldId].valid = context.state[fieldStateId].valid;
       fields[fieldId].message = context.state[fieldStateId].message;
       fields[fieldId].status = context.state[fieldStateId].status;
     }
@@ -66,7 +67,6 @@ export function createFormProps(context) {
     return customProps;
   }
 
-  // TODO: Rename
   function getValidityFor(...keyPath) {
     const fieldId = utils.getFieldIdFromKeyPath(singleDataSource, keyPath);
     return this.fields[fieldId].valid;

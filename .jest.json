@@ -1,0 +1,3 @@
+{
+  "testPathIgnorePatterns": ["<rootDir>/node_modules/", "<rootDir>/__tests__/utils"]
+}

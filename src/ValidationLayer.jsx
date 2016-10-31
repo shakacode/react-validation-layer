@@ -274,6 +274,8 @@ export class ValidationLayer extends React.Component {
 
 
   handleBlur = (domData, event, isCustom = false) => {
+    this.setTouchedField(domData.fieldId);
+
     const { props } = this;
 
     const field = utils.getField(props, domData);
@@ -292,6 +294,7 @@ export class ValidationLayer extends React.Component {
     const feedbackStrategy = utils.getStrategy(this, field);
 
     if (
+      feedbackStrategy === FeedbackStrategy.INSTANT_TOUCHED_ONLY ||
       feedbackStrategy === FeedbackStrategy.ON_FIRST_BLUR ||
       feedbackStrategy === FeedbackStrategy.ON_BLUR_ONLY ||
       feedbackStrategy === FeedbackStrategy.ON_SUCCESS_OR_FIRST_BLUR
