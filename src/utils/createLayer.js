@@ -1,7 +1,7 @@
 import * as utils from '../utils';
 import Constant from '../enums/Constant';
 
-export function createFormProps(context) {
+export function createLayer(context) {
   const fields = {};
 
   for (const fieldStateId of Object.keys(context.state)) {

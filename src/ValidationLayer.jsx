@@ -445,14 +445,14 @@ export class ValidationLayer extends React.Component {
 
   render() {
     const { children } = this.props;
-    const formProps = utils.createFormProps(this);
+    const layer = utils.createLayer(this);
 
     if (typeof children === 'function') {
-      return children(formProps);
+      return children(layer);
     }
 
     this.printDeprecationWarning();
-    return React.cloneElement(children, { form: formProps });
+    return React.cloneElement(children, { form: layer });
   }
 
 }
