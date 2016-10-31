@@ -25,7 +25,7 @@ npm install --save react-validation-layer
 
 ```js
 <ValidationLayer
-  data={formData}
+  data={{ email, password }}
   fields={[ emailParams, passwordParams ]}
   feedbackStrategy="onChange"
 >
@@ -187,9 +187,13 @@ Validation Layer emits first results only after first submission attempt. After 
 ### Required
 * [ ] Add tests!
 
+### Bugs
+* [ ] Fix messages emitting (should be in sync w/ `status`)
+
 ### API
 * [ ] Get rid of `dataKey`, pass `data` directly
 * [ ] Rename `field.attr` to `field.name`
+* [ ] Add `layerId` to namespace domIds
 
 ### Features
 * [ ] Add async validations
