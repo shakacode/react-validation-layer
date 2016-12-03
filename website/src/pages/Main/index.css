@@ -1,0 +1,9 @@
+.main-section {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.main-title {
+  display: flex;
+  font-size: 2.5em;
+}

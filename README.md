@@ -5,7 +5,8 @@
 [![dependencies status](https://img.shields.io/gemnasium/shakacode/react-validation-layer.svg?style=flat-square)](https://gemnasium.com/shakacode/react-validation-layer)
 [![license](https://img.shields.io/npm/l/react-validation-layer.svg?style=flat-square)](https://www.npmjs.com/package/react-validation-layer)
 
-Form validation layer for every React based app.
+Form validation layer for React apps.
+
 
 ## Installation
 
@@ -19,14 +20,18 @@ yarn add react-validation-layer
 npm install --save react-validation-layer
 ```
 
+
 ## Usage
 
-[... WIP ...]
+[ ... WIP: move all docs to `website/docs` ... ]
 
 ```js
 <ValidationLayer
   data={{ email, password }}
-  fields={[ emailParams, passwordParams ]}
+  fields={{
+    email: emailFieldParams,
+    password: passwordFieldParams,
+  }}
   feedbackStrategy="onChange"
 >
   {layer => (
@@ -39,6 +44,7 @@ npm install --save react-validation-layer
 </ValidationLayer>
 ```
 
+
 ### Configure
 
 #### `data`
@@ -49,11 +55,10 @@ type Data = { [key: string]: any };
 ```
 
 #### `fields`
-Array w/ form fields params.
+Object with form fields params.
 
 ```js
-type Fields = {
-  name: string | Array<string>,
+type Field = {
   feedbackStrategy?: FeedbackStrategy,
   validate?: (value: Value, props: Props) => boolean | ValidationResults,
   validateAsync?: (value: Value, props: Props) => Promise,
@@ -66,14 +71,46 @@ type Fields = {
   omitOnChange?: boolean,
   omitOnBlur?: boolean,
 };
+
+type Fields = { [attribute: string]: Field | Fields };
 ```
 
-##### `field.name`
-Name of the field — `string` or `Array<string>`. ValidationLayer will use it to get the value for this field: `props.data[field.name]`.
-`name` can be array of strings, which is key path to nested attribute in case if `data` object has nested entities (it's not yet implemented).
+**Flat structure**<br>
+In case if `data` is flat, `fields` object will also be flat:
 
 ```js
-name: string | Array<string>
+const data = {
+  username: 'alex',
+  email: 'alex@domain.com',
+};
+
+const fields = {
+  username: true, // no params, but letting layer know about this field
+  email: { validate: email => !!email }, // params for `email` field
+};
+```
+
+**Nested structure**<br>
+Sometimes `data` is nested, `fields` object must alter the shape of the `data` object:
+
+```js
+const data = {
+  username: 'alex',
+  email: 'alex@domain.com',
+  creditCard: {
+    number: '1234567890',
+    owner: 'ALEX FEDOSEEV',
+  },
+};
+
+const fields = {
+  username: true, // no params, but letting layer know about this field
+  email: { validate: email => !!email }, // params for `email` field
+  creditCard: {
+    number: { validate: number => !!number },
+    owner: { validate: owner => !!owner },
+  },
+};
 ```
 
 ##### `field.feedbackStrategy`
@@ -83,7 +120,7 @@ See [#strategies](#strategies).
 feedbackStrategy?: FeedbackStrategy
 
 type FeedbackStrategy = (
-  | 'instant'
+    'instant'
   | 'instantTouchedOnly'
   | 'onChange'
   | 'onBlurOnly'
@@ -134,7 +171,6 @@ In a certain way this is opposite to previous method. If you want to format your
 transformBeforeRender?: (value: Value) => DomValue
 ```
 
-
 ##### `field.handlers`
 `TODO`
 
@@ -180,30 +216,6 @@ Validation Layer emits first results only after first submission attempt. After 
 -
 
 **N.B.** Keep in mind that single strategy can be set for all the fields globally (root prop `feedbackStrategy` of `<ValidationLayer />`), as well as on per-field basis (`fields[field].feedbackStrategy`). Field-level strategy has higher priority, so, if it's set, it will override global strategy for current field.
-
-
-## TODO
-
-### Required
-* [ ] Add tests!
-
-### Bugs
-* [ ] Fix messages emitting (should be in sync w/ `status`)
-
-### API
-* [ ] Get rid of `dataKey`, pass `data` directly
-* [ ] Rename `field.attr` to `field.name`
-* [ ] Add `layerId` to namespace domIds
-
-### Features
-* [ ] Add async validations
-* [ ] Add button props
-* [ ] Add collections handling
-* [ ] Add refs -> focus on first invalid node on submit
-
-### Optimizations
-* [ ] Pass callback to `setState` (instead of plain object)
-* [ ] Use Flow
 
 
 ## License
