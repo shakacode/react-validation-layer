@@ -9,8 +9,13 @@ export default function onSuccess(context, field, data, statuses, event) {
 
   if (validationState.valid && data.value) {
     validationState.status = validationState.status || statuses.success;
-  } else if (!data.value && event.type === 'change') {
+  } else if (
+    (!validationState.valid && data.value) ||
+    (!data.value && event.type === 'change')
+  ) {
+    validationState.valid = null;
     validationState.status = null;
+    validationState.message = null;
   }
 
   return validationState;
