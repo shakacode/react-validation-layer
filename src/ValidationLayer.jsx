@@ -111,6 +111,7 @@ export class ValidationLayer extends React.Component {
 
     this.touchedFields = {};
     this.bluredFields = {};
+    this.emittedFields = {};
 
     this.isSubmitting = false;
     this.formWasSubmitted = false;
@@ -129,6 +130,13 @@ export class ValidationLayer extends React.Component {
       this.bluredFields[fieldId] = true;
     }
     this.setTouchedField(fieldId);
+  };
+
+
+  setEmittedField = (fieldId) => {
+    if (!this.emittedFields[fieldId]) {
+      this.emittedFields[fieldId] = true;
+    }
   };
 
 
@@ -287,9 +295,7 @@ export class ValidationLayer extends React.Component {
       domData.value = transformBeforeStore(domData.value);
     }
 
-    if (!isCustom && handleBlur) {
-      handleBlur(domData, event);
-    }
+    if (!isCustom && handleBlur) handleBlur(domData, event);
 
     const feedbackStrategy = utils.getStrategy(this, field);
 
@@ -379,7 +385,7 @@ export class ValidationLayer extends React.Component {
       this.formWasSubmitted = true;
     }
 
-    if (event && event.preventDefault) {
+    if (event && event.preventDefault && !event.defaultPrevented) {
       event.preventDefault();
     }
 
@@ -406,7 +412,10 @@ export class ValidationLayer extends React.Component {
 
 
   performSubmit = () => {
-    this.props.handlers.onSubmit(this.handleSuccessPostSubmitAction);
+    this.props.handlers.onSubmit({
+      onSuccess: this.handleSuccessPostSubmitAction,
+      onFailure: this.handleFailurePostSubmitAction,
+    });
   };
 
 
