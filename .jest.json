@@ -1,3 +1,8 @@
 {
-  "testPathIgnorePatterns": ["<rootDir>/node_modules/", "<rootDir>/__tests__/utils"]
+  "testPathIgnorePatterns": [
+    "<rootDir>/node_modules/",
+    "<rootDir>/website/",
+    "<rootDir>/__tests__/factories",
+    "<rootDir>/__tests__/helpers"
+  ]
 }

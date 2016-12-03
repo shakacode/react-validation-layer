@@ -1,7 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { mockLayerProps } from './utils';
+import { mockLayerProps } from './helpers';
+
+import * as emailField from './factories/fields/email';
+import * as passwordField from './factories/fields/password';
 
 import ValidationLayer from '../src';
 
@@ -11,7 +14,7 @@ describe('layer', () => {
     const layerProps = mockLayerProps({
       feedbackStrategy: 'onSubmit',
       data: { email: 'my@email.com', password: 'mypassword' },
-      fields: [{ attr: 'email' }, { attr: 'password' }],
+      fields: [emailField.noValidation(), passwordField.noValidation()],
     });
 
     let layer;

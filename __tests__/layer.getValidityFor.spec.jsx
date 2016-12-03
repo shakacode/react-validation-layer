@@ -1,57 +1,25 @@
-import React from 'react';
-import { mount } from 'enzyme';
-
-import { mockLayerProps } from './utils';
-
-import ValidationLayer from '../src';
-
+import * as passwordField from './factories/fields/password';
+import { mountPasswordForm } from './factories/forms/PasswordForm';
 
 describe('layer.getValidityFor()', () => {
   it('returns correct validity', () => {
-    const layerProps = mockLayerProps({
+    const Form = mountPasswordForm({
       feedbackStrategy: 'onChange',
-      data: { email: '' },
-      fields: [{
-        attr: 'email',
-        validate: v => !!v && /.*@.*\..*/.test(v),
-      }],
+      data: { password: null },
+      fields: [passwordField.validatePresenceAndLengthWithBoolOutput()],
     });
 
-    const printValidity = (valid) => {
-      switch (valid) {
-        case true:
-          return 'valid';
-        case false:
-          return 'invalid';
-        default:
-          return 'none';
-      }
-    };
+    // No validity reported on mount
+    expect(Form.find('.password-validity').text()).toBe('none');
 
-    const Form = mount(
-      <ValidationLayer {...layerProps}>
-        {layer => (
-          <div>
-            <input type="text" className="input" {...layer.getPropsFor('email')} />
-            <span className="validity">
-              {printValidity(layer.getValidityFor('email'))}
-            </span>
-          </div>
-        )}
-      </ValidationLayer>
-    );
+    // Should be valid on valid password
+    Form.setProps({ data: { password: '1234' } });
+    Form.find('.password-input').simulate('change');
+    expect(Form.find('.password-validity').text()).toBe('valid');
 
-    // No validity on mount
-    expect(Form.find('.validity').text()).toBe('none');
-
-    // Should be valid on valid email
-    Form.setProps({ data: { email: 'valid@email.com' } });
-    Form.find('.input').simulate('change');
-    expect(Form.find('.validity').text()).toBe('valid');
-
-    // Should be invalid on invalid email
-    Form.setProps({ data: { email: 'invalid@email' } });
-    Form.find('.input').simulate('change');
-    expect(Form.find('.validity').text()).toBe('invalid');
+    // Should be invalid on invalid password
+    Form.setProps({ data: { password: '123' } });
+    Form.find('.password-input').simulate('change');
+    expect(Form.find('.password-validity').text()).toBe('invalid');
   });
 });

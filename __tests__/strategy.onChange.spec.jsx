@@ -1,7 +1,7 @@
 import { mountLoginForm } from './factories/forms/LoginForm';
 
-describe('strategy.instantTouchedOnly', () => {
-  const mountForm = () => mountLoginForm({ feedbackStrategy: 'instantTouchedOnly' });
+describe('strategy.onChange', () => {
+  const mountForm = () => mountLoginForm({ feedbackStrategy: 'onChange' });
 
   it('does not emit results on mount', () => {
     const Form = mountForm();
@@ -17,34 +17,20 @@ describe('strategy.instantTouchedOnly', () => {
   });
 
 
-  it('emits results on blur', () => {
+  it('does not emit results on blur', () => {
     const Form = mountForm();
 
     // User blures from the `email` field
     Form.find('.email-input').simulate('blur');
 
-    // Error for `email` is shown
-    expect(Form.find('.email-message').text()).toBe('Email is required');
-    expect(Form.find('.email-wrapper').hasClass('error')).toBe(true);
+    // Still no results are shown
+    expect(Form.find('.email-message').length).toBe(0);
+    expect(Form.find('.email-wrapper').hasClass('error')).toBe(false);
     expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
 
-    // Still no results for `password`
     expect(Form.find('.password-message').length).toBe(0);
     expect(Form.find('.password-wrapper').hasClass('error')).toBe(false);
     expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
-
-    // User blures from the `password` field
-    Form.find('.password-input').simulate('blur');
-
-    // Error for `password` is shown
-    expect(Form.find('.password-message').text()).toBe('Password is required');
-    expect(Form.find('.password-wrapper').hasClass('error')).toBe(true);
-    expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
-
-    // Error for `email` is still there
-    expect(Form.find('.email-message').text()).toBe('Email is required');
-    expect(Form.find('.email-wrapper').hasClass('error')).toBe(true);
-    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
   });
 
 
@@ -127,8 +113,5 @@ describe('strategy.instantTouchedOnly', () => {
     expect(Form.find('.email-message').text()).toBe('Email is invalid');
     expect(Form.find('.email-wrapper').hasClass('error')).toBe(true);
     expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
-
-    // Yay!
-    expect(true).toBe(true);
   });
 });
