@@ -444,7 +444,7 @@ export class ValidationLayer extends React.Component {
     if (this.warned) return;
 
     // eslint-disable-next-line no-console
-    console.error(
+    console.warn(
       '[Validation Layer Warning]: Direct rendering of the children is deprecated. ' +
       'Use children-as-function way to render your form.'
     );
