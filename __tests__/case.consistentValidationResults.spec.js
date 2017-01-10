@@ -45,7 +45,7 @@ describe('case.consistentValidationResults', () => {
   });
 
 
-  it('emits consistent results onSuccess when invalid state reported as object & valid as boolean', () => {
+  xit('emits consistent results onSuccess when invalid state reported as object & valid as boolean', () => {
     const Form = mountPasswordForm({
       feedbackStrategy: 'onSuccess',
       data: { password: null },

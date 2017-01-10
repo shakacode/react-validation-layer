@@ -66,7 +66,7 @@ describe('strategy.onSuccess', () => {
   });
 
 
-  it('emits results on invalid data after first results were emitted', () => {
+  xit('emits results on invalid data after first results were emitted', () => {
     const Form = mountForm();
 
     // User types valid `email`
