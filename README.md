@@ -27,12 +27,12 @@ npm install --save react-validation-layer
 
 ```js
 <ValidationLayer
+  strategy="onFirstBlur"
   data={{ email, password }}
   fields={{
     email: emailFieldParams,
     password: passwordFieldParams,
   }}
-  feedbackStrategy="onChange"
 >
   {layer => (
     <form onSubmit={layer.handleSubmit}>
@@ -58,24 +58,22 @@ type Data = { [key: string]: any };
 Object with form fields params.
 
 ```js
-type Field = {
-  feedbackStrategy?: FeedbackStrategy,
+type Field = boolean | {
+  strategy?: Strategy,
   validate?: (value: Value, props: Props) => boolean | ValidationResults,
   validateAsync?: (value: Value, props: Props) => Promise,
   filter?: (value: DomValue, props: Props) => boolean,
-  transformBeforeStore?: (value: DomValue) => Value,
-  transformBeforeRender?: (value: Value) => DomValue,
+  transformBeforeStore?: (value: DomValue, props: Props) => Value,
+  transformBeforeRender?: (value: Value, props: Props) => DomValue,
   handlers?: Handlers,
-  omitDomId?: boolean,
-  omitRef?: boolean,
-  omitOnChange?: boolean,
-  omitOnBlur?: boolean,
 };
 
 type Fields = { [attribute: string]: Field | Fields };
 ```
 
-**Flat structure**<br>
+If a field doesn't have validations and other special handlers, then its field value should be set to `true` to let the layer know that this field exists, thus it can serve props for it.
+
+**Flat structures**<br>
 In case if `data` is flat, `fields` object will also be flat:
 
 ```js
@@ -90,7 +88,7 @@ const fields = {
 };
 ```
 
-**Nested structure**<br>
+**Nested structures**<br>
 Sometimes `data` is nested, `fields` object must alter the shape of the `data` object:
 
 ```js
@@ -113,21 +111,20 @@ const fields = {
 };
 ```
 
-##### `field.feedbackStrategy`
+##### `field.strategy`
 See [#strategies](#strategies).
 
 ```js
-feedbackStrategy?: FeedbackStrategy
+strategy?: Strategy
 
-type FeedbackStrategy = (
+type Strategy = (
     'instant'
   | 'instantTouchedOnly'
-  | 'onChange'
-  | 'onBlurOnly'
+  | 'onFirstChange'
   | 'onFirstBlur'
-  | 'onSuccess'
-  | 'onSuccessOrFirstBlur'
-  | 'onSubmit'
+  | 'onFirstSuccess'
+  | 'onFirstSuccessOrFirstBlur'
+  | 'onFirstSubmit'
 );
 ```
 
@@ -135,9 +132,9 @@ type FeedbackStrategy = (
 Validation function, which takes value and props object (this is props that were passed to `<ValidationLayer />`). It can return boolean or object:
 
 ```js
-validate?: (value: Value, props: Props) => boolean | ValidationResults
+validate?: (value: Value, props: Props) => ValidationResults
 
-type ValidationResults = {
+type ValidationResults = boolean | {
   valid: boolean,
   message?: string,
   status?: string,
@@ -161,61 +158,53 @@ filter?: (value: DomValue, props: Props) => boolean
 * in the view we want `creditCard` to be shown w/ spaces (eg `1234 5678 8765 4321`), but inside the data store it should be spaceless: `1234567887654321`.
 
 ```js
-transformBeforeStore?: (value: DomValue) => Value
+transformBeforeStore?: (value: DomValue, props: Props) => Value
 ```
 
 ##### `field.transformBeforeRender`
-In a certain way this is opposite to previous method. If you want to format your number or represent credit card w/ spaces in the form field—you can make it happen w/ this function.
+In a certain way, this is opposite to previous method. If you want to format your number or represent credit card w/ spaces in the form field—you can make it happen using this hook.
 
 ```js
-transformBeforeRender?: (value: Value) => DomValue
+transformBeforeRender?: (value: Value, props: Props) => DomValue
 ```
 
 ##### `field.handlers`
 `TODO`
 
-##### `field.omitDomId`
-`TODO`
 
-##### `field.omitRef`
-`TODO`
+### Sync strategies
 
-##### `field.omitOnChange`
-`TODO`
+#### `instant` sync strategies
+Instant strategies validate and emit results for all fields on every props update (i.e. re-render).
 
-##### `field.omitOnBlur`
-`TODO`
-
-
-### Strategies
-
-#### `instant`
+##### `instant`
 Validation Layer emits results immediately for all fields right on component mount. Results will be emitted instantly for all fields on every change in every field.
 
-#### `instantTouchedOnly`
-Validation Layer emits results instantly for all fields that were touched by the user (`changed` or `focused -> blured`).
+##### `instantTouchedOnly`
+Validation Layer emits results instantly for all fields that were touched by the user (`changed` or `focused then-> blured`).
 
-#### `onChange`
-Validation Layer emits results for the single field on every change. Note that first validation will be performed only after first change.
 
-#### `onSuccess`
-Validation Layer emits results on first successful validation. After first results were emitted—feedback is instant.
+#### `on` sync strategies
+In most cases validation feedback should be provided as soon as possible, but not too soon. The question comes down to when start to provide this feedback. Strategies below trigger immediate feedback at the specific moment, e.g. on first blur from the field or on first successful validation. To get the meaning of each strategy add the following prefix to its name: "Start to provide as-user-types feedback on..."
 
-#### `onFirstBlur`
+##### `onFirstChange`
+Validation Layer emits results for the single field as user types. Note that first validation will be performed only after first change.
+
+##### `onFirstBlur`
 Validation Layer emits results on first blur. After first results were emitted—feedback is instant.
 
-#### `onBlurOnly`
-Validation Layer emits results only on blur.
+##### `onFirstSuccess`
+Validation Layer emits results on first successful validation. After first results were emitted—feedback is instant.
 
-#### `onSuccessOrFirstBlur`
+##### `onFirstSuccessOrFirstBlur`
 Validation Layer emits first results immediately on successful validation or on first blur. After first results were emitted—feedback is instant.
 
-#### `onSubmit`
+##### `onFirstSubmit`
 Validation Layer emits first results only after first submission attempt. After this all fields are switched to instant feedback strategy until validation layer will be reseted or remounted.
 
 -
 
-**N.B.** Keep in mind that single strategy can be set for all the fields globally (root prop `feedbackStrategy` of `<ValidationLayer />`), as well as on per-field basis (`fields[field].feedbackStrategy`). Field-level strategy has higher priority, so, if it's set, it will override global strategy for current field.
+**N.B.** Keep in mind that single strategy can be set for all the fields globally (root prop `strategy` of `<ValidationLayer />`), as well as on per-field basis (`fields[field].strategy`). Field-level strategy has higher priority, so, if it's set, it will override global strategy for current field.
 
 
 ## License

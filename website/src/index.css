@@ -77,6 +77,10 @@ body,
   margin-bottom: 20px;
 }
 
+.label-paceholder {
+  width: 115px;
+}
+
 label {
   display: inline-flex;
   justify-content: flex-end;
@@ -101,10 +105,10 @@ input {
   font-size: 14px;
 }
 
-.success {
+.success .form-message {
   color: green;
 }
 
-.error {
+.failure .form-message {
   color: red;
 }

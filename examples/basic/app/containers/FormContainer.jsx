@@ -60,7 +60,7 @@ export default class FormContainer extends React.Component {
       <ValidationLayer
         {...this.props}
         dataKey="articleData"
-        feedbackStrategy="onSubmit"
+        strategy="onFirstSubmit"
         fields={this.getFormFields()}
         handlers={{
           onChange: props.updateFormState,

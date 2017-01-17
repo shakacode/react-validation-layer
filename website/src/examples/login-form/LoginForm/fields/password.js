@@ -1,7 +1,15 @@
 export default {
-  attr: 'password',
-  validate: password => !!password || {
-    valid: false,
-    message: 'Password is required',
+  validate: password => {
+    if (!password) {
+      return {
+        valid: false,
+        message: 'Password is required',
+      };
+    }
+
+    return {
+      valid: true,
+      message: 'Nice!',
+    };
   },
 }

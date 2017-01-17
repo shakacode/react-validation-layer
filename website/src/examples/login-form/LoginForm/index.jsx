@@ -6,19 +6,19 @@ import password from './fields/password';
 
 import ValidationLayer from '../../../../../lib';
 
-const LoginForm = ({ loginData, updateFormState }) => (
+const LoginForm = ({ loginData, updateFormState, submitForm }) => (
   <ValidationLayer
-    feedbackStrategy="onSuccessOrFirstBlur"
-    dataKey="data"
+    id="loginForm"
     data={loginData}
-    fields={[email, password]}
+    fields={{ email, password }}
+    strategy="onFirstSuccessOrFirstBlur"
     handlers={{
       onChange: updateFormState,
-      onSubmit: v => v,
+      onSubmit: submitForm,
     }}
   >
     {layer => (
-      <form>
+      <form onSubmit={layer.handleSubmit}>
         <div className={classNames('form-field-wrapper', layer.getStatusFor('email'))}>
           <label htmlFor={layer.getDomIdFor('email')}>
             Email
@@ -40,7 +40,7 @@ const LoginForm = ({ loginData, updateFormState }) => (
           </label>
           <input
             {...layer.getPropsFor('password')}
-            type="text"
+            type="password"
           />
           {
             layer.getMessageFor('password') &&
@@ -48,6 +48,10 @@ const LoginForm = ({ loginData, updateFormState }) => (
               {layer.getMessageFor('password')}
             </div>
           }
+        </div>
+        <div className="form-field-wrapper">
+          <div className="label-paceholder" />
+          <button>Submit</button>
         </div>
       </form>
     )}

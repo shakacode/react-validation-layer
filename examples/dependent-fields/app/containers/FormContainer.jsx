@@ -20,17 +20,17 @@ export default class FormContainer extends React.Component {
       {
         attr: 'email',
         validate: validators.email,
-        feedbackStrategy: 'onSuccessOrFirstBlur',
+        strategy: 'onSuccessOrFirstBlur',
       },
       {
         attr: 'password',
         validate: validators.password,
-        feedbackStrategy: 'instantTouchedOnly',
+        strategy: 'instantTouchedOnly',
       },
       {
         attr: 'passwordConfirmation',
         validate: validators.passwordConfirmation,
-        feedbackStrategy: 'instantTouchedOnly',
+        strategy: 'instantTouchedOnly',
       },
     ];
   }

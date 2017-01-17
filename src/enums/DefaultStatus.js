@@ -1,6 +1,11 @@
+/* @flow */
 /* eslint-disable key-spacing */
 
-export default Object.freeze({
+import type { DefaultStatusEnum } from '../types';
+
+const DefaultStatus: DefaultStatusEnum = Object.freeze({
   SUCCESS: 'success',
-  ERROR  : 'error',
+  FAILURE: 'failure',
 });
+
+export default DefaultStatus;
