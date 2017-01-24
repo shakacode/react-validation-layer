@@ -1,7 +1,6 @@
 const EMAIL_REGEX = /.*@.*\..+/;
 
 export default {
-  attr: 'email',
   validate: email => {
     if (!email) {
       return {
@@ -17,6 +16,9 @@ export default {
       };
     }
 
-    return true;
+    return {
+      valid: true,
+      message: 'Nice!',
+    };
   },
 }

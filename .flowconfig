@@ -1,0 +1,27 @@
+[ignore]
+<PROJECT_ROOT>/lib/.*
+<PROJECT_ROOT>/website/.*
+<PROJECT_ROOT>/examples/.*
+
+# Temporary
+.*/node_modules/fbjs/lib/partitionObjectByKey.js.*
+
+
+[libs]
+./flow-typed/
+
+
+[options]
+module.system=node
+module.use_strict=true
+
+esproposal.class_instance_fields=enable
+esproposal.class_static_fields=enable
+
+suppress_comment=\\(.\\|\n\\)*\\$FlowIssue\\($\\|[^(]\\|(\\(>=0\\.\\(1[0-6]\\|[0-9]\\).[0-9]\\)? *\\(site=[a-z,_]*www[a-z,_]*\\)?)\\)
+suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe\\($\\|[^(]\\|(\\(>=0\\.\\(1[0-6]\\|[0-9]\\).[0-9]\\)? *\\(site=[a-z,_]*www[a-z,_]*\\)?)\\)
+suppress_comment=\\(.\\|\n\\)*\\$FlowIgnoreMe\\($\\|[^(]\\|(\\(>=0\\.\\(1[0-6]\\|[0-9]\\).[0-9]\\)? *\\(site=[a-z,_]*www[a-z,_]*\\)?)\\)
+
+suppress_type=$FlowIssue
+suppress_type=$FlowFixMe
+suppress_type=$FlowIgnoreMe

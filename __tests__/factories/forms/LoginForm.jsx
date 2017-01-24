@@ -1,10 +1,13 @@
+/* @flow */
 /* eslint-disable react/prop-types */
 
 import React from 'react';
 import classNames from 'classnames';
 import { mount } from 'enzyme';
 
-import { mockLayerProps } from '../../helpers';
+import type { Data, Fields, Strategy } from '../../../src/types';
+
+import { mockStrictLayerProps } from '../../helpers';
 
 import * as emailField from '../fields/email';
 import * as passwordField from '../fields/password';
@@ -14,23 +17,31 @@ import ValidationLayer from '../../../src';
 
 const defaultData = { email: null, password: null };
 
-const defaultFields = [
-  emailField.validatePresenceAndShapeWithMessages({
+const defaultFields = {
+  email: emailField.validatePresenceAndShapeWithMessages({
     presence: 'Email is required',
     shape: 'Email is invalid',
   }),
-  passwordField.validatePresenceAndLengthWithMessages({
+  password: passwordField.validatePresenceAndLengthWithMessages({
     presence: 'Password is required',
     length: 'Password is too short',
   }),
-];
+};
+
+type Props = {
+  strategy?: Strategy,
+  id?: string,
+  data?: Data,
+  fields?: Fields,
+};
 
 const LoginForm = ({
-  feedbackStrategy,
+  strategy,
+  id = 'loginForm',
   data = defaultData,
   fields = defaultFields,
-}) => (
-  <ValidationLayer {...mockLayerProps({ feedbackStrategy, data, fields })}>
+}: Props) => (
+  <ValidationLayer {...mockStrictLayerProps({ strategy, id, data, fields })}>
     {layer => (
       <form className="form" onSubmit={layer.handleSubmit}>
         <div className={classNames('email-wrapper', layer.getStatusFor('email'))}>
@@ -65,4 +76,5 @@ const LoginForm = ({
 );
 
 /* eslint-disable new-cap */
-export const mountLoginForm = (...args) => mount(LoginForm(...args));
+export const mountLoginForm =
+  (...args: Array<Props>): * => mount(LoginForm(...args));

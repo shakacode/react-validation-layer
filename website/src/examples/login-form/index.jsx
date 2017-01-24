@@ -14,11 +14,19 @@ export default class LoginFormContainer extends Component {
     this.setState({ [attr]: value });
   };
 
+  submitForm = ({ onSuccess }) => {
+    this.setState({
+      email: null,
+      password: null,
+    }, onSuccess);
+  };
+
   render() {
     return (
       <LoginForm
         loginData={this.state}
         updateFormState={this.updateFormState}
+        submitForm={this.submitForm}
       />
     );
   }

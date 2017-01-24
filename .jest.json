@@ -3,6 +3,7 @@
     "<rootDir>/node_modules/",
     "<rootDir>/website/",
     "<rootDir>/__tests__/factories",
-    "<rootDir>/__tests__/helpers"
+    "<rootDir>/__tests__/helpers",
+    "<rootDir>/__tests__/types"
   ]
 }
