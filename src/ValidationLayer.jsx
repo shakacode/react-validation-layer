@@ -211,6 +211,7 @@ export class ValidationLayer extends React.Component {
     const { props, stateContainer } = this;
 
     stateContainer.setIsSubmitting(true);
+    stateContainer.setAllFieldsTouched();
     stateContainer.setFormWasSubmitted();
 
     if (event && event.preventDefault) {

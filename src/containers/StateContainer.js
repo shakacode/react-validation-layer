@@ -74,6 +74,17 @@ export default class StateContainer {
     }
   };
 
+  setAllFieldsTouched = (): void => {
+    this.touchedFields =
+      this
+        .normalizedFields
+        .map(field => field.id)
+        .reduce((fields, fieldId) => ({
+          ...fields,
+          [fieldId]: true,
+        }), {});
+  };
+
 
   getBluredField = (fieldId: FieldId): ?boolean => this.bluredFields[fieldId];
 
