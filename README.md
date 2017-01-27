@@ -5,7 +5,7 @@
 [![dependencies status](https://img.shields.io/gemnasium/shakacode/react-validation-layer.svg?style=flat-square)](https://gemnasium.com/shakacode/react-validation-layer)
 [![license](https://img.shields.io/npm/l/react-validation-layer.svg?style=flat-square)](https://www.npmjs.com/package/react-validation-layer)
 
-Form validation layer for React apps.
+An opinionated form validation tool for React apps.
 
 
 ## Installation
@@ -89,7 +89,7 @@ const fields = {
 ```
 
 **Nested structures**<br>
-Sometimes `data` is nested, `fields` object must alter the shape of the `data` object:
+Sometimes `data` is nested, `fields` object must replicate the shape of the `data` object:
 
 ```js
 const data = {
@@ -174,7 +174,7 @@ transformBeforeRender?: (value: Value, props: Props) => DomValue
 
 ### Sync strategies
 
-#### `instant` sync strategies
+#### `instant*` sync strategies
 Instant strategies validate and emit results for all fields on every props update (i.e. re-render).
 
 ##### `instant`
@@ -184,23 +184,23 @@ Validation Layer emits results immediately for all fields right on component mou
 Validation Layer emits results instantly for all fields that were touched by the user (`changed` or `focused then-> blured`).
 
 
-#### `on` sync strategies
-In most cases validation feedback should be provided as soon as possible, but not too soon. The question comes down to when start to provide this feedback. Strategies below trigger immediate feedback at the specific moment, e.g. on first blur from the field or on first successful validation. To get the meaning of each strategy add the following prefix to its name: "Start to provide as-user-types feedback on..."
+#### `on*` sync strategies
+In most cases validation feedback should be provided as soon as possible, but not too soon. The question comes down to when to start to provide the feedback. Strategies below don't provide any feedback until the specific moment, e.g. the first blur from the field or the first successful validation. To understand the behavior of each strategy, add the following prefix to its name: "Start providing feedback on..."
 
 ##### `onFirstChange`
-Validation Layer emits results for the single field as user types. Note that first validation will be performed only after first change.
+Validation Layer emits results for the single field as user types. Note that first feedback will be provided only after first change in this field.
 
 ##### `onFirstBlur`
-Validation Layer emits results on first blur. After first results were emitted—feedback is instant.
+Validation Layer emits results on first blur. After first results were emitted—feedback is provided on every change in this field.
 
 ##### `onFirstSuccess`
-Validation Layer emits results on first successful validation. After first results were emitted—feedback is instant.
+Validation Layer emits results on first successful validation. After first results were emitted—feedback is provided on every change in this field.
 
 ##### `onFirstSuccessOrFirstBlur`
-Validation Layer emits first results immediately on successful validation or on first blur. After first results were emitted—feedback is instant.
+Validation Layer emits first results immediately on successful validation or on first blur. After first results were emitted—feedback is provided on every change in this field.
 
 ##### `onFirstSubmit`
-Validation Layer emits first results only after first submission attempt. After this all fields are switched to instant feedback strategy until validation layer will be reseted or remounted.
+Validation Layer emits first results only after first submission attempt. After this results for each field are emitted on every change in this field until validation layer will be reseted or remounted (except fields with `instant` strategies, they will be receiving feedback instantly on every props update).
 
 -
 
