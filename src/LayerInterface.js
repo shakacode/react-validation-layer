@@ -1,56 +1,61 @@
 /* @flow */
-/* eslint-disable no-underscore-dangle */
 
 import type {
-  State,
   LayerId,
   FieldId,
   FieldDomId,
   KeyPath,
   DomValue,
   EnumerableValue,
-  FieldBaseProps,
-  FieldPropsWithChecked,
+  FieldDomProps,
+  FieldDomPropsWithChecked,
+  SubmitButtonDomProps,
+  StateContainer,
+  DomHandler,
   LayerField,
   LayerHandleChange,
   LayerHandleBlur,
   LayerHandleSubmit,
   LayerHandlers,
-} from '../types';
+} from './types';
 
-import StateContainer from '../containers/StateContainer';
-
-import Constant from '../enums/Constant';
+import Constant from './enums/Constant';
 
 import {
   buildFieldIdFromUserKeyPath,
   buildFieldDomIdWithValue,
   parseFieldStateId,
-} from '../modules/ids';
+} from './modules/ids';
 
-import buildErrorMessage from '../modules/buildErrorMessage';
+import buildErrorMessage from './modules/buildErrorMessage';
 
 
 /**
- * @desc Interface to access ValidationLayer data from the views.
+ * @desc Interface to access validation layer data from the views.
  *
  */
-export default class Layer {
+export default class LayerInterface {
 
   __layerId: LayerId;
   __fields: { [fieldId: string]: LayerField };
   __getField: (keyPath: KeyPath, methodName: string) => LayerField;
 
-  handleChange: LayerHandleChange;
-  handleBlur: LayerHandleBlur;
+  __isSubmitting: boolean;
+
+  __handleDomBlur: DomHandler;
+  __handleDomChange: DomHandler;
+
+  notifyOnBlur: LayerHandleBlur;
+  notifyOnChange: LayerHandleChange;
   handleSubmit: LayerHandleSubmit;
 
 
   constructor(
-    state: State,
     stateContainer: StateContainer,
     handlers: LayerHandlers,
   ) {
+    const state = stateContainer.getState();
+
     this.__layerId = stateContainer.getLayerId();
 
     this.__fields = Object.keys(state).reduce(
@@ -94,25 +99,38 @@ export default class Layer {
       return field;
     };
 
-    this.handleChange = handlers.handleChange;
-    this.handleBlur = handlers.handleBlur;
+    this.__isSubmitting = stateContainer.getIsSubmitting();
+
+    this.__handleDomBlur = handlers.handleDomBlur;
+    this.__handleDomChange = handlers.handleDomChange;
+
+    this.notifyOnBlur = handlers.handleCustomBlur;
+    this.notifyOnChange = handlers.handleCustomChange;
     this.handleSubmit = handlers.handleSubmit;
   }
 
 
-  getPropsFor = (keyPath: KeyPath): FieldBaseProps => {
+  getPropsFor = (keyPath: KeyPath): FieldDomProps => {
     const field = this.__getField(keyPath, 'getPropsFor');
-    return field.props;
+
+    // $FlowIssue: exact type + destructuring: https://github.com/facebook/flow/issues/2405
+    return {
+      ...field.props,
+      onBlur: this.__handleDomBlur,
+      onChange: this.__handleDomChange,
+    };
   };
 
 
-  getCheckboxPropsFor = (keyPath: KeyPath): FieldPropsWithChecked => {
+  getCheckboxPropsFor = (keyPath: KeyPath): FieldDomPropsWithChecked => {
     const field = this.__getField(keyPath, 'getCheckboxPropsFor');
 
     // $FlowIssue: exact type + destructuring: https://github.com/facebook/flow/issues/2405
     return {
       ...field.props,
       checked: !!field.props.value,
+      onBlur: this.__handleDomBlur,
+      onChange: this.__handleDomChange,
     };
   };
 
@@ -120,7 +138,7 @@ export default class Layer {
   getRadioButtonPropsFor = (
     keyPath: KeyPath,
     value: EnumerableValue,
-  ): FieldPropsWithChecked => {
+  ): FieldDomPropsWithChecked => {
     const layerId = this.__layerId;
     const field = this.__getField(keyPath, 'getRadioButtonPropsFor');
 
@@ -130,6 +148,8 @@ export default class Layer {
       value,
       id: buildFieldDomIdWithValue(layerId, keyPath, value),
       checked: field.props.value === value,
+      onBlur: this.__handleDomBlur,
+      onChange: this.__handleDomChange,
     };
   };
 
@@ -145,11 +165,15 @@ export default class Layer {
       comparator?: (value: DomValue) => boolean,
       disabled?: ?boolean,
     },
-  ): FieldBaseProps | FieldPropsWithChecked => {
+  ): FieldDomProps | FieldDomPropsWithChecked => {
     const layerId = this.__layerId;
     const field = this.__getField(keyPath, 'getCustomPropsFor');
 
-    const customProps = { ...field.props };
+    const customProps = {
+      ...field.props,
+      onBlur: this.__handleDomBlur,
+      onChange: this.__handleDomChange,
+    };
 
     if (comparator) {
       customProps.checked = comparator(field.props.value);
@@ -168,28 +192,53 @@ export default class Layer {
   };
 
 
-  getValidityFor = (keyPath: KeyPath): ?boolean => {
+  getSubmitButtonProps = (): SubmitButtonDomProps => ({
+    type: 'submit',
+    disabled: this.__isSubmitting,
+  });
+
+
+  getValidityFor = (keyPath: KeyPath): boolean | null => {
     const field = this.__getField(keyPath, 'getValidityFor');
-    return field.resolution ? field.resolution.valid : null;
-  };
-
-
-  getMessageFor = (keyPath: KeyPath): ?string => {
-    const field = this.__getField(keyPath, 'getMessageFor');
-    return field.resolution ? field.resolution.message : null;
+    return (
+      field.resolution && typeof field.resolution.valid !== 'undefined'
+      ? field.resolution.valid
+      : null
+    );
   };
 
 
   getStatusFor = (keyPath: KeyPath): ?string => {
     const field = this.__getField(keyPath, 'getStatusFor');
-    return field.resolution ? field.resolution.status : null;
+    return (
+      field.resolution && field.resolution.status
+      ? field.resolution.status
+      : null
+    );
   };
 
 
-  getFieldIdFor = (keyPath: KeyPath): FieldId => {
-    const field = this.__getField(keyPath, 'getFieldIdFor');
-    return field.props[Constant.FIELD_ID_DOM_DATA_ATTRIBUTE];
+  getMessageFor = (keyPath: KeyPath): ?string => {
+    const field = this.__getField(keyPath, 'getMessageFor');
+    return (
+      field.resolution && field.resolution.message
+      ? field.resolution.message
+      : null
+    );
   };
+
+
+  getAsyncStatusFor = (keyPath: KeyPath): boolean => {
+    const field = this.__getField(keyPath, 'getAsyncStatusFor');
+    return (
+      field.resolution && typeof field.resolution.isProcessing !== 'undefined'
+      ? field.resolution.isProcessing
+      : false
+    );
+  };
+
+
+  getSubmissionStatus = (): boolean => this.__isSubmitting;
 
 
   getDomIdFor = (
@@ -204,5 +253,11 @@ export default class Layer {
       ? buildFieldDomIdWithValue(layerId, keyPath, value)
       : field.props.id
     );
+  };
+
+
+  getFieldIdFor = (keyPath: KeyPath): FieldId => {
+    const field = this.__getField(keyPath, 'getFieldIdFor');
+    return field.props[Constant.FIELD_ID_DOM_DATA_ATTRIBUTE];
   };
 }

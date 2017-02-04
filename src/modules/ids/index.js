@@ -7,7 +7,6 @@ import type {
   FieldPropsStateId,
   FieldValidationStateId,
   ParsedFieldStateId,
-  NormalizedField,
   EnumerableValue,
 } from '../../types';
 
@@ -61,11 +60,11 @@ export function buildFieldIdFromUserKeyPath(
  */
 export function buildFieldDomId(
   layerId: LayerId,
-  field: NormalizedField,
+  keyPath: Array<string>,
 ): FieldDomId {
   return (
     [layerId]
-      .concat(field.keyPath)
+      .concat(keyPath)
       .join(Constant.FIELD_DOM_ID_DELIMITER)
   );
 }

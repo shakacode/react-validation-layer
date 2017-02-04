@@ -4,11 +4,8 @@
 import type { StrategyEnum } from '../types';
 
 const Strategy: StrategyEnum = Object.freeze({
-  // Instant feedback on every props update
-  INSTANT                       : 'instant',
-  INSTANT_TOUCHED_ONLY          : 'instantTouchedOnly',
+  DEFAULT                       : 'onFirstSuccessOrFirstBlur',
 
-  // Switch to as-you-type feedback...
   ON_FIRST_CHANGE               : 'onFirstChange',
   ON_FIRST_BLUR                 : 'onFirstBlur',
   ON_FIRST_SUCCESS              : 'onFirstSuccess',

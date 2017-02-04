@@ -4,7 +4,7 @@ import * as passwordField from '../../factories/fields/password';
 import { mountPasswordForm } from '../../factories/forms/PasswordForm';
 
 describe('layer.getValidityFor()', () => {
-  it('returns correct validity', () => {
+  it('returns validity', () => {
     const Form = mountPasswordForm({
       strategy: 'onFirstChange',
       data: { password: null },

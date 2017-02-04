@@ -1,7 +1,7 @@
 /* @flow */
 
 // ValidationLayer
-export { ValidationLayer as default } from './ValidationLayer';
+export { default } from './ValidationLayer';
 
 // Public utils
-export { default as normalizeValidationResults } from './modules/normalizeValidationResults';
+// export { default as normalizeValidationResults } from './modules/normalizeValidationResults';

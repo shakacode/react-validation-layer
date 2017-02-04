@@ -109,6 +109,10 @@ input {
   color: green;
 }
 
+.weak .form-message {
+  color: #c6ba1c;
+}
+
 .failure .form-message {
   color: red;
 }

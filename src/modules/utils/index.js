@@ -48,37 +48,49 @@ export function fetchProp(
 }
 
 
-export function isDefined<V>(value: V): boolean {
-  return typeof value !== 'undefined';
+export function isDefined<S>(subject: S): boolean {
+  return typeof subject !== 'undefined';
 }
 
 
-export function isNull<V>(value: V): boolean {
-  return value === null;
+export function isNull<S>(subject: S): boolean {
+  return subject === null;
 }
 
 
-export function isString<V>(value: V): boolean {
-  return typeof value === 'string';
+export function isString<S>(subject: S): boolean {
+  return typeof subject === 'string';
 }
 
 
-export function isNumber<V>(value: V): boolean {
-  return typeof value === 'number';
+export function isNumber<S>(subject: S): boolean {
+  return typeof subject === 'number';
 }
 
 
-export function isPlainObject<V>(value: V): boolean {
+export function isObject<S>(subject: S): boolean {
+  return typeof subject === 'object';
+}
+
+export function isPlainObject<S>(subject: S): boolean {
   return (
-    typeof value === 'object'
-    && Object.prototype.toString.call(value) === '[object Object]'
+    isObject(subject)
+    && Object.prototype.toString.call(subject) === '[object Object]'
   );
 }
 
-export function isFunction<V>(value: V): boolean {
-  return typeof value === 'function';
+export function isFunction<S>(subject: S): boolean {
+  return typeof subject === 'function';
 }
 
+// eslint-disable-next-line flowtype/no-weak-types
+export function isPromise<V, S: Promise<V> | Object>(subject: S): boolean {
+  return (
+    !!subject
+    && (isObject(subject) || isFunction(subject))
+    && isFunction(subject.then)
+  );
+}
 
 export function isChangeEvent(event: SyntheticInputEvent): boolean {
   return event.type === 'change';

@@ -9,6 +9,9 @@ import normalizeFieldsFromProps from '../../../src/modules/normalizeFieldsFromPr
 
 describe('modules.normalizeFieldsFromProps()', () => {
   it('combines correct array of flat fields', () => {
+    const asyncStrategy = undefined;
+    const debounceInterval = undefined;
+
     const fields = {
       username: true,
       email: { validate: dummyFunction },
@@ -21,19 +24,25 @@ describe('modules.normalizeFieldsFromProps()', () => {
       password: undefined,
     };
 
-    const normalizedFields = normalizeFieldsFromProps(fields, data);
+    const normalizedFields = normalizeFieldsFromProps(
+      asyncStrategy,
+      debounceInterval,
+      fields,
+      data,
+    );
 
-    const expected = [
+    expect(normalizedFields).toEqual([
       { id: 'username', keyPath: ['username'] },
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'password', keyPath: ['password'], validate: dummyFunction },
-    ];
-
-    expect(normalizedFields).toEqual(expected);
+    ]);
   });
 
 
   it('combines correct array of 1 level nested fields', () => {
+    const asyncStrategy = undefined;
+    const debounceInterval = undefined;
+
     const fields = {
       username: true,
       email: { validate: dummyFunction },
@@ -62,9 +71,14 @@ describe('modules.normalizeFieldsFromProps()', () => {
       },
     };
 
-    const normalizedFields = normalizeFieldsFromProps(fields, data);
+    const normalizedFields = normalizeFieldsFromProps(
+      asyncStrategy,
+      debounceInterval,
+      fields,
+      data,
+    );
 
-    const expected = [
+    expect(normalizedFields).toEqual([
       { id: 'username', keyPath: ['username'] },
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'avatar.url', keyPath: ['avatar', 'url'], validate: dummyFunction },
@@ -72,13 +86,14 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'coverPhoto.url', keyPath: ['coverPhoto', 'url'], validate: dummyFunction },
       { id: 'coverPhoto.width', keyPath: ['coverPhoto', 'width'], transformBeforeStore: dummyFunction },
       { id: 'coverPhoto.height', keyPath: ['coverPhoto', 'height'], transformBeforeStore: dummyFunction },
-    ];
-
-    expect(normalizedFields).toEqual(expected);
+    ]);
   });
 
 
   it('combines correct array of 2 level nested fields', () => {
+    const asyncStrategy = undefined;
+    const debounceInterval = undefined;
+
     const fields = {
       username: true,
       email: { validate: dummyFunction },
@@ -113,9 +128,14 @@ describe('modules.normalizeFieldsFromProps()', () => {
       },
     };
 
-    const normalizedFields = normalizeFieldsFromProps(fields, data);
+    const normalizedFields = normalizeFieldsFromProps(
+      asyncStrategy,
+      debounceInterval,
+      fields,
+      data,
+    );
 
-    const expected = [
+    expect(normalizedFields).toEqual([
       { id: 'username', keyPath: ['username'] },
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'photos.private', keyPath: ['photos', 'private'] },
@@ -124,13 +144,14 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'photos.coverPhoto.url', keyPath: ['photos', 'coverPhoto', 'url'], validate: dummyFunction },
       { id: 'photos.coverPhoto.width', keyPath: ['photos', 'coverPhoto', 'width'], transformBeforeStore: dummyFunction },
       { id: 'photos.coverPhoto.height', keyPath: ['photos', 'coverPhoto', 'height'], transformBeforeStore: dummyFunction },
-    ];
-
-    expect(normalizedFields).toEqual(expected);
+    ]);
   });
 
 
   it('combines correct array of 2 level nested fields with immutable data', () => {
+    const asyncStrategy = undefined;
+    const debounceInterval = undefined;
+
     const fields = {
       username: true,
       email: { validate: dummyFunction },
@@ -165,9 +186,14 @@ describe('modules.normalizeFieldsFromProps()', () => {
       },
     });
 
-    const normalizedFields = normalizeFieldsFromProps(fields, data);
+    const normalizedFields = normalizeFieldsFromProps(
+      asyncStrategy,
+      debounceInterval,
+      fields,
+      data,
+    );
 
-    const expected = [
+    expect(normalizedFields).toEqual([
       { id: 'username', keyPath: ['username'] },
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'photos.private', keyPath: ['photos', 'private'] },
@@ -176,9 +202,46 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'photos.coverPhoto.url', keyPath: ['photos', 'coverPhoto', 'url'], validate: dummyFunction },
       { id: 'photos.coverPhoto.width', keyPath: ['photos', 'coverPhoto', 'width'], transformBeforeStore: dummyFunction },
       { id: 'photos.coverPhoto.height', keyPath: ['photos', 'coverPhoto', 'height'], transformBeforeStore: dummyFunction },
-    ];
+    ]);
+  });
 
-    expect(normalizedFields).toEqual(expected);
+
+  it('debounces async validator w/ ON_CHANGE asyncStrategy', () => {
+    const asyncStrategy = 'onChange';
+    const debounceInterval = undefined;
+
+    const fields = { email: { validateAsync: dummyFunction } };
+    const data = { email: 'some@email.com' };
+
+    const normalizedFields = normalizeFieldsFromProps(
+      asyncStrategy,
+      debounceInterval,
+      fields,
+      data,
+    );
+    const normalizedValidateAsync = normalizedFields[0].validateAsync;
+
+    expect(normalizedValidateAsync).toBeInstanceOf(Function);
+    expect(normalizedValidateAsync).not.toBe(dummyFunction);
+  });
+
+
+  it('does not debounce async validator w/ ON_BLUR asyncStrategy', () => {
+    const asyncStrategy = 'onBlur';
+    const debounceInterval = undefined;
+
+    const fields = { email: { validateAsync: dummyFunction } };
+    const data = { email: 'some@email.com' };
+
+    const normalizedFields = normalizeFieldsFromProps(
+      asyncStrategy,
+      debounceInterval,
+      fields,
+      data,
+    );
+    const normalizedValidateAsync = normalizedFields[0].validateAsync;
+
+    expect(normalizedValidateAsync).toBe(dummyFunction);
   });
 
 

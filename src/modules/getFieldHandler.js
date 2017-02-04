@@ -1,13 +1,13 @@
 /* @flow */
 
 import type {
-  Props,
-  NormalizedField,
-  Filter,
-  TransformBeforeStore,
-  TransformBeforeRender,
+  LayerId,
+  FieldId,
   OnChange,
   OnBlur,
+  ValueHandler,
+  PropsLevelDomHandlers,
+  FieldLevelDomHandlers,
 } from '../types';
 
 import buildErrorMessage from './buildErrorMessage';
@@ -15,34 +15,35 @@ import { isFunction } from './utils';
 
 
 /**
- * @desc It is possible to define DOM handler on field level
- *       as well as on props level for all the fields.
- *       This function is figuring out which one to use
- *       for specific field.
+ * @desc It is possible to define DOM handler on the field level
+ *       as well as on the props level for all the fields.
+ *       This function figures out which one to use for specific field.
  *
  */
 export function getFieldDomHandler(
+  layerId: LayerId,
+  fieldId: FieldId,
   handlerKey: 'onChange' | 'onBlur',
-  field: NormalizedField,
-  props: Props,
+  fieldLevelDomHandlers: ?FieldLevelDomHandlers,
+  propsLevelDomHandlers: PropsLevelDomHandlers,
 ): ?OnChange | ?OnBlur {
-  const fieldLevelHandler = field.handlers && field.handlers[handlerKey];
-  const propsLevelHandler = props.handlers && props.handlers[handlerKey];
+  const fieldLevelHandler = fieldLevelDomHandlers && fieldLevelDomHandlers[handlerKey];
+  const propsLevelHandler = propsLevelDomHandlers && propsLevelDomHandlers[handlerKey];
 
   const handler = fieldLevelHandler || propsLevelHandler;
 
   if (handlerKey === 'onChange' && !handler) {
     throw new Error(buildErrorMessage({
-      layerId: props.id,
-      fieldId: field.id,
+      layerId,
+      fieldId,
       message: `Looks like you forgot to provide \`${handlerKey}\` handler.`,
     }));
   }
 
   if (handler && !isFunction(handler)) {
     throw new Error(buildErrorMessage({
-      layerId: props.id,
-      fieldId: fieldLevelHandler && field.id,
+      layerId,
+      fieldId: fieldLevelHandler ? fieldId : null,
       message: `\`${handlerKey}\` must be a function.`,
     }));
   }
@@ -55,18 +56,23 @@ export function getFieldDomHandler(
  * @desc Same as function above, but for value handlers,
  *       i.e. `filter`, `transformBeforeStore` & `transformBeforeRender`.
  *
+ * NOTE: Might worth to remove this and allow only `field`-level definitions.
+ *       Not documenting it for now.
+ *
  */
 export function getFieldValueHandler(
+  layerId: LayerId,
+  fieldId: FieldId,
   handlerKey: 'filter' | 'transformBeforeStore' | 'transformBeforeRender',
-  field: NormalizedField,
-  props: Props,
-): ?Filter | ?TransformBeforeStore | ?TransformBeforeRender {
-  const handler = field[handlerKey] || props[handlerKey];
+  fieldLevelValueHandler: ValueHandler,
+  propsLevelValueHandler: ValueHandler,
+): ValueHandler {
+  const handler = fieldLevelValueHandler || propsLevelValueHandler;
 
   if (handler && !isFunction(handler)) {
     throw new Error(buildErrorMessage({
-      layerId: props.id,
-      fieldId: field[handlerKey] && field.id,
+      layerId,
+      fieldId: fieldLevelValueHandler ? fieldId : null,
       message: `\`${handlerKey}\` must be a function.`,
     }));
   }

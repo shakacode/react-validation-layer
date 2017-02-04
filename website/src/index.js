@@ -25,6 +25,9 @@ const App = () => (
         <Link to="/examples/login-form" className="nav-link">
           Login Form
         </Link>
+        <Link to="/examples/signup-form" className="nav-link">
+          Signup Form
+        </Link>
       </div>
       <div className="container">
         <Match pattern="/" exactly component={Main} />

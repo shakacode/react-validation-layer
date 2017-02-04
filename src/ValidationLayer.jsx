@@ -1,305 +1,467 @@
 /* @flow */
 
-import React from 'react';
+import React, { Component } from 'react';
 
 import type {
   Props,
   State,
+  LayerId,
   FieldId,
-  NormalizedField,
-  DomData,
   Value,
+  Data,
+  DomData,
+  Strategy,
+  AsyncStrategy,
+  Statuses,
+  FieldFlags,
+  NormalizedField,
+  NormalizedFields,
+  FieldsPropsState,
+  ValidationResults,
+  ExternalErrors,
+  FieldValidationStateId,
+  ValidationStateWithExternalErrors,
+  InsuredAsyncValidationResults,
 } from './types';
 
 import Constant from './enums/Constant';
+import DefaultStatus from './enums/DefaultStatus';
 
-import Layer from './containers/Layer';
-import StateContainer from './containers/StateContainer';
-
-import {
-  performFieldValidation,
-  performBatchValidation,
-  performInstantFieldsValidation,
-} from './modules/validations';
+import { performFieldValidation, performOnSubmitValidation } from './modules/validations';
+import { buildCompleteAsyncValidationResults } from './modules/validations/utils';
+import { parseFieldId, parseFieldStateId, buildFieldValidationStateId } from './modules/ids';
+import { fetchProp, isFunction } from './modules/utils';
 import normalizeFieldsFromProps from './modules/normalizeFieldsFromProps';
+import normalizeExternalErrors from './modules/normalizeExternalErrors';
 import getFieldsPropsState from './modules/getFieldsPropsState';
-import resetState from './modules/resetState';
 import buildErrorMessage from './modules/buildErrorMessage';
-import { buildFieldValidationStateId } from './modules/ids';
-import { getFieldDomHandler, getFieldValueHandler } from './modules/getFieldHandler';
-import { getNextDataFromDom, getNextDataFromCustomHandler } from './modules/getNextData';
-import { isFunction } from './modules/utils';
+
+import LayerDomHandlers from './LayerDomHandlers';
 
 
-export class ValidationLayer extends React.Component {
+/**
+ * @desc Core component.
+ *       Holds and manages state of validation layer.
+ *
+ */
+export default class ValidationLayer extends Component {
 
-  // Providing default id in vanilla React implementation
-  // But id will be required in implementation w/ persisted state
   static defaultProps = { id: Constant.DEFAULT_LAYER_ID };
 
   props: Props;
   state: State = {};
 
-  stateContainer: StateContainer = new StateContainer(this.props.id);
+  __layerId: LayerId;
+
+  __normalizedFields: NormalizedFields = [];
+
+  __bluredFields: FieldFlags = {};
+  __emittedFields: FieldFlags = {};
+
+  __isSubmitting: boolean = false;
+  __formWasSubmitted: boolean = false;
 
 
-  componentWillMount(): void {
-    const { props, stateContainer } = this;
+  constructor(props: Props, ...rest: Array<*>): void {
+    super(props, ...rest);
 
-    // Normalize fields
-    const normalizedFields = normalizeFieldsFromProps(props.fields, props.data);
-    stateContainer.setNormalizedFields(normalizedFields);
+    this.__layerId = props.id;
 
-    // Set fields props and validation state for instant fields
-    const nextFieldsPropsState = getFieldsPropsState(
-      props,
-      stateContainer,
-      this.handleDomChange,
-      this.handleDomBlur,
+    this.__normalizedFields = normalizeFieldsFromProps(
+      props.asyncStrategy,
+      props.debounceInterval,
+      props.fields,
+      props.data,
     );
-    const nextFieldsValidationState = performInstantFieldsValidation(props, stateContainer);
-    const nextState = { ...nextFieldsPropsState, ...nextFieldsValidationState };
+  }
 
-    this.setState(nextState);
+
+  /**
+   * @desc Lifecycle hooks.
+   *
+   */
+  componentWillMount(): void {
+    // Set fields props
+    this.setNextFieldsPropsState();
   }
 
 
   componentWillReceiveProps(nextProps: Props): void {
-    const { stateContainer } = this;
-
     // Update normalized fields
-    const normalizedFields = normalizeFieldsFromProps(nextProps.fields, nextProps.data);
-    stateContainer.setNormalizedFields(normalizedFields);
+    this.setNextNormalizedFields(nextProps);
 
-    // Update fields props and validation state for instant fields
-    const nextFieldsPropsState = getFieldsPropsState(
-      nextProps,
-      stateContainer,
-      this.handleDomChange,
-      this.handleDomBlur,
-    );
-    const nextFieldsValidationState = performInstantFieldsValidation(nextProps, stateContainer);
-    const nextState = { ...nextFieldsPropsState, ...nextFieldsValidationState };
-
-    this.setState(nextState);
+    // Update fields props
+    this.setNextFieldsPropsState(nextProps);
   }
 
 
-  resetLayer = (): void => {
-    const { props, stateContainer } = this;
-    const normalizedFields = normalizeFieldsFromProps(props.fields, props.data);
+  /**
+   * @desc Internal getters.
+   *
+   */
+  getLayerId = (): LayerId => this.__layerId;
+  getState = (): State => this.state;
+  getData = (): Data => this.props.data;
+  getPropsLevelStrategy = (): ?Strategy => this.props.strategy;
+  getPropsLevelAsyncStrategy = (): ?AsyncStrategy => this.props.asyncStrategy;
+  getPropsLevelStatuses = (): ?Statuses => this.props.statuses;
 
-    stateContainer.resetState(normalizedFields);
+
+  /**
+   * @desc Fields DOM props management.
+   *
+   */
+  getNextFieldsPropsState = (nextProps?: ?Props): FieldsPropsState => {
+    const props = nextProps || this.props;
+
+    return getFieldsPropsState(
+      this.getLayerId(),
+      this.getNormalizedFields(),
+      props.data,
+      props.transformBeforeRender,
+      this.getIsSubmitting(),
+    );
+  };
+
+  setNextFieldsPropsState = (
+    nextProps?: ?Props,
+    callback?: () => void,
+  ): void => {
+    const nextState = this.getNextFieldsPropsState(nextProps);
+    this.setState(nextState, callback);
   };
 
 
-  handleDomChange = (event: SyntheticInputEvent): void => {
-    const { props, stateContainer } = this;
-    const layerId = stateContainer.getLayerId();
-    const originalData = props.data;
-    const domData = getNextDataFromDom(event, originalData, layerId);
+  /**
+   * @desc Normalized fields management.
+   *
+   */
+  getNormalizedFields = (): NormalizedFields => this.__normalizedFields;
 
-    this.handleChange(domData);
-  };
+  getNormalizedField = (fieldId: FieldId): NormalizedField => {
+    const normalizedField = this.__normalizedFields.find(field => field.id === fieldId);
 
+    if (!normalizedField) {
+      const layerId = this.getLayerId();
 
-  handleCustomChange = (fieldId: FieldId, value: Value): void => {
-    const originalData = this.props.data;
-    const domData = getNextDataFromCustomHandler(fieldId, value, originalData);
-    this.handleChange(domData);
-  };
-
-
-  handleChange = (domData: DomData): void => {
-    const { props, stateContainer } = this;
-
-    const field = stateContainer.getNormalizedField(domData.fieldId);
-    const filter = getFieldValueHandler('filter', field, props);
-
-    if (
-      filter                           // if filter is provided
-      && domData.value                 // & there's a value (we don't want to filter empty string!)
-      && !filter(domData.value, props) // & filter function returned false
-    ) {
-      return;                          // then ignoring this update
+      throw new Error(buildErrorMessage({
+        layerId,
+        fieldId,
+        message: [
+          `Can't find \`field\` at key path: ${fieldId}`,
+          'Make sure it exists and has truthy value (e.g. object with options or just `true`).',
+        ],
+      }));
     }
 
-    const transformBeforeStore = getFieldValueHandler('transformBeforeStore', field, props);
+    return normalizedField;
+  }
 
-    const processedValue =
-      transformBeforeStore
-      ? transformBeforeStore(domData.value, props)
-      : domData.value
-    ;
+  setNextNormalizedFields = (nextProps?: Props): void => {
+    const props = nextProps || this.props;
 
-    const processedDomData = { ...domData, value: processedValue };
+    const nextNormalizedFields = normalizeFieldsFromProps(
+      props.asyncStrategy,
+      props.debounceInterval,
+      props.fields,
+      props.data,
+    );
 
-    if (domData.event) {
-      const handleChange = getFieldDomHandler('onChange', field, props);
+    // Adding only new fileds to prevent replacement
+    // of debounced async validators
+    const normalizedFields = nextNormalizedFields.map(nextNormalizedField => {
+      const normalizedField = this.__normalizedFields.find(
+        field => field.id === nextNormalizedField.id,
+      );
+      return normalizedField || nextNormalizedField;
+    });
 
-      // $FlowIgnoreMe: Even getFieldDomHandler throws if onChange is missing, flow can't infer it
-      handleChange(processedDomData);
+    this.__normalizedFields = normalizedFields;
+  };
+
+
+  /**
+   * @desc Blured fields management.
+   *
+   */
+  getBluredField = (fieldId: FieldId): ?boolean => this.__bluredFields[fieldId];
+
+  setBluredField = (fieldId: FieldId): void => {
+    if (!this.__bluredFields[fieldId]) {
+      this.__bluredFields[fieldId] = true;
     }
-
-    // $FlowIssue: https://github.com/facebook/flow/issues/2405
-    this.handleFieldValidation(field, processedDomData);
   };
 
 
-  handleDomBlur = (event: SyntheticInputEvent): void => {
-    const { props, stateContainer } = this;
-    const layerId = stateContainer.getLayerId();
-    const originalData = props.data;
-    const domData = getNextDataFromDom(event, originalData, layerId);
+  /**
+   * @desc Emitted fields management.
+   *
+   */
+  getEmittedField = (fieldId: FieldId): ?boolean => this.__emittedFields[fieldId];
 
-    this.handleBlur(domData);
+  setEmittedField = (fieldId: FieldId): void => {
+    if (!this.__emittedFields[fieldId]) {
+      this.__emittedFields[fieldId] = true;
+    }
   };
 
-
-  handleCustomBlur = (
-    fieldId: FieldId,
-    value: Value,
-    event: SyntheticInputEvent,
-  ): void => {
-    const originalData = this.props.data;
-    const domData = getNextDataFromCustomHandler(fieldId, value, originalData, event);
-    this.handleBlur(domData, true);
-  };
-
-
-  handleBlur = (
-    domData: DomData,
-    isCustom?: boolean = false,
-  ): void => {
-    const { props, stateContainer } = this;
-
-    const field = stateContainer.getNormalizedField(domData.fieldId);
-    const handleBlur = getFieldDomHandler('onBlur', field, props);
-
-    const transformBeforeStore = getFieldValueHandler('transformBeforeStore', field, props);
-
-    const processedValue =
-      transformBeforeStore
-      ? transformBeforeStore(domData.value, props)
-      : domData.value
+  setAllFieldsEmitted = (): void => {
+    this.__emittedFields =
+      this
+        .__normalizedFields
+        .map(field => field.id)
+        .reduce((fields, fieldId) => ({ ...fields, [fieldId]: true }), {})
     ;
-
-    const processedDomData = { ...domData, value: processedValue };
-
-    if (!isCustom && handleBlur) handleBlur(processedDomData);
-
-    // $FlowIssue: https://github.com/facebook/flow/issues/2405
-    this.handleFieldValidation(field, processedDomData);
   };
 
 
-  handleFieldValidation = (
+  /**
+   * @desc Returns `true` if any ongoing async validation is happening.
+   *
+   */
+  isAnyOngoingAsyncActivity = (): boolean => {
+    const { state } = this;
+    // $FlowIgnoreMe: Flow, don't be such an ass
+    return Object.keys(state).some(stateId => state[stateId].isProcessing);
+  };
+
+
+  /**
+   * @desc Get and set flag if form is submitting.
+   *
+   */
+  getIsSubmitting = (): boolean => this.__isSubmitting;
+
+  setIsSubmitting = (isSubmitting: boolean): void => {
+    this.__isSubmitting = isSubmitting;
+  };
+
+
+  /**
+   * @desc Get and set flag if form was submitted at least once.
+   *
+   */
+  getFormWasSubmitted = (): boolean => this.__formWasSubmitted;
+
+  setFormWasSubmitted = (): void => {
+    if (!this.__formWasSubmitted) {
+      this.__formWasSubmitted = true;
+    }
+  };
+
+
+  /**
+   * @desc Field validation.
+   *       This method is triggered from <LayerDomHandlers />
+   *       on `change` & `blur` events.
+   *
+   */
+  validateField = (
     field: NormalizedField,
     domData: DomData,
   ): void => {
-    const { props, stateContainer } = this;
-    const nextState = performFieldValidation(props, field, domData, stateContainer);
-
-    if (nextState) {
-      const stateKey = buildFieldValidationStateId(field.id);
-      this.setState({ [stateKey]: nextState });
-    }
-  };
-
-
-  handleSubmit = (event: SyntheticInputEvent): void => {
-    const { props, stateContainer } = this;
-
-    stateContainer.setIsSubmitting(true);
-    stateContainer.setAllFieldsTouched();
-    stateContainer.setFormWasSubmitted();
-
-    if (event && event.preventDefault) {
-      event.preventDefault();
-    }
-
-    const nextFieldsPropsState = getFieldsPropsState(
-      props,
-      stateContainer,
-      this.handleDomChange,
-      this.handleDomBlur,
+    const { nextSyncState, ongoingAsyncValidations } = performFieldValidation(
+      field,
+      domData.value,
+      domData.event,
+      this,
     );
 
-    this.setState(nextFieldsPropsState, this.handleFormValidationOnSubmit);
+    if (Object.keys(nextSyncState).length === 0) return;
+
+    this.setState(nextSyncState, () => {
+      Object.keys(ongoingAsyncValidations).forEach(stateId => {
+        ongoingAsyncValidations[stateId].then(deferredNextState =>
+          this.setDeferredNextState(stateId, deferredNextState),
+        );
+      });
+    });
   };
 
 
-  handleFormValidationOnSubmit = (): void => {
-    const { props, stateContainer } = this;
-    const fields = stateContainer.getNormalizedFields();
-    const { validationState, isInvalid } = performBatchValidation(props, fields);
+  /**
+   * @desc Async validation notifier.
+   *       This method is triggered from debouncer,
+   *       when async validator is ready to run.
+   *
+   */
+  notifyAsync = (
+    fieldId: FieldId,
+    value: Value,
+    asyncValidation: Promise<ValidationResults>,
+  ): void => {
+    const stateId = buildFieldValidationStateId(fieldId);
 
-    if (isInvalid) {
-      this.setState(validationState, this.handleFailurePostSubmitAction);
-    } else {
-      props.handlers.onSubmit({
-        onSuccess: this.handleSuccessPostSubmitAction,
+    asyncValidation.then(results => {
+      const deferredNextState = {
+        resolution: buildCompleteAsyncValidationResults(
+          fieldId,
+          results,
+          this.getPropsLevelStatuses(),
+          this.getLayerId(),
+        ),
+        forValue: value,
+      };
+
+      this.setDeferredNextState(stateId, deferredNextState);
+    });
+  };
+
+
+  /**
+   * @desc Sets next validation state from async validator
+   *       (if it's not obsolete).
+   *
+   */
+  setDeferredNextState = (
+    stateId: FieldValidationStateId,
+    nextState: InsuredAsyncValidationResults,
+  ): void => {
+    if (!nextState || !nextState.resolution) return;
+
+    const { props } = this;
+
+    const { fieldId } = parseFieldStateId(stateId);
+    const { keyPath } = parseFieldId(fieldId);
+
+    const fieldValue = fetchProp(props.data, keyPath);
+
+    // While async call is being processed,
+    // deferred validation state might become obsolete:
+    // i.e. value was changed & state was replaced
+    // w/ next validation results for the next value
+    if (nextState.forValue !== fieldValue) return;
+
+    this.setState({ [stateId]: nextState.resolution });
+  };
+
+
+  /**
+   * @desc Form validation.
+   *       This method is triggered from <LayerDomHandlers />
+   *       on form submission request.
+   *
+   */
+  validateForm = (): void => {
+    const { validationState, isValid } = performOnSubmitValidation(
+      this.getData(),
+      this.getState(),
+      this.getNormalizedFields(),
+      this.getPropsLevelStatuses(),
+      this.getLayerId(),
+    );
+
+    if (isValid) {
+      const { handlers } = this.props;
+
+      if (!handlers || !handlers.onSubmit || !isFunction(handlers.onSubmit)) {
+        throw new Error(buildErrorMessage({
+          layerId: this.getLayerId(),
+          message: "Make sure `handlers.onSubmit` is exists and it's a function",
+        }));
+      }
+
+      handlers.onSubmit({
+        onSuccess: this.resetState,
         onFailure: this.handleFailurePostSubmitAction,
       });
+    } else {
+      this.setState(validationState, this.handleFailurePostSubmitAction);
     }
   };
 
 
-  handleSuccessPostSubmitAction = (): void => {
-    this.resetLayer();
+  /**
+   * @desc Handler of form submission failure.
+   *       This method is triggered from userland, when form submission failed.
+   *       It accepts single argument: errors, reported from API (or anywhere else).
+   *
+   */
+  handleFailurePostSubmitAction = (errors?: ExternalErrors): void => {
+    this.setIsSubmitting(false);
 
-    const { props, state, stateContainer } = this;
+    if (!errors) return this.setNextFieldsPropsState();
 
-    const nextFieldsPropsState = getFieldsPropsState(
-      props,
-      stateContainer,
-      this.handleDomChange,
-      this.handleDomBlur,
-    );
-    const nextFieldsValidationState = performInstantFieldsValidation(props, stateContainer);
-    const resetedState = resetState(state, nextFieldsPropsState, nextFieldsValidationState);
+    const nextFieldsPropsState = this.getNextFieldsPropsState();
 
-    this.setState(resetedState);
+    const statuses = this.getPropsLevelStatuses();
+    const normalizedErrors = normalizeExternalErrors(errors);
+    const nextFieldsValidationState: ValidationStateWithExternalErrors =
+      normalizedErrors.reduce((nextValidationState, error) => {
+        const stateId = buildFieldValidationStateId(error.fieldId);
+
+        return {
+          ...nextValidationState,
+          [stateId]: {
+            valid: false,
+            status:
+              statuses && statuses.failure
+              ? statuses.failure
+              : DefaultStatus.FAILURE,
+            message: error.message,
+            isAsync: true,
+          },
+        };
+      }, {})
+    ;
+
+    const nextState = {
+      ...nextFieldsPropsState,
+      ...nextFieldsValidationState,
+    };
+
+    return this.setState(nextState);
   };
 
 
-  handleFailurePostSubmitAction = (): void => {
-    const { props, stateContainer } = this;
+  /**
+   * @desc State reset. Triggered from userland.
+   *       Back to origins on successful form submission.
+   *
+   */
+  resetState = (): void => {
+    this.setNextNormalizedFields();
 
-    stateContainer.setIsSubmitting(false);
+    this.__bluredFields = {};
+    this.__emittedFields = {};
 
-    const nextFieldsPropsState = getFieldsPropsState(
-      props,
-      stateContainer,
-      this.handleDomChange,
-      this.handleDomBlur,
+    this.__isSubmitting = false;
+    this.__formWasSubmitted = false;
+
+    // All values of the state keys must be set to an empty objects
+    // to replace stale data, b/c setState() merges updates w/ current state.
+    const resetedState = Object.keys(this.state).reduce(
+      (nextState, key) => ({ ...nextState, [key]: {} }),
+      {},
     );
+    const nextFieldsPropsState = this.getNextFieldsPropsState();
 
-    this.setState(nextFieldsPropsState);
+    this.setState({ ...resetedState, ...nextFieldsPropsState });
   };
 
 
   render() {
-    const { props, state, stateContainer } = this;
+    const { props } = this;
+    const layerId = this.getLayerId();
 
-    const layer = new Layer(
-      state,
-      stateContainer,
-      {
-        handleChange: this.handleCustomChange,
-        handleBlur: this.handleCustomBlur,
-        handleSubmit: this.handleSubmit,
-      },
-    );
-
-    if (!isFunction(props.children)) {
+    if (typeof props.children !== 'function') {
       throw new Error(buildErrorMessage({
-        layerId: stateContainer.getLayerId(),
+        layerId,
         message: '`children` must be a function',
       }));
     }
 
-    // $FlowIgnoreMe: `isFunction` performs check, but Flow can't infer
-    return props.children(layer);
+    return (
+      <LayerDomHandlers
+        layerId={layerId}
+        stateContainer={this}
+        data={props.data}
+        filter={props.filter}
+        handlers={props.handlers}
+        transformBeforeStore={props.transformBeforeStore}
+      >
+        {layer => props.children && props.children(layer)}
+      </LayerDomHandlers>
+    );
   }
 }

@@ -2,7 +2,7 @@
 
 import type { StrategyHandler } from '../../../types';
 
-import { buildCompleteValidationResults } from '../utils';
+import { buildCompleteSyncValidationResults } from '../utils';
 
 /**
  * @desc According to this strategy Layer won't emit any results
@@ -10,7 +10,19 @@ import { buildCompleteValidationResults } from '../utils';
  *       After first results are emitted-feedback is provided on every change.
  *
  */
-export const onFirstChange: StrategyHandler = (props, field, data, stateContainer) => {
+export const onFirstChange: StrategyHandler = (
+  field,
+  value,
+  data,
+  event,
+  stateContainer,
+) => {
   stateContainer.setEmittedField(field.id);
-  return buildCompleteValidationResults(props, field, data.value);
+  return buildCompleteSyncValidationResults(
+    field,
+    value,
+    data,
+    stateContainer.getPropsLevelStatuses(),
+    stateContainer.getLayerId(),
+  );
 };

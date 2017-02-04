@@ -5,7 +5,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { mount } from 'enzyme';
 
-import type { Data, Fields, Strategy } from '../../../src/types';
+import type { Data, Fields, Strategy, PropsLevelDomHandlers } from '../../../src/types';
 
 import { mockStrictLayerProps } from '../../helpers';
 
@@ -29,10 +29,11 @@ const defaultFields = {
 };
 
 type Props = {
-  strategy?: Strategy,
   id?: string,
   data?: Data,
   fields?: Fields,
+  strategy?: Strategy,
+  handlers?: PropsLevelDomHandlers | void,
 };
 
 const LoginForm = ({
@@ -40,8 +41,10 @@ const LoginForm = ({
   id = 'loginForm',
   data = defaultData,
   fields = defaultFields,
+  // $FlowIgnoreMe
+  handlers = undefined,
 }: Props) => (
-  <ValidationLayer {...mockStrictLayerProps({ strategy, id, data, fields })}>
+  <ValidationLayer {...mockStrictLayerProps({ strategy, id, data, fields, handlers })}>
     {layer => (
       <form className="form" onSubmit={layer.handleSubmit}>
         <div className={classNames('email-wrapper', layer.getStatusFor('email'))}>
@@ -70,11 +73,18 @@ const LoginForm = ({
             </span>
           }
         </div>
+        <div className="submit-button-wrapper">
+          <button
+            {...layer.getSubmitButtonProps()}
+            className="submit-button"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     )}
   </ValidationLayer>
 );
 
 /* eslint-disable new-cap */
-export const mountLoginForm =
-  (...args: Array<Props>): * => mount(LoginForm(...args));
+export const mountLoginForm = (...args: Array<Props>): * => mount(LoginForm(...args));

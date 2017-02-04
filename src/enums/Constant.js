@@ -5,6 +5,7 @@ import type { ConstantEnum } from '../types';
 
 const Constant: ConstantEnum = Object.freeze({
   DEFAULT_LAYER_ID                   : 'form',
+  DEFAULT_DEBOUNCE_INTERVAL          : 700,
   FIELD_ID_DOM_DATA_ATTRIBUTE        : 'data-fieldid',
   FIELD_ID_DELIMITER                 : '.',
   FIELD_ID_COLLECTION_INDEX_DELIMITER: '/',

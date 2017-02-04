@@ -7,13 +7,14 @@ import type {
   Fields,
   Statuses,
   Strategy,
+  AsyncStrategy,
   OnChange,
   OnBlur,
   OnSubmit,
-  PropsLevelHandlers,
+  PropsLevelDomHandlers,
 } from '../../src/types';
 
-import Layer from '../../src/containers/Layer';
+import LayerInterface from '../../src/LayerInterface';
 
 
 export type TestValidity = 'valid' | 'invalid' | 'none';
@@ -23,12 +24,14 @@ export type TestProps = {
   data?: Data,
   fields?: Fields,
   statuses?: Statuses,
-  handlers?: PropsLevelHandlers,
+  handlers?: PropsLevelDomHandlers | void,
   strategy?: Strategy,
-  children?: (layer: Layer) => React.Element<*>,
+  asyncStrategy?: AsyncStrategy,
+  debounceInterval?: number,
+  children?: (layer: LayerInterface) => React.Element<*>,
 };
 
-export type TestPropsLevelHandlers = {|
+export type TestPropsLevelDomHandlers = {|
   onChange?: OnChange,
   onBlur?: OnBlur,
   onSubmit?: OnSubmit,

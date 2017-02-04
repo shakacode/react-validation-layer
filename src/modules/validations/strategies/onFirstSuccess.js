@@ -2,7 +2,7 @@
 
 import type { StrategyHandler } from '../../../types';
 
-import { buildCompleteValidationResults, buildEmptyValidationResults } from '../utils';
+import { buildCompleteSyncValidationResults, buildEmptyValidationResults } from '../utils';
 
 /**
  * @desc According to this strategy Layer won't emit any results
@@ -10,8 +10,20 @@ import { buildCompleteValidationResults, buildEmptyValidationResults } from '../
  *       After first results are emitted-feedback is provided on every change.
  *
  */
-export const onFirstSuccess: StrategyHandler = (props, field, data, stateContainer) => {
-  const validationState = buildCompleteValidationResults(props, field, data.value);
+export const onFirstSuccess: StrategyHandler = (
+  field,
+  value,
+  data,
+  event,
+  stateContainer,
+) => {
+  const validationState = buildCompleteSyncValidationResults(
+    field,
+    value,
+    data,
+    stateContainer.getPropsLevelStatuses(),
+    stateContainer.getLayerId(),
+  );
 
   if (stateContainer.getEmittedField(field.id)) {
     return validationState;

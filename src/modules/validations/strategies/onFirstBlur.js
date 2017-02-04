@@ -2,7 +2,7 @@
 
 import type { StrategyHandler } from '../../../types';
 
-import { buildCompleteValidationResults, buildEmptyValidationResults } from '../utils';
+import { buildCompleteSyncValidationResults, buildEmptyValidationResults } from '../utils';
 import { isBlurEvent } from '../../utils';
 
 /**
@@ -11,10 +11,22 @@ import { isBlurEvent } from '../../utils';
  *       After first results are emitted-feedback is provided on every change.
  *
  */
-export const onFirstBlur: StrategyHandler = (props, field, data, stateContainer) => {
-  const validationState = buildCompleteValidationResults(props, field, data.value);
+export const onFirstBlur: StrategyHandler = (
+  field,
+  value,
+  data,
+  event,
+  stateContainer,
+) => {
+  const validationState = buildCompleteSyncValidationResults(
+    field,
+    value,
+    data,
+    stateContainer.getPropsLevelStatuses(),
+    stateContainer.getLayerId(),
+  );
 
-  if (data.event && isBlurEvent(data.event)) {
+  if (event && isBlurEvent(event)) {
     stateContainer.setBluredField(field.id);
     stateContainer.setEmittedField(field.id);
     return validationState;

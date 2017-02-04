@@ -1,18 +1,30 @@
 /* @flow */
 
-import type { Fields, NormalizedFields, Data } from '../types';
+import type {
+  Fields,
+  NormalizedFields,
+  Data,
+  AsyncStrategy as AsyncStrategyType,
+} from '../types';
+
+import Constant from '../enums/Constant';
+import AsyncStrategy from '../enums/AsyncStrategy';
 
 import { buildFieldId } from './ids';
 import { fetchProp, isPlainObject } from './utils';
+import { debounce } from './validations/utils';
 
 
 /**
  * @desc Validation Layer accepts fields as Object w/ props
- *       (struture of this Object alters the structure of data object).
+ *       (struture of this Object replicates the structure of the data object).
  *       For internal usage this Object is normalized to flat Array of fields.
+ *       Also it wraps async validators with ON_CHANGE strategy in debouncer.
  *
  */
 export default function normalizeFieldsFromProps(
+  propsAsyncStrategy: AsyncStrategyType | void,
+  propsDebounceInterval: number | void,
   fields: Fields,
   data: Data,
   normalizedFields: NormalizedFields = [],
@@ -30,6 +42,8 @@ export default function normalizeFieldsFromProps(
 
     if (isPlainObject(dataBranch)) {
       normalizeFieldsFromProps(
+        propsAsyncStrategy,
+        propsDebounceInterval,
         fieldsBranch,
         dataBranch,
         normalizedFields,
@@ -37,12 +51,43 @@ export default function normalizeFieldsFromProps(
       );
     } else {
       const id = buildFieldId(keyPath);
-      const normalizedField =
-        isPlainObject(fieldsBranch)
-        ? { id, keyPath, ...fieldsBranch }
-        : { id, keyPath }
-      ;
-      normalizedFields.push(normalizedField);
+
+      if (isPlainObject(fieldsBranch)) {
+        const fieldAsyncStrategy =
+          propsAsyncStrategy
+          || fieldsBranch.asyncStrategy
+          || AsyncStrategy.DEFAULT
+        ;
+        const debounceInterval =
+          propsDebounceInterval
+          || fieldsBranch.debounceInterval
+          || Constant.DEFAULT_DEBOUNCE_INTERVAL
+        ;
+        const isDebouncedAsyncValidation =
+          fieldsBranch.validateAsync
+          && fieldAsyncStrategy === AsyncStrategy.ON_CHANGE
+        ;
+
+        const normalizedField =
+          isDebouncedAsyncValidation
+          ?
+            ({
+              ...fieldsBranch,
+              id,
+              keyPath,
+              validateAsync: debounce(fieldsBranch.validateAsync, debounceInterval),
+            })
+          :
+            ({
+              ...fieldsBranch,
+              id,
+              keyPath,
+            })
+        ;
+        normalizedFields.push(normalizedField);
+      } else {
+        normalizedFields.push({ id, keyPath });
+      }
     }
   }
 

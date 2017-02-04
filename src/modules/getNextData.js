@@ -15,9 +15,9 @@ import buildErrorMessage from './buildErrorMessage';
  *
  */
 export function getNextDataFromDom(
-  event: SyntheticInputEvent,
-  originalData: Data,
   layerId: LayerId,
+  data: Data,
+  event: SyntheticInputEvent,
 ): DomData {
   const domEl = event.target;
 
@@ -40,8 +40,8 @@ export function getNextDataFromDom(
     keyPath,
     value,
     checked,
+    data,
     event,
-    originalData,
   };
 }
 
@@ -54,7 +54,7 @@ export function getNextDataFromDom(
 export function getNextDataFromCustomHandler(
   fieldId: FieldId,
   value: Value,
-  originalData: Data,
+  data: Data,
   event?: SyntheticInputEvent,
 ): DomData {
   const { attr, keyPath } = parseFieldId(fieldId);
@@ -64,7 +64,7 @@ export function getNextDataFromCustomHandler(
     attr,
     keyPath,
     value,
+    data,
     event,
-    originalData,
   };
 }

@@ -2,7 +2,7 @@
 
 import { getDefaultStatuses } from '../../../../../src/modules/validations/utils';
 
-describe('modules.validation.getDefaultStatuses()', () => {
+describe('modules.validation.utils.getDefaultStatuses()', () => {
   it('returns custom statuses from props when provided', () => {
     const statusesFromProps = { success: 'succeeded', failure: 'failed' };
     const statuses = getDefaultStatuses(statusesFromProps);

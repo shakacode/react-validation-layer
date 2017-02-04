@@ -3,7 +3,7 @@
 
 import React from 'react';
 import classNames from 'classnames';
-import { mount, shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 import type { TestProps } from '../../types';
 
@@ -31,14 +31,18 @@ const PasswordForm = (layerProps: TestProps) => (
             {printValidity(layer.getValidityFor('password'))}
           </div>
         </div>
+        <div className="submit-button-wrapper">
+          <button
+            {...layer.getSubmitButtonProps()}
+            className="submit-button"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     )}
   </ValidationLayer>
 );
 
 /* eslint-disable new-cap */
-export const mountPasswordForm =
-  (...args: Array<TestProps>) => mount(PasswordForm(...args));
-
-export const shallowRenderPasswordForm =
-  (...args: Array<TestProps>) => shallow(PasswordForm(...args));
+export const mountPasswordForm = (...args: Array<TestProps>): * => mount(PasswordForm(...args));

@@ -15,7 +15,7 @@ export default function buildErrorMessage({
   message,
 }: {
   layerId?: LayerId,
-  fieldId?: FieldId,
+  fieldId?: ?FieldId,
   message: string | Array<?string>
 }): string {
   const normalizedMessage = Array.isArray(message) ? message : [message];

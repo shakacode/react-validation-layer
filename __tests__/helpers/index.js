@@ -1,7 +1,7 @@
 /* @flow */
 
-import type { Props, NormalizedField, PropsLevelHandlers } from '../../src/types';
-import type { TestProps, TestValidity, TestPropsLevelHandlers } from '../types';
+import type { Props, NormalizedField, PropsLevelDomHandlers } from '../../src/types';
+import type { TestProps, TestValidity, TestPropsLevelDomHandlers } from '../types';
 
 import { buildFieldId } from '../../src/modules/ids';
 import normalizeFieldsFromProps from '../../src/modules/normalizeFieldsFromProps';
@@ -22,7 +22,7 @@ export const mockOnSubmitHandler = () => (callbacks: {
 
 export const mockPropsLevelHandlers =
   // $FlowIssue: https://github.com/facebook/flow/issues/2977
-  (handlers?: TestPropsLevelHandlers = {}): PropsLevelHandlers => ({
+  (handlers?: TestPropsLevelDomHandlers = {}): PropsLevelDomHandlers => ({
     onChange: mockOnChangeHandler(),
     onSubmit: mockOnSubmitHandler(),
     ...handlers,
@@ -34,6 +34,7 @@ export const mockNormalizedField = (
 ): NormalizedField => {
   const keyPath = props.keyPath || ['dummy'];
 
+  // $FlowIgnoreMe: Not exact here, yeah
   return {
     id: buildFieldId(keyPath),
     keyPath,
@@ -57,14 +58,22 @@ export const mockStrictLayerProps = (props: TestProps): Props => {
 
   if (
     !props.strategy &&
-    !normalizeFieldsFromProps(props.fields, props.data).every(field => field.strategy)
+    !normalizeFieldsFromProps(
+      props.asyncStrategy,
+      props.debounceInterval,
+      props.fields,
+      props.data,
+    ).every(field => field.strategy)
   ) {
     throw new Error('`strategy` is required');
   }
 
-  const defaultProps = { handlers: mockPropsLevelHandlers() };
+  const { handlers, ...restProps } = props;
 
-  return { ...defaultProps, ...props };
+  return {
+    handlers: handlers || mockPropsLevelHandlers(),
+    ...restProps,
+  };
 };
 
 
