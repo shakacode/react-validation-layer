@@ -21,77 +21,107 @@ const SignupForm = ({ signupData, updateFormState, submitForm }) => (
   >
     {layer => (
       <form onSubmit={layer.handleSubmit}>
-        <div
-          className={classNames(
-            'form-field-wrapper',
-            layer.getStatusFor('email'),
-          )}
-        >
-          <label htmlFor={layer.getDomIdFor('email')}>
-            Email
-          </label>
-          <input
-            {...layer.getPropsFor('email')}
-            type="text"
-          />
-          {
-            layer.getAsyncStatusFor('email') &&
-            <div className="form-message">
-              {layer.getAsyncStatusFor('email') && 'Checking...'}
+        <div className="form-bg">
+          <div className="form-messages-area-bg form-messages-area-bg-lg" />
+          <div className="form-content">
+            <h2 className="push-lg">
+              Signup
+            </h2>
+
+            {/* Field: `email` */}
+            <div
+              className={classNames(
+                'form-field-wrapper',
+                layer.getStatusFor('email'),
+              )}
+            >
+              <label
+                htmlFor={layer.getDomIdFor('email')}
+                className="label-lg"
+              >
+                Email
+              </label>
+              <input
+                {...layer.getPropsFor('email')}
+                type="text"
+              />
+              {
+                layer.getAsyncStatusFor('email') &&
+                <div className="form-message">
+                  {layer.getAsyncStatusFor('email') && 'Checking...'}
+                </div>
+              }
+              {
+                layer.getMessageFor('email') &&
+                <div className="form-message">
+                  {layer.getMessageFor('email')}
+                </div>
+              }
             </div>
-          }
-          {
-            layer.getMessageFor('email') &&
-            <div className="form-message">
-              {layer.getMessageFor('email')}
+            <div className="note push-lg">
+              Hint: try `test@taken.email`
             </div>
-          }
-        </div>
-        <div
-          className={classNames(
-            'form-field-wrapper',
-            layer.getStatusFor('password'),
-          )}
-        >
-          <label htmlFor={layer.getDomIdFor('password')}>
-            Password
-          </label>
-          <input
-            {...layer.getPropsFor('password')}
-            type="password"
-          />
-          {
-            layer.getMessageFor('password') &&
-            <div className="form-message">
-              {layer.getMessageFor('password')}
+
+            {/* Field: `password` */}
+            <div
+              className={classNames(
+                'form-field-wrapper',
+                layer.getStatusFor('password'),
+              )}
+            >
+              <label
+                htmlFor={layer.getDomIdFor('password')}
+                className="label-lg"
+              >
+                Password
+              </label>
+              <input
+                {...layer.getPropsFor('password')}
+                type="password"
+              />
+              {
+                layer.getMessageFor('password') &&
+                <div className="form-message">
+                  {layer.getMessageFor('password')}
+                </div>
+              }
             </div>
-          }
-        </div>
-        <div
-          className={classNames(
-            'form-field-wrapper',
-            layer.getStatusFor('passwordConfirmation'),
-          )}
-        >
-          <label htmlFor={layer.getDomIdFor('passwordConfirmation')}>
-            Password Confirmation
-          </label>
-          <input
-            {...layer.getPropsFor('passwordConfirmation')}
-            type="password"
-          />
-          {
-            layer.getMessageFor('passwordConfirmation') &&
-            <div className="form-message">
-              {layer.getMessageFor('passwordConfirmation')}
+
+            {/* Field: `passwordConfirmation` */}
+            <div
+              className={classNames(
+                'form-field-wrapper',
+                layer.getStatusFor('passwordConfirmation'),
+              )}
+            >
+              <label
+                htmlFor={layer.getDomIdFor('passwordConfirmation')}
+                className="label-lg"
+              >
+                Confirm Password
+              </label>
+              <input
+                {...layer.getPropsFor('passwordConfirmation')}
+                type="password"
+              />
+              {
+                layer.getMessageFor('passwordConfirmation') &&
+                <div className="form-message">
+                  {layer.getMessageFor('passwordConfirmation')}
+                </div>
+              }
             </div>
-          }
-        </div>
-        <div className="form-field-wrapper">
-          <div className="label-paceholder" />
-          <button>
-            Submit
-          </button>
+
+            {/* Submit button */}
+            <div className="form-field-wrapper">
+              <button
+                {...layer.getSubmitButtonProps()}
+                className="push-lg"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
         </div>
       </form>
     )}

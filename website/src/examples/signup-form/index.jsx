@@ -16,6 +16,7 @@ export default class SignupFormContainer extends Component {
   };
 
   submitForm = ({ onSuccess }) => {
+    window.alert("All good! Now I'll reset the form");
     this.setState({
       email: null,
       password: null,

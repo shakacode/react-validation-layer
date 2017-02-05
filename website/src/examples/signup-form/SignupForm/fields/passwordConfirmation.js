@@ -3,7 +3,7 @@ export default {
     if (!passwordConfirmation) {
       return {
         valid: false,
-        message: 'Password confirmation is required',
+        message: 'Confirmation is required',
       };
     }
 

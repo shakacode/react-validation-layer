@@ -15,7 +15,7 @@ export default {
     if (password.length < PASSWORD_MIN_LENGTH) {
       return {
         valid: false,
-        message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters length`,
+        message: `${PASSWORD_MIN_LENGTH}+ characters, please`,
       };
     }
 
@@ -23,7 +23,7 @@ export default {
       return {
         valid: true,
         status: 'weak',
-        message: 'Not really strong one, but should be fine',
+        message: "Can be stronger, but it's fine",
       };
     }
 

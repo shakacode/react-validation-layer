@@ -7,6 +7,9 @@ const Main = () => (
     <h1 className="main-title">
       React Validation Layer
     </h1>
+    <div>
+      &larr; Check out Examples.
+    </div>
   </section>
 );
 

@@ -16,9 +16,11 @@ const App = () => (
         <Link to="/" className="nav-link">
           Main
         </Link>
-        <Link to="/docs" className="nav-link">
-          Docs
-        </Link>
+        {/*
+          <Link to="/docs" className="nav-link">
+            Docs
+          </Link>
+        */}
         <div className="nav-section-title">
           Examples
         </div>

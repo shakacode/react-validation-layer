@@ -1,4 +1,4 @@
-const TAKEN_EMAIL = 'taken@email.test';
+const TAKEN_EMAIL = 'test@taken.email';
 
 export default {
   validateEmail: (email) => new Promise((resolve, reject) => {

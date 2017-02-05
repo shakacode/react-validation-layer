@@ -46,6 +46,7 @@ body,
 }
 
 .nav-link {
+  margin-bottom: 5px;
   color: #fff;
   text-decoration: none;
 }
@@ -66,27 +67,71 @@ body,
   max-width: 800px;
 }
 
+h1,
+h2 {
+  margin: 0 0 22px;
+}
 
-/* TODO: Move form styles to more appropriate place */
+
+/* TODO: Refactor this mess and move to appropriate place */
+
+.form-bg {
+  position: relative;
+  background-color: #fff;
+  padding: 30px 40px 40px;
+}
+
+.form-messages-area-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f9f9f9;
+  border-left: 1px dashed #ccc;
+}
+
+.form-messages-area-bg-md {
+  width: calc(800px - 40px - 100px - 15px - 300px - 40px);
+}
+
+.form-messages-area-bg-lg {
+  width: calc(800px - 40px - 130px - 15px - 300px - 40px);
+}
+
+.form-content {
+  position: relative;
+}
 
 .form-field-wrapper {
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.label-paceholder {
-  width: 115px;
+  margin-top: 20px;
 }
 
 label {
   display: inline-flex;
   justify-content: flex-end;
   margin-right: 15px;
-  width: 100px;
   cursor: pointer;
+  font-size: 16px;
+}
+
+.label-md {
+  width: 100px;
+}
+
+.push-md {
+  margin-left: calc(100px + 15px);
+}
+
+.label-lg {
+  width: 130px;
+}
+
+.push-lg {
+  margin-left: calc(130px + 15px);
 }
 
 input {
@@ -101,7 +146,42 @@ input {
   margin-right: 15px;
 }
 
+button {
+  display: inline-flex;
+  border: 1px solid transparent;
+  cursor: pointer;
+  border-color: #72b935;
+  border-radius: 4px;
+  background: linear-gradient(#72b935, #72b935);
+  padding: 12px 15px;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+button:focus,
+button:hover {
+  background: linear-gradient(#72b935, #77c138);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 7px 1px #72b935;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.note {
+  margin-top: 7px;
+  font-size: 14px;
+  color: #777;
+}
+
 .form-message {
+  margin-left: 40px;
   font-size: 14px;
 }
 

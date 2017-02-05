@@ -30,7 +30,7 @@ export default {
       .then(res => (
         res.ok
         ? resolve({ valid: true, message: 'Nice!' })
-        : resolve({ valid: false, message: 'Email alredy exists' })
+        : resolve({ valid: false, message: 'Email is alredy taken' })
       ))
   })
 }
