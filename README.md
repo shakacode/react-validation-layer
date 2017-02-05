@@ -51,6 +51,8 @@ npm install --save react-validation-layer
 As simple as:
 
 ```js
+import ValidationLayer from 'react-validation-layer';
+
 <ValidationLayer
   strategy="onFirstSubmit"
   data={{ email, password }}
@@ -216,10 +218,19 @@ type ValidationResults = boolean | {
 
 Validation function, which takes `value` and `data` object (the one that is passed to `<ValidationLayer />`). It can return either `boolean` or `Object`.
 
-Object with `ValidationResults`:
+`ValidationResults` as an object contains:
 * `valid`: boolean flag, tells if passed value is valid or not. Required.
 * `message`: usually a text string (or i18n id of a text string) which will show up in the view, when this result will be emitted. Actually it can be whatever you want, e.g. array of strings. Not required, if you don't use it.
 * `status`: suppose to identify css class, e.g. `success` or `failure` (those are defaults). Keep in mind that you can pass here any string to provide rich feedback to the user. E.g. when you validate credit card field, on successful validation instead of simple `success` status, you can pass `visa` / `mastercard` etc to display icon of the payment system. Also see [`props.statuses`](#propsstatuses). Not required, if you don't use it or fine with defaults.
+
+_NOTE: In case if you want to re-use validators somewhere else, `react-validation-layer` exposes `normalizeValidationResults` util, which takes result from the `field.validate` and normalizes it to `ValidationResults` object shape._
+
+```js
+import { normalizeValidationResults } from 'react-validation-layer';
+
+const normalizedValidationResults = normalizeValidationResults(field.validate(email));
+// => always object, e.g. `{ valid: true }`
+```
 
 
 #### `field.validateAsync`
@@ -514,24 +525,20 @@ And here is what you can get:
 * [`handleSubmit`](#layerhandlesubmit)
 
 **Providing paths to field data**<br>
-Usually you get _something_ for specific field. In case if your `data` is flat, just pass attribute name to getter:
+Usually you _`getSomething`_ for specific field. In case if your `fields` object is flat, just pass attribute name to getter:
 
 ```js
-const data = { email: 'some@email.com' };
+const fields = { email: true };
 
-layer.getStatusFor('email')
+layer.getStatusFor('email') // <- string
 ```
 
-If you deal with nested structures and want to get _something_ for the field, that more than 1 level deep, provide key path to it:
+If you deal with nested structures and want to _`getSomething`_ for the field, that more than 1 level deep, provide key path to it:
 
 ```js
-const data = {
-  user: {
-    email: 'some@email.com',
-  },
-};
+const fields = { user: { email: true } };
 
-layer.getStatusFor(['user', 'email'])
+layer.getStatusFor(['user', 'email']) // <- array of strings
 ```
 
 
