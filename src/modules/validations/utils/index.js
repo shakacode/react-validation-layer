@@ -68,8 +68,6 @@ export function normalizeValidationResults(
 /**
  * @desc Applies sync validator and returns normalized validation results.
  *
- * TODO: Make public util
- *
  */
 export function applySyncValidation(
   validator: ?Validate,
