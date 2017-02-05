@@ -158,12 +158,12 @@ export default class LayerInterface {
     keyPath: KeyPath,
     {
       value,
-      comparator,
       disabled,
+      getChecked,
     }: {
       value?: EnumerableValue,
-      comparator?: (value: DomValue) => boolean,
       disabled?: ?boolean,
+      getChecked?: (value: DomValue) => boolean,
     },
   ): FieldDomProps | FieldDomPropsWithChecked => {
     const layerId = this.__layerId;
@@ -175,16 +175,16 @@ export default class LayerInterface {
       onChange: this.__handleDomChange,
     };
 
-    if (comparator) {
-      customProps.checked = comparator(field.props.value);
+    if (value) {
+      customProps.id = buildFieldDomIdWithValue(layerId, keyPath, value);
     }
 
     if (disabled) {
       customProps.disabled = disabled;
     }
 
-    if (value) {
-      customProps.id = buildFieldDomIdWithValue(layerId, keyPath, value);
+    if (getChecked) {
+      customProps.checked = getChecked(field.props.value);
     }
 
     // $FlowIssue: exact type + destructuring: https://github.com/facebook/flow/issues/2405

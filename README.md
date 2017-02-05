@@ -411,8 +411,8 @@ _Default: `—`_
 
 ```js
 type Handlers = {
-  onChange: (updatedData: UpdatedData) => void,
-  onBlur: (updatedData: UpdatedData) => void,
+  onChange?: (updatedData: UpdatedData) => void,
+  onBlur?: (updatedData: UpdatedData) => void,
   onSubmit: (callbacks: OnSubmitCallbacks) => void,
 };
 ```
@@ -572,7 +572,21 @@ When you render radio buttons, you must render one radio button for each possibl
 
 ### `layer.getCustomPropsFor`
 
-`TODO:` add docs.
+```js
+type GetCustomPropsFor = (attr: string | KeyPath, options: Options) => FieldDomProps | FieldDomPropsWithChecked;
+
+type Options = {
+  value?: string,
+  disabled?: ?boolean,
+  getChecked?: (value: string) => boolean,
+};
+```
+
+Sometimes you want to do fancy stuff in UI and involve uncommon logic. If you can't achieve what you want with standard getters, here is constructor for you. It takes attribute name/key path + object with options (all keys are optional):
+
+* `value`: if provided, used to build radio button DOM id (**NOT as `value` DOM attribute!**). Should be a `string`. Use it only if you render radio button.
+* `disabled`: if provided, will be used for `disabled` DOM attribute. Should be `boolean`.
+* `getChecked`: if provided, will be used to get `checked` DOM attribute. It must be a function, which takes 1 argument: DOM `value` of the field, and returns `boolean`.
 
 
 ### `layer.getSubmitButtonProps`
