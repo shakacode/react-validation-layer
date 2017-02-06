@@ -79,7 +79,15 @@ import ValidationLayer from 'react-validation-layer';
   {layer => (
     <form onSubmit={layer.handleSubmit}>
       <input type="text" {...layer.getPropsFor('email')} />
+      <span className={layer.getStatusFor('email')}>
+        {layer.getMessageFor('email')}
+      </span>
+
       <input type="text" {...layer.getPropsFor('password')} />
+      <span className={layer.getStatusFor('password')}>
+        {layer.getMessageFor('password')}
+      </span>
+
       <button {...layer.getSubmitButtonProps()}>
         Submit
       </button>
@@ -138,7 +146,7 @@ _Default: `—`_
 type Data = { [attr: string]: any };
 ```
 
-Object with form data. Layer doesn't care about where and how you manage the data. You can use vanilla React, or Redux, or whatever to store the state. Just pack the data for the form fields into single object and pass it to validation layer. Object can be flat or nested (see next section). [`immutable`](https://github.com/facebook/immutable-js) structures are supported (no need to call `toJS()`).
+Object with the form data. Layer doesn't care about how you manage the state. You can use vanilla React, or Redux, or whatever as a state container. Just pack the data for the form  into single object and pass it to validation layer. Object can be flat or nested (see next section). [`immutable`](https://github.com/facebook/immutable-js) structures are supported (no need to call `toJS()`).
 
 
 ### `props.fields`
@@ -232,7 +240,7 @@ Validation function, which takes `value` and `data` object (the one that is pass
 `ValidationResults` as an object contains:
 * `valid`: boolean flag, tells if passed value is valid or not. Required.
 * `message`: usually a text string (or i18n id of a text string) which will show up in the view, when this result will be emitted. Actually it can be whatever you want, e.g. array of strings. Not required, if you don't use it.
-* `status`: suppose to identify css class, e.g. `success` or `failure` (those are defaults). Keep in mind that you can pass here any string to provide rich feedback to the user. E.g. when you validate credit card field, on successful validation instead of simple `success` status, you can pass `visa` / `mastercard` etc to display icon of the payment system. Also see [`props.statuses`](#propsstatuses). Not required, if you don't use it or fine with defaults.
+* `status`: suppose to identify css class, e.g. `success` or `failure` (those are defaults). Keep in mind that you can pass here any string to provide rich feedback to the user. E.g. when you validate credit card field, on successful validation instead of simple `success` status, you can pass `visa` / `mastercard` etc to display icon of the payment system. Not required, if you don't use it or fine with defaults. Also see [`props.statuses`](#propsstatuses).
 
 _NOTE: In case if you want to re-use validators somewhere else, `react-validation-layer` exposes `normalizeValidationResults` util, which takes result from the `field.validate` and normalizes it to `ValidationResults` object shape._
 
@@ -340,7 +348,7 @@ type Strategy =
 ;
 ```
 
-In most cases validation feedback should be provided as soon as possible, but not too soon. The question comes down to when to start to provide the feedback. It really depends on context. Strategies below won't provide any feedback until the specific moment, e.g. the first blur from the field or the first successful validation. To understand the behavior of each strategy, add the following prefix to its name: "Start providing instant feedback on..."
+In most cases validation feedback should be provided as soon as possible, but not too soon. The question comes down to when to start to provide the feedback. It really depends on context. Strategies below won't provide any feedback until the specific moment, e.g. the first blur from the field or the first successful validation. All you have to do is to pick the most suitable one for your context. To understand the behavior of each strategy, add the following prefix to its name: "Start providing instant feedback on..."
 
 #### `onFirstChange`
 Validation Layer emits results for the single field as user types. Note that first feedback will be provided only after first change in this field.
@@ -408,7 +416,7 @@ _Default: `700`_
 type DebounceInterval = number;
 ```
 
-Configure amount of time (in `ms`) layer should wait after last user activity before debounced async validation will be invoked.
+Configure amount of time (in `ms`) that layer should wait after last user activity before debounced async validation will be invoked.
 
 
 ### `props.statuses`
@@ -544,7 +552,7 @@ const fields = { email: true };
 layer.getStatusFor('email') // <- string
 ```
 
-If you deal with nested structures and want to _`getSomething`_ for the field, that more than 1 level deep, provide key path to it:
+If you deal with nested structures and want to _`getSomething`_ for the field, that's nested more than 1 level deep, provide key path to it:
 
 ```js
 const fields = { user: { email: true } };
@@ -561,7 +569,7 @@ type GetPropsFor = (attr: string | KeyPath) => FieldDomProps;
 <input type="text" {...layer.getPropsFor('email')} />
 ```
 
-Returns props for general input DOM element (like text input). It contains props like `value`, `onChange` etc. Apply it via spread operator.
+Returns props for general input DOM element (e.g. text input). It contains props like `value`, `onChange` etc. Apply it via spread operator.
 
 
 ### `layer.getCheckboxPropsFor`
@@ -624,7 +632,7 @@ Returns props for submit button. Its only purpose is to disable button on form s
 type GetValidityFor = (attr: string | KeyPath) => boolean | null;
 ```
 
-Returns validity for the field. Keep in mind that in case if layer, according to strategy, isn't ready yet to provide feedback, it will return `null`.
+Returns validity for the field. Keep in mind that in case if layer, according to strategy, isn't ready to provide feedback yet, it will return `null`.
 
 
 ### `layer.getStatusFor`
@@ -633,7 +641,7 @@ Returns validity for the field. Keep in mind that in case if layer, according to
 type GetStatusFor = (attr: string | KeyPath) => string;
 ```
 
-Returns `status` for the field. The one that is passed (or not) via validation results. Keep in mind that in case if layer, according to strategy, isn't ready yet to provide feedback, it will return `null`.
+Returns `status` for the field. The one that is passed (or not) via validation results. Keep in mind that in case if layer, according to strategy, isn't ready to provide feedback yet, it will return `null`.
 
 
 ### `layer.getMessageFor`
@@ -642,7 +650,7 @@ Returns `status` for the field. The one that is passed (or not) via validation r
 type GetMessageFor = (attr: string | KeyPath) => string;
 ```
 
-Returns `message` for the field. The one that is passed (or not) via validation results. Keep in mind that in case if layer, according to strategy, isn't ready yet to provide feedback, it will return `null`.
+Returns `message` for the field. The one that is passed (or not) via validation results. Keep in mind that in case if layer, according to strategy, isn't ready to provide feedback yet, it will return `null`.
 
 
 ### `layer.getAsyncStatusFor`
@@ -697,7 +705,7 @@ layer.notifyOnChange(
 );
 ```
 
-If you do some fancy stuff with the field (e.g. update its value via JS / third-party tool, e.g. date picker), then use this method to notify layer about the change so it can perform validations.
+If you do some fancy stuff with the field (e.g. update its value via JS / third-party tool, e.g. date picker), then use this method to notify layer about the change, so it can perform validations.
 
 
 ### `layer.notifyOnBlur`
