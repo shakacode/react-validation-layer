@@ -6,6 +6,7 @@ import type { StrategyEnum } from '../types';
 const Strategy: StrategyEnum = Object.freeze({
   DEFAULT                       : 'onFirstSuccessOrFirstBlur',
 
+  ON_MOUNT                      : 'onMount',
   ON_FIRST_CHANGE               : 'onFirstChange',
   ON_FIRST_BLUR                 : 'onFirstBlur',
   ON_FIRST_SUCCESS              : 'onFirstSuccess',

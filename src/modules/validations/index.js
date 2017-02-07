@@ -7,13 +7,14 @@ import type {
   State,
   Value,
   Data,
+  Fields,
   Statuses,
   StateContainer,
   NormalizedField,
   NormalizedFields,
   SyncValidationResults,
   CompositeValidationResults,
-  FieldValidationResults,
+  FieldsValidationResults,
   OnSubmitValidationResults,
 } from '../../types';
 
@@ -21,10 +22,14 @@ import Strategy from '../../enums/Strategy';
 import AsyncStrategy from '../../enums/AsyncStrategy';
 import DebounceStatus from '../../enums/DebounceStatus';
 
-import buildErrorMessage from '../buildErrorMessage';
+import {
+  buildCompleteSyncValidationResults,
+  buildIntermediateAsyncValidationResults,
+  buildCompleteAsyncValidationResults,
+} from './utils';
 import { buildFieldValidationStateId, buildFieldIdFromUserKeyPath } from '../ids';
-import { buildCompleteSyncValidationResults, buildIntermediateAsyncValidationResults } from './utils';
 import { fetchProp, isBlurEvent, isChangeEvent, isPromise } from '../utils';
+import buildErrorMessage from '../buildErrorMessage';
 
 import strategies from './strategies';
 import asyncStrategies from './async-strategies';
@@ -179,7 +184,7 @@ export function performFieldValidation(
   parentValue: ?Value,
   parentEvent: ?SyntheticInputEvent,
   stateContainer: StateContainer,
-): FieldValidationResults {
+): FieldsValidationResults {
   if (parentField.linkedFields && !Array.isArray(parentField.linkedFields)) {
     throw new Error(buildErrorMessage({
       layerId: stateContainer.getLayerId(),
@@ -300,7 +305,101 @@ export function performFieldValidation(
 
 
 /**
- * @desc Performs validation of fields on form submission.
+ * @desc Performs fields validation on mount.
+ *
+ */
+export function performOnMountValidation(
+  fields: Fields,
+  stateContainer: StateContainer,
+): FieldsValidationResults {
+  const layerId = stateContainer.getLayerId();
+  const data = stateContainer.getData();
+  const normalizedFields = stateContainer.getNormalizedFields();
+  const propsLevelStatuses = stateContainer.getPropsLevelStatuses();
+  const propsLevelStrategy = stateContainer.getPropsLevelStrategy();
+  const propsLevelAsyncStrategy = stateContainer.getPropsLevelAsyncStrategy();
+
+  const origin = { nextSyncState: {}, ongoingAsyncValidations: {} };
+
+  return (
+    normalizedFields
+      .filter(field => (field.strategy || propsLevelStrategy) === Strategy.ON_MOUNT)
+      .reduce(({ nextSyncState, ongoingAsyncValidations }, field) => {
+        stateContainer.setEmittedField(field.id);
+
+        // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
+        const value: Value = fetchProp(data, field.keyPath);
+        const stateId = buildFieldValidationStateId(field.id);
+
+        const fieldNextSyncValidationState = buildCompleteSyncValidationResults(
+          field,
+          value,
+          data,
+          propsLevelStatuses,
+          layerId,
+        );
+
+        // Don't perform async validation if:
+        //   - there is no async validator
+        //   - value is empty (no reason to validate empty value on remote)
+        //   - value is invalid localy (no reason to validate invalid value on remote)
+        const isAsync =
+          !!field.validateAsync
+          && (!!value || value === 0)
+          && fieldNextSyncValidationState.valid
+        ;
+
+        if (!isAsync) {
+          return {
+            nextSyncState: {
+              ...nextSyncState,
+              [stateId]: fieldNextSyncValidationState,
+            },
+            ongoingAsyncValidations,
+          };
+        }
+
+        const asyncStrategy =
+          field.asyncStrategy
+          || propsLevelAsyncStrategy
+          || AsyncStrategy.DEFAULT
+        ;
+
+        // If asyncStrategy is ON_CHANGE,
+        // then validator on normalized field is debounced.
+        // We'll use original one.
+        const asyncValidator =
+          asyncStrategy === AsyncStrategy.ON_CHANGE
+          ? fetchProp(fields, field.keyPath).validateAsync
+          : field.validateAsync
+        ;
+
+        return {
+          nextSyncState: {
+            ...nextSyncState,
+            [stateId]: buildIntermediateAsyncValidationResults(),
+          },
+          ongoingAsyncValidations: {
+            ...ongoingAsyncValidations,
+            // $FlowIgnoreMe: Hope it will be there (x)
+            [stateId]: asyncValidator(value).then(results => ({
+              resolution: buildCompleteAsyncValidationResults(
+                field.id,
+                results,
+                propsLevelStatuses,
+                layerId,
+              ),
+              forValue: value,
+            })),
+          },
+        };
+      }, origin)
+  );
+}
+
+
+/**
+ * @desc Performs fields validation on form submission.
  *       We don't want to perform async validations here
  *       as those will be performed on the server anyway - all within single request.
  *       However we should respect the current state of async validations.

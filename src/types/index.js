@@ -118,6 +118,7 @@ export type PropsLevelDomHandlers = {|
 export type ValueHandler = ?Filter | ?TransformBeforeStore | ?TransformBeforeRender;
 
 export type Strategy =
+  | 'onMount'
   | 'onFirstChange'
   | 'onFirstBlur'
   | 'onFirstSuccess'
@@ -186,9 +187,12 @@ export type CompositeValidationResults =
   | AsyncValidationResults
   | DebounceStatusReport
 ;
-export type FieldValidationResults = {|
+export type OngoingAsyncValidations = {
+  [stateKey: FieldValidationStateId]: AsyncValidationResults,
+};
+export type FieldsValidationResults = {|
   nextSyncState: State,
-  ongoingAsyncValidations: { [stateKey: FieldValidationStateId]: AsyncValidationResults },
+  ongoingAsyncValidations: OngoingAsyncValidations,
 |};
 
 export type Validate = (value: Value, data: Data) => ValidationResults;
@@ -356,6 +360,7 @@ export type AsyncStrategyHandlers = {
 // Enums
 export type StrategyEnum = {|
   DEFAULT: 'onFirstSuccessOrFirstBlur',
+  ON_MOUNT: 'onMount',
   ON_FIRST_CHANGE: 'onFirstChange',
   ON_FIRST_BLUR: 'onFirstBlur',
   ON_FIRST_SUCCESS: 'onFirstSuccess',

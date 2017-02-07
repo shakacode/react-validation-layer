@@ -21,13 +21,18 @@ import type {
   ExternalErrors,
   FieldValidationStateId,
   ValidationStateWithExternalErrors,
+  OngoingAsyncValidations,
   InsuredAsyncValidationResults,
 } from './types';
 
 import Constant from './enums/Constant';
 import DefaultStatus from './enums/DefaultStatus';
 
-import { performFieldValidation, performOnSubmitValidation } from './modules/validations';
+import {
+  performFieldValidation,
+  performOnMountValidation,
+  performOnSubmitValidation,
+} from './modules/validations';
 import { buildCompleteAsyncValidationResults } from './modules/validations/utils';
 import { parseFieldId, parseFieldStateId, buildFieldValidationStateId } from './modules/ids';
 import { fetchProp, isFunction } from './modules/utils';
@@ -83,6 +88,12 @@ export default class ValidationLayer extends Component {
   componentWillMount(): void {
     // Set fields props
     this.setNextFieldsPropsState();
+  }
+
+
+  componentDidMount(): void {
+    // Performs validation of fields w/ `onMount` strategy
+    this.validateOnMount();
   }
 
 
@@ -251,6 +262,18 @@ export default class ValidationLayer extends Component {
 
 
   /**
+   * @desc On mount fields validation.
+   *
+   */
+  validateOnMount = (): void => {
+    const { fields } = this.props;
+    const { nextSyncState, ongoingAsyncValidations } = performOnMountValidation(fields, this);
+
+    this.setNextValidationState(nextSyncState, ongoingAsyncValidations);
+  };
+
+
+  /**
    * @desc Field validation.
    *       This method is triggered from <LayerDomHandlers />
    *       on `change` & `blur` events.
@@ -267,15 +290,7 @@ export default class ValidationLayer extends Component {
       this,
     );
 
-    if (Object.keys(nextSyncState).length === 0) return;
-
-    this.setState(nextSyncState, () => {
-      Object.keys(ongoingAsyncValidations).forEach(stateId => {
-        ongoingAsyncValidations[stateId].then(deferredNextState =>
-          this.setDeferredNextState(stateId, deferredNextState),
-        );
-      });
-    });
+    this.setNextValidationState(nextSyncState, ongoingAsyncValidations);
   };
 
 
@@ -303,17 +318,37 @@ export default class ValidationLayer extends Component {
         forValue: value,
       };
 
-      this.setDeferredNextState(stateId, deferredNextState);
+      this.setNextDeferredValidationState(stateId, deferredNextState);
     });
   };
 
 
   /**
-   * @desc Sets next validation state from async validator
+   * @desc Sets next validation state from various validators.
+   *
+   */
+  setNextValidationState = (
+    nextSyncState: State,
+    ongoingAsyncValidations: OngoingAsyncValidations,
+  ): void => {
+    if (Object.keys(nextSyncState).length === 0) return;
+
+    this.setState(nextSyncState, () => {
+      Object.keys(ongoingAsyncValidations).forEach(stateId => {
+        ongoingAsyncValidations[stateId].then(deferredNextState =>
+          this.setNextDeferredValidationState(stateId, deferredNextState),
+        );
+      });
+    });
+  };
+
+
+  /**
+   * @desc Sets next deferred validation state from async validator
    *       (if it's not obsolete).
    *
    */
-  setDeferredNextState = (
+  setNextDeferredValidationState = (
     stateId: FieldValidationStateId,
     nextState: InsuredAsyncValidationResults,
   ): void => {

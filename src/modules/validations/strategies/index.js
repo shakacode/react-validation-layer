@@ -5,6 +5,7 @@ import type { StrategyHandlers } from '../../../types';
 
 import Strategy from '../../../enums/Strategy';
 
+import { onMount } from './onMount';
 import { onFirstChange } from './onFirstChange';
 import { onFirstBlur } from './onFirstBlur';
 import { onFirstSuccess } from './onFirstSuccess';
@@ -13,6 +14,7 @@ import { onFirstSubmit } from './onFirstSubmit';
 
 
 const strategies: StrategyHandlers = {
+  [Strategy.ON_MOUNT]                      : onMount,
   [Strategy.ON_FIRST_CHANGE]               : onFirstChange,
   [Strategy.ON_FIRST_BLUR]                 : onFirstBlur,
   [Strategy.ON_FIRST_SUCCESS]              : onFirstSuccess,
