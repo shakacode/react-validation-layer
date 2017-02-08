@@ -23,6 +23,7 @@ import AsyncStrategy from '../../enums/AsyncStrategy';
 import DebounceStatus from '../../enums/DebounceStatus';
 
 import {
+  buildEmptyValidationResults,
   buildCompleteSyncValidationResults,
   buildIntermediateAsyncValidationResults,
   buildCompleteAsyncValidationResults,
@@ -56,24 +57,39 @@ function performSyncFieldValidation(
   // Figuring out defined strategy
   const strategy = field.strategy || stateContainer.getPropsLevelStrategy() || DEFAULT;
 
-  // Ignoring blur event, if strategy doesn't care about blur
+  // Figuring out defined async strategy
+  const asyncStrategy =
+    field.asyncStrategy
+    || stateContainer.getPropsLevelAsyncStrategy()
+    || AsyncStrategy.DEFAULT
+  ;
+
+  // Ignoring blur event, if strategies don't care about blur
   const blurConcernedStrategy = [ON_FIRST_BLUR, ON_FIRST_SUCCESS_OR_FIRST_BLUR].includes(strategy);
+  const blurConcernedAsyncStrategy =
+    !!field.validateAsync
+    && asyncStrategy === AsyncStrategy.ON_BLUR
+  ;
 
   if (
     event
     && isBlurEvent(event)
     && !blurConcernedStrategy
+    && !blurConcernedAsyncStrategy
   ) {
     return null;
   }
 
 
-  // Also ignoring blur event, if strategy is concerned about the first blur,
-  // but it's not the first blur event for this field
+  // Also ignoring blur event, if:
+  //   - field doesn't have async validation w/ ON_BLUR strategy
+  //   - and sync strategy is concerned about the first blur,
+  //     but it's not the first blur event for this field
   if (
     event
     && isBlurEvent(event)
     && blurConcernedStrategy
+    && !blurConcernedAsyncStrategy
     && (stateContainer.getBluredField(field.id) || stateContainer.getEmittedField(field.id))
   ) {
     return null;
@@ -96,8 +112,20 @@ function performSyncFieldValidation(
     }));
   }
 
-  // Validate with the calculated strategy
-  return validateWithStrategy(field, value, data, event, stateContainer);
+  // Validating with the calculated strategy
+  const validatedWithStrategy = validateWithStrategy(field, value, data, event, stateContainer);
+
+  // Before emit one more case must be handled:
+  // if this is `change` event and validation was successful,
+  // but field has also async validation w/ ON_BLUR stategy.
+  // In this case not emitting anything until the blur.
+  return (
+    blurConcernedAsyncStrategy
+    && validatedWithStrategy.valid
+    && (event && isChangeEvent(event))
+    ? buildEmptyValidationResults()
+    : validatedWithStrategy
+  );
 }
 
 
@@ -116,9 +144,11 @@ function performAsyncFieldValidation(
   // Don't perform async validation if:
   //   - there is no async validator
   //   - value is empty (no reason to validate empty value on remote)
+  //   - value is invalid localy (no reason to validate invalid value on remote)
   //   - sync validation said `don't-provide-feedback-yet`
   const noAsyncValidator = !field.validateAsync;
   const noValue = !value && value !== 0;
+  const isSyncValidationInvalid = syncValidationResults && !syncValidationResults.valid;
   const noEmittableSyncResults =
     syncValidationResults
     && syncValidationResults.valid === null
@@ -129,6 +159,7 @@ function performAsyncFieldValidation(
   if (
     noAsyncValidator
     || noValue
+    || isSyncValidationInvalid
     || noEmittableSyncResults
   ) {
     return syncValidationResults;
@@ -152,10 +183,8 @@ function performAsyncFieldValidation(
 
   // Don't perform async validation if:
   //   - validation is skipped by sync validator (null value returned)
-  //   - value is invalid localy (no reason to validate invalid value on remote)
   //   - it's a change event, but async strategy is ON_BLUR
   const isSyncValidationSkipped = syncValidationResults === null;
-  const isSyncValidationInvalid = syncValidationResults && !syncValidationResults.valid;
   const isOnChangeEventButOnBlurStrategy =
     event
     && isChangeEvent(event)
@@ -164,7 +193,6 @@ function performAsyncFieldValidation(
 
   if (
     isSyncValidationSkipped
-    || isSyncValidationInvalid
     || isOnChangeEventButOnBlurStrategy
   ) {
     return syncValidationResults;

@@ -56,7 +56,26 @@ describe('modules.validation.asyncStrategy.onChange()', () => {
   });
 
 
-  it('does not trigger async validation if sync validation failed', () => {
+  it('does not trigger async validation if sync validation failed with no value', () => {
+    const validateAsync = jest.fn();
+
+    const Form = mountForm('onFirstChange', validateAsync);
+
+    // User types invalid `email`
+    Form.setProps({ data: { email: '' } });
+    Form.find('.email-input').simulate('change');
+
+    // Error for `email` is shown
+    expect(Form.find('.email-message').text()).toBe('Email is required');
+    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
+
+    // validateAsync wasn't triggered
+    expect(validateAsync).toHaveBeenCalledTimes(0);
+  });
+
+
+  it('does not trigger async validation if sync validation failed with invalid value', () => {
     const validateAsync = jest.fn();
 
     const Form = mountForm('onFirstChange', validateAsync);

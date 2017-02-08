@@ -1,6 +1,6 @@
 /* @flow */
 
-import { validatePresenceWithMessage } from '../../../../factories/fields/email';
+import { validatePresenceAndShapeWithMessages } from '../../../../factories/fields/email';
 import { mountSignupForm } from '../../../../factories/forms/SignupForm';
 
 describe('modules.validation.asyncStrategy.onBlur()', () => {
@@ -11,7 +11,10 @@ describe('modules.validation.asyncStrategy.onBlur()', () => {
     asyncStrategy: 'onBlur',
     fields: {
       email: {
-        ...validatePresenceWithMessage('Email is required'),
+        ...validatePresenceAndShapeWithMessages({
+          presence: 'Email is required',
+          shape: 'Email is invalid',
+        }),
         validateAsync,
       },
       password: true,
@@ -32,8 +35,8 @@ describe('modules.validation.asyncStrategy.onBlur()', () => {
   });
 
 
-  it('does not trigger async validation if sync validation failed', () => {
-    const validateAsync = jest.fn();
+  it('does not trigger async validation if sync validation is failed with no value', () => {
+    const validateAsync = jest.fn(() => new Promise(() => null));
 
     const Form = mountForm('onFirstChange', validateAsync);
 
@@ -50,6 +53,32 @@ describe('modules.validation.asyncStrategy.onBlur()', () => {
 
     // validateAsync wasn't triggered
     expect(validateAsync).toHaveBeenCalledTimes(0);
+  });
+
+
+  it('does not trigger async validation if sync validation is failed with invalid value', () => {
+    const validateAsync = jest.fn(() => new Promise(() => null));
+
+    const Form = mountForm('onFirstChange', validateAsync);
+
+    // User changes the `email` field
+    Form.setProps({ data: { email: 'invalid@email' } });
+    Form.find('.email-input').simulate('change');
+
+    // Error for `email` is shown
+    expect(Form.find('.email-message').text()).toBe('Email is invalid');
+    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
+
+    Form.find('.email-input').simulate('blur');
+
+    // validateAsync wasn't triggered
+    expect(validateAsync).toHaveBeenCalledTimes(0);
+
+    // Error for `email` is still there
+    expect(Form.find('.email-message').text()).toBe('Email is invalid');
+    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
   });
 
 
@@ -134,5 +163,29 @@ describe('modules.validation.asyncStrategy.onBlur()', () => {
         done.fail(error);
       }
     }, WAIT_BEFORE_RESOLVED + 10);
+  });
+
+
+  it('does not emit results on change if there is async validator w/ onBlur strategy', () => {
+    const validateAsync = jest.fn(() => new Promise(() => null));
+
+    const Form = mountForm('onFirstChange', validateAsync);
+
+    // User changes the `email` field
+    Form.setProps({ data: { email: 'valid@email.com' } });
+    Form.find('.email-input').simulate('change');
+
+    // No results for `email`
+    expect(Form.find('.email-message').length).toBe(0);
+    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(false);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
+
+    Form.find('.email-input').simulate('blur');
+
+    // validateAsync is triggered, processing label is shown w/o validity status
+    expect(validateAsync).toHaveBeenCalledTimes(1);
+    expect(Form.find('.email-message').text()).toBe('Checking...');
+    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(false);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
   });
 });
