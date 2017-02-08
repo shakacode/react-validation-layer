@@ -1,9 +1,9 @@
 /* @flow */
 
-import { validatePresenceAndShapeWithMessages } from '../../../../factories/fields/email';
-import { mountSignupForm } from '../../../../factories/forms/SignupForm';
+import { validatePresenceAndShapeWithMessages } from '../../../factories/fields/email';
+import { mountSignupForm } from '../../../factories/forms/SignupForm';
 
-describe('modules.validation.asyncStrategy.onBlur()', () => {
+describe('asyncStrategy.onBlur()', () => {
   const WAIT_BEFORE_RESOLVED = 20;
 
   const mountForm = (strategy, validateAsync) => mountSignupForm({

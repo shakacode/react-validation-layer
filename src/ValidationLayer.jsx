@@ -45,8 +45,7 @@ import LayerDomHandlers from './LayerDomHandlers';
 
 
 /**
- * @desc Core component.
- *       Holds and manages state of validation layer.
+ * @desc Core component. Container of the validation layer state.
  *
  */
 export default class ValidationLayer extends Component {
@@ -274,9 +273,8 @@ export default class ValidationLayer extends Component {
 
 
   /**
-   * @desc Field validation.
-   *       This method is triggered from <LayerDomHandlers />
-   *       on `change` & `blur` events.
+   * @desc Field validation on `change` & `blur` events.
+   *       This method is triggered from <LayerDomHandlers />.
    *
    */
   validateField = (
@@ -372,9 +370,25 @@ export default class ValidationLayer extends Component {
 
 
   /**
-   * @desc Form validation.
-   *       This method is triggered from <LayerDomHandlers />
-   *       on form submission request.
+   * @desc Submission handler.
+   *
+   */
+  triggerSubmission = (): void => {
+    // Not submitting anything if there's any ongoing async activity
+    // or form is submitting at the moment
+    if (this.isAnyOngoingAsyncActivity() || this.getIsSubmitting()) {
+      return;
+    }
+
+    this.setIsSubmitting(true);
+    this.setFormWasSubmitted();
+    this.setAllFieldsEmitted();
+    this.setNextFieldsPropsState(null, this.validateForm);
+  };
+
+
+  /**
+   * @desc Form validation on submission.
    *
    */
   validateForm = (): void => {

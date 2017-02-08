@@ -17,7 +17,7 @@ import LayerInterface from './LayerInterface';
 
 
 /**
- * @desc DOM event handlers (stateless) container:
+ * @desc Stateless container of DOM event handlers:
  *         - onChange
  *         - onBlur
  *         - onSubmit
@@ -186,18 +186,7 @@ export default class LayerDomHandlers extends React.Component {
       event.preventDefault();
     }
 
-    const { stateContainer } = this.props;
-
-    // Not submitting anything if there's any ongoing async activity
-    // or form is submitting at the moment
-    if (stateContainer.isAnyOngoingAsyncActivity() || stateContainer.getIsSubmitting()) {
-      return;
-    }
-
-    stateContainer.setIsSubmitting(true);
-    stateContainer.setFormWasSubmitted();
-    stateContainer.setAllFieldsEmitted();
-    stateContainer.setNextFieldsPropsState(null, stateContainer.validateForm);
+    this.props.stateContainer.triggerSubmission();
   };
 
 

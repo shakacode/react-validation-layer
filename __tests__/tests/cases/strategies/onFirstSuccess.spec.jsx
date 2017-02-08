@@ -1,9 +1,9 @@
 /* @flow */
 
-import { mountLoginForm } from '../../../../factories/forms/LoginForm';
+import { mountLoginForm } from '../../../factories/forms/LoginForm';
 
-describe('strategy.onFirstBlur', () => {
-  const mountForm = () => mountLoginForm({ strategy: 'onFirstBlur' });
+describe('strategy.onFirstSuccess', () => {
+  const mountForm = () => mountLoginForm({ strategy: 'onFirstSuccess' });
 
   it('does not emit results on mount', () => {
     const Form = mountForm();
@@ -19,41 +19,17 @@ describe('strategy.onFirstBlur', () => {
   });
 
 
-  it('emits results on first blur', () => {
+  it('does not emit results on blur', () => {
     const Form = mountForm();
 
     // User blures from the `email` field
     Form.find('.email-input').simulate('blur');
 
-    // Error for `email` is shown
-    expect(Form.find('.email-message').text()).toBe('Email is required');
-    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
-    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
-
-    // No results for `password` are shown
-    expect(Form.find('.password-message').length).toBe(0);
-    expect(Form.find('.password-wrapper').hasClass('failure')).toBe(false);
-    expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
-
-    // User types invalid `email`
-    Form.setProps({ data: { email: 'invalid@email', password: null } });
-    Form.find('.email-input').simulate('change');
-
-    // Still error for `email` is shown
-    expect(Form.find('.email-message').text()).toBe('Email is invalid');
-    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
-    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
-
-    // User types valid `email`
-    Form.setProps({ data: { email: 'valid@email.com', password: null } });
-    Form.find('.email-input').simulate('change');
-
-    // Success for `email`
+    // No results are shown
     expect(Form.find('.email-message').length).toBe(0);
     expect(Form.find('.email-wrapper').hasClass('failure')).toBe(false);
-    expect(Form.find('.email-wrapper').hasClass('success')).toBe(true);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
 
-    // Still no results for `password` are shown
     expect(Form.find('.password-message').length).toBe(0);
     expect(Form.find('.password-wrapper').hasClass('failure')).toBe(false);
     expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
@@ -78,34 +54,22 @@ describe('strategy.onFirstBlur', () => {
   });
 
 
-  it('does not emits results on valid data', () => {
+  it('emits results on valid data', () => {
     const Form = mountForm();
 
     // User types valid `email`
     Form.setProps({ data: { email: 'valid@email.com', password: null } });
     Form.find('.email-input').simulate('change');
 
-    // No results are shown
+    // Success for `email`
     expect(Form.find('.email-message').length).toBe(0);
     expect(Form.find('.email-wrapper').hasClass('failure')).toBe(false);
-    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
-
-    expect(Form.find('.password-message').length).toBe(0);
-    expect(Form.find('.password-wrapper').hasClass('failure')).toBe(false);
-    expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
+    expect(Form.find('.email-wrapper').hasClass('success')).toBe(true);
   });
 
 
   it('emits results on invalid data after first results were emitted', () => {
     const Form = mountForm();
-
-    // User blures from the `email` field
-    Form.find('.email-input').simulate('blur');
-
-    // Error for `email` is shown
-    expect(Form.find('.email-message').text()).toBe('Email is required');
-    expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
-    expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
 
     // User types valid `email`
     Form.setProps({ data: { email: 'valid@email.com', password: null } });

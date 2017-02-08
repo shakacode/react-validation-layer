@@ -1,9 +1,9 @@
 /* @flow */
 
-import { validatePresenceAndShapeWithMessages } from '../../../../factories/fields/email';
-import { mountSignupForm } from '../../../../factories/forms/SignupForm';
+import { validatePresenceAndShapeWithMessages } from '../../../factories/fields/email';
+import { mountSignupForm } from '../../../factories/forms/SignupForm';
 
-describe('modules.validation.asyncStrategy.onChange()', () => {
+describe('asyncStrategy.onChange()', () => {
   const DEBOUNCE_INTERVAL = 20;
   const WAIT_BEFORE_RESOLVED = 100;
 

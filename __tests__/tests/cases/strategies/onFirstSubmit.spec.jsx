@@ -1,6 +1,6 @@
 /* @flow */
 
-import { mountLoginForm } from '../../../../factories/forms/LoginForm';
+import { mountLoginForm } from '../../../factories/forms/LoginForm';
 
 describe('strategy.onFirstSubmit', () => {
   const mountForm = () => mountLoginForm({ strategy: 'onFirstSubmit' });
