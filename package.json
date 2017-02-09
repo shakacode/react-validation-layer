@@ -30,9 +30,8 @@
     "prerelease": "yarn run check && yarn run clean && yarn run build",
     "preversion": "yarn run prerelease",
     "prepublish": "yarn run prerelease",
-    "release:patch": "scripts/release patch",
-    "release:minor": "scripts/release minor",
-    "release:major": "scripts/release major"
+    "release": "scripts/release latest",
+    "release:next": "scripts/release next"
   },
   "files": [
     "lib"

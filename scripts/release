@@ -1,6 +1,3 @@
 #!/bin/sh
 
-yarn version --new-version $1 --message "Bump version to %s" && \
-git push && \
-git push --tags && \
-npm publish # yarn-publish is broken
+$(yarn global bin)/np --tag=$1
