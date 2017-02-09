@@ -1,6 +1,6 @@
 {
   "name": "react-validation-layer",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "An opinionated form validation tool for React apps",
   "author": "Alex Fedoseev <alex.fedoseev@gmail.com> (https://github.com/alexfedoseev)",
   "license": "MIT",
