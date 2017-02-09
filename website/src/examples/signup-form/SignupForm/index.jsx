@@ -42,13 +42,13 @@ const SignupForm = ({ signupData, updateFormState, submitForm }) => (
                 Email
               </label>
               <input
-                {...layer.getPropsFor('email')}
                 type="text"
+                {...layer.getPropsFor('email')}
               />
               {
                 layer.getAsyncStatusFor('email') &&
                 <div className="form-message">
-                  {layer.getAsyncStatusFor('email') && 'Checking...'}
+                  Checking...
                 </div>
               }
               {
@@ -76,8 +76,8 @@ const SignupForm = ({ signupData, updateFormState, submitForm }) => (
                 Password
               </label>
               <input
-                {...layer.getPropsFor('password')}
                 type="password"
+                {...layer.getPropsFor('password')}
               />
               {
                 layer.getMessageFor('password') &&
@@ -101,8 +101,8 @@ const SignupForm = ({ signupData, updateFormState, submitForm }) => (
                 Confirm Password
               </label>
               <input
-                {...layer.getPropsFor('passwordConfirmation')}
                 type="password"
+                {...layer.getPropsFor('passwordConfirmation')}
               />
               {
                 layer.getMessageFor('passwordConfirmation') &&
@@ -115,8 +115,8 @@ const SignupForm = ({ signupData, updateFormState, submitForm }) => (
             {/* Submit button */}
             <div className="form-field-wrapper">
               <button
-                {...layer.getSubmitButtonProps()}
                 className="push-lg"
+                {...layer.getSubmitButtonProps()}
               >
                 Submit
               </button>

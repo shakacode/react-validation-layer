@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter, Match, Link } from 'react-router'
+import { HashRouter, Route, Link } from 'react-router-dom'
 
 import Main from './pages/Main';
 import Docs from './docs';
@@ -32,9 +32,9 @@ const App = () => (
         </Link>
       </div>
       <div className="container">
-        <Match pattern="/" exactly component={Main} />
-        <Match pattern="/docs" component={Docs} />
-        <Match pattern="/examples" component={Examples} />
+        <Route path="/" exact component={Main} />
+        <Route path="/docs" component={Docs} />
+        <Route path="/examples" component={Examples} />
 
         {/* <Miss component={NotFound}/> */}
       </div>

@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import { Match } from 'react-router'
+import { Route } from 'react-router-dom'
 
 import LoginForm from './login-form';
 import SignupForm from './signup-form';
@@ -9,8 +9,8 @@ import SignupForm from './signup-form';
 
 const Examples = (props) => (
   <section className="section">
-    <Match pattern="/examples/login-form" component={LoginForm} />
-    <Match pattern="/examples/signup-form" component={SignupForm} />
+    <Route path="/examples/login-form" component={LoginForm} />
+    <Route path="/examples/signup-form" component={SignupForm} />
   </section>
 );
 

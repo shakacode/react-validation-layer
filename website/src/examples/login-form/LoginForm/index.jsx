@@ -35,8 +35,8 @@ const LoginForm = ({ loginData, updateFormState, submitForm }) => (
                 Email
               </label>
               <input
-                {...layer.getPropsFor('email')}
                 type="text"
+                {...layer.getPropsFor('email')}
               />
               {
                 layer.getMessageFor('email') &&
@@ -55,8 +55,8 @@ const LoginForm = ({ loginData, updateFormState, submitForm }) => (
                 Password
               </label>
               <input
-                {...layer.getPropsFor('password')}
                 type="password"
+                {...layer.getPropsFor('password')}
               />
               {
                 layer.getMessageFor('password') &&
@@ -70,8 +70,8 @@ const LoginForm = ({ loginData, updateFormState, submitForm }) => (
             <div className="form-field-wrapper">
               <div className="label-medium-paceholder" />
               <button
-                {...layer.getSubmitButtonProps()}
                 className="push-md"
+                {...layer.getSubmitButtonProps()}
               >
                 Submit
               </button>
