@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  background-color: #eaeaea;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 300;
+  font-size: 20px;
+}
+
+#app {
+  display: flex;
+}
+
+.root {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.nav {
+  display: flex;
+  flex-flow: column nowrap;
+  background-color: #222;
+  width: 250px;
+  height: 100%;
+  padding: 20px;
+  color: #fff;
+  font-size: 17px;
+}
+
+.nav-section-title {
+  margin: 30px 0 10px;
+  color: #aaa;
+}
+
+.nav-link {
+  margin-bottom: 5px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  flex: 1;
+  min-height: 100%;
+  padding: 20px 40px;
+}
+
+.section {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 800px;
+  max-width: 800px;
+}
+
+h1,
+h2 {
+  margin: 0 0 22px;
+}
+
+
+/* TODO: Refactor this mess and move to appropriate place */
+
+.form-bg {
+  position: relative;
+  background-color: #fff;
+  padding: 30px 40px 40px;
+}
+
+.form-messages-area-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f9f9f9;
+  border-left: 1px dashed #ccc;
+}
+
+.form-messages-area-bg-md {
+  width: calc(800px - 40px - 100px - 15px - 300px - 40px);
+}
+
+.form-messages-area-bg-lg {
+  width: calc(800px - 40px - 130px - 15px - 300px - 40px);
+}
+
+.form-content {
+  position: relative;
+}
+
+.form-field-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 20px;
+}
+
+label {
+  display: inline-flex;
+  justify-content: flex-end;
+  margin-right: 15px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.label-md {
+  width: 100px;
+}
+
+.push-md {
+  margin-left: calc(100px + 15px);
+}
+
+.label-lg {
+  width: 130px;
+}
+
+.push-lg {
+  margin-left: calc(130px + 15px);
+}
+
+input {
+  display: inline-flex;
+  padding: 8px;
+  font-size: 16px;
+  width: 300px;
+}
+
+label,
+input {
+  margin-right: 15px;
+}
+
+button {
+  display: inline-flex;
+  border: 1px solid transparent;
+  cursor: pointer;
+  border-color: #72b935;
+  border-radius: 4px;
+  background: linear-gradient(#72b935, #72b935);
+  padding: 12px 15px;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+button:focus,
+button:hover {
+  background: linear-gradient(#72b935, #77c138);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 7px 1px #72b935;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.note {
+  margin-top: 7px;
+  font-size: 14px;
+  color: #777;
+}
+
+.form-message {
+  margin-left: 40px;
+  font-size: 14px;
+}
+
+.success .form-message {
+  color: green;
+}
+
+.weak .form-message {
+  color: #c6ba1c;
+}
+
+.failure .form-message {
+  color: red;
+}

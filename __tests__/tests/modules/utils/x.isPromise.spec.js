@@ -1,0 +1,7 @@
+/* @flow */
+
+// import * as utils from '../../../../src/modules/utils';
+
+describe('utils.isPromise()', () => {
+  xit('add tests', () => {});
+});
