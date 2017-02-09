@@ -1,7 +1,7 @@
 {
   "name": "react-validation-layer",
   "version": "1.0.0-beta.1",
-  "description": "Form validation layer for every React based app",
+  "description": "An opinionated form validation tool for React apps",
   "author": "Alex Fedoseev <alex.fedoseev@gmail.com> (https://github.com/alexfedoseev)",
   "license": "MIT",
   "main": "./lib/index.js",
@@ -27,9 +27,7 @@
     "flow:up": "flow-typed update",
     "clean": "rm -rf lib",
     "check": "yarn run flow && yarn run test && yarn run lint",
-    "prerelease": "yarn run check && yarn run clean && yarn run build",
-    "preversion": "yarn run prerelease",
-    "prepublish": "yarn run prerelease",
+    "preversion": "yarn run check && yarn run build",
     "release": "scripts/release latest",
     "release:next": "scripts/release next"
   },
