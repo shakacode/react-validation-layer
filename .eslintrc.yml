@@ -1,33 +1,34 @@
 ---
 extends:
-  - eslint-config-shakacode
-  - plugin:flowtype/recommended
+  - "eslint-config-shakacode"
+  - "plugin:flowtype/recommended"
 
 plugins:
-  - flowtype
+  - "flowtype"
 
 env:
   jest: true
 
 rules:
   no-unused-vars:
-    - error
-    - args: after-used
+    - "error"
+    - args: "after-used"
 
-  arrow-body-style: off
-  no-underscore-dangle: off
+  arrow-body-style: "off"
+  no-underscore-dangle: "off"
+  no-multi-assign: "off"
 
-  react/sort-comp: off
+  react/sort-comp: "off"
 
   import/no-extraneous-dependencies:
-    - error
+    - "error"
     - devDependencies: true
 
-  import/prefer-default-export: off
+  import/prefer-default-export: "off"
 
   flowtype/require-valid-file-annotation:
-    - error
-    - always
+    - "error"
+    - "always"
 
-  flowtype/no-weak-types: error
-  flowtype/no-dupe-keys: error
+  flowtype/no-weak-types: "error"
+  flowtype/no-dupe-keys: "error"

@@ -409,7 +409,7 @@ export function performOnMountValidation(
           },
           ongoingAsyncValidations: {
             ...ongoingAsyncValidations,
-            // $FlowIgnoreMe: Hope it will be there (x)
+            // $FlowFixMe: Not sure how to assure flow that it's not debounced validator
             [stateId]: asyncValidator(value).then(results => ({
               resolution: buildCompleteAsyncValidationResults(
                 field.id,

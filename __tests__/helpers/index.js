@@ -43,6 +43,7 @@ export const mockNormalizedField = (
 };
 
 
+// $FlowIssue: exact type + destructuring: https://github.com/facebook/flow/issues/2405
 export const mockDummyLayerProps = (props: TestProps): Props => ({
   id: 'dummyId',
   data: {},
@@ -70,6 +71,7 @@ export const mockStrictLayerProps = (props: TestProps): Props => {
 
   const { handlers, ...restProps } = props;
 
+  // $FlowIssue: exact type + destructuring: https://github.com/facebook/flow/issues/2405
   return {
     handlers: handlers || mockPropsLevelHandlers(),
     ...restProps,

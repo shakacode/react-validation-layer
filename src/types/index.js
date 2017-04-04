@@ -9,8 +9,8 @@ import LayerInterface from '../LayerInterface';
 
 export type LayerId = string;
 
-export type Props = {
-  id: LayerId,
+export type Props = {|
+  id?: LayerId,
   data: Data,
   fields: Fields,
   strategy?: Strategy,
@@ -22,9 +22,9 @@ export type Props = {
   transformBeforeStore?: TransformBeforeStore,
   transformBeforeRender?: TransformBeforeRender,
   children?: (layer: LayerInterface) => React.Element<*>,
-};
+|};
 
-export type LayerDomHandlersProps = {
+export type LayerDomHandlersProps = {|
   layerId: LayerId,
   stateContainer: StateContainer,
   data: Data,
@@ -32,7 +32,7 @@ export type LayerDomHandlersProps = {
   transformBeforeStore?: TransformBeforeStore,
   handlers: PropsLevelDomHandlers,
   children?: (layer: LayerInterface) => React.Element<*>,
-};
+|};
 
 export type Data = { [attr: string]: Value | Data };
 
