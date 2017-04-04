@@ -7,7 +7,7 @@ node_js:
   - 7
 
 script:
-  - yarn run check
+  - yarn run validate
   - yarn run build
 
 branches:

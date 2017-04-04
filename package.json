@@ -26,8 +26,8 @@
     "flow": "flow --show-all-errors",
     "flow:up": "rm -rf flow-typed && flow-typed install",
     "clean": "rm -rf lib",
-    "check": "yarn run flow && yarn run test && yarn run lint",
-    "preversion": "yarn run check && yarn run build",
+    "validate": "yarn run flow && yarn run test && yarn run lint",
+    "preversion": "yarn run validate && yarn run build",
     "release": "scripts/release latest",
     "release:next": "scripts/release next"
   },
