@@ -18,10 +18,10 @@ module.use_strict=true
 esproposal.class_instance_fields=enable
 esproposal.class_static_fields=enable
 
-suppress_comment=\\(.\\|\n\\)*\\$FlowIssue\\($\\|[^(]\\|(\\(>=0\\.\\(1[0-6]\\|[0-9]\\).[0-9]\\)? *\\(site=[a-z,_]*www[a-z,_]*\\)?)\\)
-suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe\\($\\|[^(]\\|(\\(>=0\\.\\(1[0-6]\\|[0-9]\\).[0-9]\\)? *\\(site=[a-z,_]*www[a-z,_]*\\)?)\\)
-suppress_comment=\\(.\\|\n\\)*\\$FlowIgnoreMe\\($\\|[^(]\\|(\\(>=0\\.\\(1[0-6]\\|[0-9]\\).[0-9]\\)? *\\(site=[a-z,_]*www[a-z,_]*\\)?)\\)
-
-suppress_type=$FlowIssue
+suppress_type=$FlowTODO
 suppress_type=$FlowFixMe
-suppress_type=$FlowIgnoreMe
+suppress_type=$FlowIssue
+
+suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
+suppress_comment=\\(.\\|\n\\)*\\$FlowIgnoreMe
+suppress_comment=\\(.\\|\n\\)*\\$FlowIssue

@@ -50,8 +50,6 @@ import LayerDomHandlers from './LayerDomHandlers';
  */
 export default class ValidationLayer extends Component {
 
-  static defaultProps = { id: Constant.DEFAULT_LAYER_ID };
-
   props: Props;
   state: State = {};
 
@@ -69,7 +67,7 @@ export default class ValidationLayer extends Component {
   constructor(props: Props, ...rest: Array<*>): void {
     super(props, ...rest);
 
-    this.__layerId = props.id;
+    this.__layerId = props.id || Constant.DEFAULT_LAYER_ID;
 
     this.__normalizedFields = normalizeFieldsFromProps(
       props.asyncStrategy,
