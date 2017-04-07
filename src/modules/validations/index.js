@@ -1,7 +1,5 @@
 /* @flow */
 
-import * as _ from '../utils/lodash';
-
 import type {
   LayerId,
   State,
@@ -29,7 +27,7 @@ import {
   buildCompleteAsyncValidationResults,
 } from './utils';
 import { buildFieldValidationStateId, buildFieldIdFromUserKeyPath } from '../ids';
-import { getProp, isBlurEvent, isChangeEvent, isPromise } from '../utils';
+import { getProp, setProp, isBlurEvent, isChangeEvent, isPromise } from '../utils';
 import buildErrorMessage from '../buildErrorMessage';
 
 import strategies from './strategies';
@@ -262,7 +260,7 @@ export function performFieldValidation(
     const data =
       isParentField
       ? currentData
-      : _.set(_.cloneDeep(currentData), parentField.keyPath, parentValue)
+      : setProp(currentData, parentField.keyPath, parentValue)
     ;
 
     // Performing sync -> async validations

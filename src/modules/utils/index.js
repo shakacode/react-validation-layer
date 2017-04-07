@@ -1,6 +1,10 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
+import * as _ from './lodash';
+
+import type { Value } from '../../types';
+
 /**
  * @desc If value is `null` or `undefined`,
  *       then we should pass empty string as a DOM value.
@@ -44,6 +48,27 @@ export function getProp(
     container.getIn && isFunction(container.getIn)
     ? container.getIn(normalizedKeyPath)
     : normalizedKeyPath.reduce((data, key) => data[key], container)
+  );
+}
+
+
+/**
+ * @desc Sets value of property at provided key path.
+ *       Data container can be vanilla JS Object,
+ *       as well as Immutable structure (e.g. Map).
+ *
+ */
+export function setProp(
+  container: Object, // eslint-disable-line flowtype/no-weak-types
+  keyPath: string | Array<string>,
+  value: Value,
+) {
+  const normalizedKeyPath = normalizeKeyPath(keyPath);
+
+  return (
+    container.setIn && isFunction(container.setIn)
+    ? container.setIn(normalizedKeyPath, value)
+    : _.set(_.cloneDeep(container), keyPath, value)
   );
 }
 

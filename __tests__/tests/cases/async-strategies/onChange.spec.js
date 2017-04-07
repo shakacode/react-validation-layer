@@ -20,6 +20,7 @@ describe('asyncStrategy.onChange()', () => {
         validateAsync,
       },
       password: true,
+      passwordConfirmation: true,
     },
   });
 
