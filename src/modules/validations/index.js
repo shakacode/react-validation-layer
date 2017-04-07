@@ -29,7 +29,7 @@ import {
   buildCompleteAsyncValidationResults,
 } from './utils';
 import { buildFieldValidationStateId, buildFieldIdFromUserKeyPath } from '../ids';
-import { fetchProp, isBlurEvent, isChangeEvent, isPromise } from '../utils';
+import { getProp, isBlurEvent, isChangeEvent, isPromise } from '../utils';
 import buildErrorMessage from '../buildErrorMessage';
 
 import strategies from './strategies';
@@ -254,7 +254,7 @@ export function performFieldValidation(
     const currentData = stateContainer.getData();
 
     // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
-    const value: ?Value = isParentField ? parentValue : fetchProp(currentData, field.keyPath);
+    const value: ?Value = isParentField ? parentValue : getProp(currentData, field.keyPath);
     const event = isParentField ? parentEvent : null;
 
     // If it's a linked field, data must be updated w/ the next value of parent field.
@@ -356,7 +356,7 @@ export function performOnMountValidation(
         stateContainer.setEmittedField(field.id);
 
         // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
-        const value: Value = fetchProp(data, field.keyPath);
+        const value: Value = getProp(data, field.keyPath);
         const stateId = buildFieldValidationStateId(field.id);
 
         const fieldNextSyncValidationState = buildCompleteSyncValidationResults(
@@ -398,7 +398,7 @@ export function performOnMountValidation(
         // We'll use original one.
         const asyncValidator =
           asyncStrategy === AsyncStrategy.ON_CHANGE
-          ? fetchProp(fields, field.keyPath).validateAsync
+          ? getProp(fields, field.keyPath).validateAsync
           : field.validateAsync
         ;
 
@@ -453,7 +453,7 @@ export function performOnSubmitValidation(
 
   return fields.reduce(({ validationState, isValid }, field) => {
     // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
-    const value: Value = fetchProp(data, field.keyPath);
+    const value: Value = getProp(data, field.keyPath);
     const fieldValidationStateId = buildFieldValidationStateId(field.id);
 
     const fieldCurrentValidationState = state[fieldValidationStateId];

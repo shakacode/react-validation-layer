@@ -12,7 +12,7 @@ import Constant from '../enums/Constant';
 
 import { getFieldValueHandler } from './getFieldHandler';
 import { buildFieldDomId, buildFieldPropsStateId } from './ids';
-import { fetchProp, normalizeValueForDom } from './utils';
+import { getProp, normalizeValueForDom } from './utils';
 
 
 /**
@@ -33,7 +33,7 @@ export default function getFieldsPropsState(
       const fieldPropsStateId = buildFieldPropsStateId(field.id);
 
       // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
-      const fieldValue: Value = fetchProp(data, field.keyPath);
+      const fieldValue: Value = getProp(data, field.keyPath);
       const fieldNormalizedDomValue = normalizeValueForDom(fieldValue);
 
       const transformBeforeRender = getFieldValueHandler(

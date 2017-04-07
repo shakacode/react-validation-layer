@@ -2,6 +2,6 @@
 
 // import * as utils from '../../../../src/modules/utils';
 
-describe('utils.fetchProp()', () => {
+describe('utils.getProp()', () => {
   xit('add tests', () => {});
 });

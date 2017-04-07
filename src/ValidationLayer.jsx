@@ -35,7 +35,7 @@ import {
 } from './modules/validations';
 import { buildCompleteAsyncValidationResults } from './modules/validations/utils';
 import { parseFieldId, parseFieldStateId, buildFieldValidationStateId } from './modules/ids';
-import { fetchProp, isFunction } from './modules/utils';
+import { getProp, isFunction } from './modules/utils';
 import normalizeFieldsFromProps from './modules/normalizeFieldsFromProps';
 import normalizeExternalErrors from './modules/normalizeExternalErrors';
 import getFieldsPropsState from './modules/getFieldsPropsState';
@@ -355,7 +355,7 @@ export default class ValidationLayer extends Component {
     const { fieldId } = parseFieldStateId(stateId);
     const { keyPath } = parseFieldId(fieldId);
 
-    const fieldValue = fetchProp(props.data, keyPath);
+    const fieldValue = getProp(props.data, keyPath);
 
     // While async call is being processed,
     // deferred validation state might become obsolete:

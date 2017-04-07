@@ -11,7 +11,7 @@ import Constant from '../enums/Constant';
 import AsyncStrategy from '../enums/AsyncStrategy';
 
 import { buildFieldId } from './ids';
-import { fetchProp, isPlainObject } from './utils';
+import { getProp, isPlainObject } from './utils';
 import { debounce } from './validations/utils';
 
 
@@ -37,7 +37,7 @@ export default function normalizeFieldsFromProps(
   while (++index < keys.length) {
     const key = keys[index];
     const fieldsBranch = fields[key];
-    const dataBranch = fetchProp(data, key);
+    const dataBranch = getProp(data, key);
     const keyPath = parentKeyPath.concat(key);
 
     if (isPlainObject(dataBranch)) {

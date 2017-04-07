@@ -34,7 +34,7 @@ export function normalizeKeyPath(
  *       as well as Immutable structure (e.g. Map).
  *
  */
-export function fetchProp(
+export function getProp(
   container: Object, // eslint-disable-line flowtype/no-weak-types
   keyPath: string | Array<string>,
 ) {
