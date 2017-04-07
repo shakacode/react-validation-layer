@@ -18,6 +18,7 @@ describe('asyncStrategy.onBlur()', () => {
         validateAsync,
       },
       password: true,
+      passwordConfirmation: true,
     },
   });
 

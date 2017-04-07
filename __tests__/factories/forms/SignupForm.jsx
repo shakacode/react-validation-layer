@@ -18,7 +18,11 @@ import { mockStrictLayerProps } from '../../helpers';
 import ValidationLayer from '../../../src';
 
 
-const defaultData = { email: null, password: null };
+const defaultData = {
+  email: null,
+  password: null,
+  passwordConfirmation: null,
+};
 
 type Props = {
   id?: string,
@@ -84,6 +88,24 @@ const SignupForm = ({
             layer.getMessageFor('password') &&
             <span className="password-message">
               {layer.getMessageFor('password')}
+            </span>
+          }
+        </div>
+        <div
+          className={classNames(
+            'password-confirmation-wrapper',
+            layer.getStatusFor('passwordConfirmation'),
+          )}
+        >
+          <input
+            type="text"
+            className="password-confirmation-input"
+            {...layer.getPropsFor('passwordConfirmation')}
+          />
+          {
+            layer.getMessageFor('passwordConfirmation') &&
+            <span className="password-confirmation-message">
+              {layer.getMessageFor('passwordConfirmation')}
             </span>
           }
         </div>
