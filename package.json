@@ -6,7 +6,6 @@
   "license": "MIT",
   "main": "lib/react-validation-layer.cjs.js",
   "module": "lib/react-validation-layer.es.js",
-  "browser": "lib/react-validation-layer.umd.js",
   "engines": {
     "node": ">=4.2.0"
   },
