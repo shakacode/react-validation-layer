@@ -4,7 +4,9 @@
   "description": "An opinionated form validation tool for React apps",
   "author": "Alex Fedoseev <alex.fedoseev@gmail.com> (https://github.com/alexfedoseev)",
   "license": "MIT",
-  "main": "./lib/index.js",
+  "main": "lib/react-validation-layer.cjs.js",
+  "module": "lib/react-validation-layer.es.js",
+  "browser": "lib/react-validation-layer.umd.js",
   "engines": {
     "node": ">=4.2.0"
   },
@@ -17,12 +19,13 @@
   },
   "scripts": {
     "start": "yarn run clean && yarn run dev",
-    "dev": "babel --watch --out-dir lib src",
-    "build": "yarn run clean && yarn run build:lib && yarn run build:flow",
-    "build:lib": "babel --out-dir lib src",
-    "build:flow": "flow-copy-source -v src lib",
-    "lint": "eslint --ext .js,.jsx .",
-    "test": "jest --config .jest.json",
+    "dev": "BABEL_ENV=build BUILD_TARGET=cjs rollup --config --watch",
+    "build": "yarn run clean && yarn run build:es && yarn run build:cjs && yarn run build:umd",
+    "build:es": "BABEL_ENV=build BUILD_TARGET=es rollup --config",
+    "build:cjs": "BABEL_ENV=build BUILD_TARGET=cjs rollup --config",
+    "build:umd": "BABEL_ENV=build BUILD_TARGET=umd rollup --config",
+    "lint": "eslint .",
+    "test": "BABEL_ENV=test jest --config .jest.json",
     "flow": "flow --show-all-errors",
     "flow:up": "rm -rf flow-typed && flow-typed install",
     "clean": "rm -rf lib",
@@ -50,6 +53,7 @@
     "babel-core": "6.24.0",
     "babel-jest": "19.0.0",
     "babel-plugin-check-es2015-constants": "6.22.0",
+    "babel-plugin-external-helpers": "6.22.0",
     "babel-plugin-syntax-jsx": "6.18.0",
     "babel-plugin-transform-class-properties": "6.23.0",
     "babel-plugin-transform-es2015-arrow-functions": "6.22.0",
@@ -79,12 +83,16 @@
     "eslint-plugin-jsx-a11y": "4.0.0",
     "eslint-plugin-react": "6.10.3",
     "flow-bin": "0.42.0",
-    "flow-copy-source": "1.1.0",
     "flow-typed": "2.0.0",
     "immutable": "3.8.1",
     "jest": "19.0.2",
     "react": "15.4.2",
     "react-addons-test-utils": "15.4.2",
-    "react-dom": "15.4.2"
+    "react-dom": "15.4.2",
+    "rollup": "0.41.6",
+    "rollup-plugin-babel": "2.7.1",
+    "rollup-plugin-commonjs": "8.0.2",
+    "rollup-plugin-node-resolve": "3.0.0",
+    "rollup-watch": "3.2.2"
   }
 }
