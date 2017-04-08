@@ -5,7 +5,7 @@ import email from './fields/email';
 import password from './fields/password';
 import passwordConfirmation from './fields/passwordConfirmation';
 
-import ValidationLayer from '../../../../../lib';
+import ValidationLayer from '../../../../../lib/react-validation-layer.cjs';
 
 const SignupForm = ({ signupData, updateFormState, submitForm }) => (
   <ValidationLayer

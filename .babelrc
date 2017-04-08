@@ -18,8 +18,19 @@
     ["transform-es2015-destructuring", { "loose": true }],
     "transform-es2015-block-scoping",
     "transform-object-rest-spread",
-    ["transform-es2015-modules-commonjs", { "loose": true }],
     "transform-react-jsx",
     "syntax-jsx"
-  ]
+  ],
+  "env": {
+    "build": {
+      "plugins": [
+        "external-helpers"
+      ]
+    },
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  }
 }

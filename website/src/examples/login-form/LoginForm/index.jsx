@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import email from './fields/email';
 import password from './fields/password';
 
-import ValidationLayer from '../../../../../lib';
+import ValidationLayer from '../../../../../lib/react-validation-layer.cjs';
 
 const LoginForm = ({ loginData, updateFormState, submitForm }) => (
   <ValidationLayer
