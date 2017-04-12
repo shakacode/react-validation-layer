@@ -52,8 +52,10 @@ describe('layer', () => {
     expect(layer.getCustomPropsFor).toBeInstanceOf(Function);
     expect(layer.getSubmitButtonProps).toBeInstanceOf(Function);
     expect(layer.getValidityFor).toBeInstanceOf(Function);
-    expect(layer.getMessageFor).toBeInstanceOf(Function);
+    expect(layer.isSuccessFor).toBeInstanceOf(Function);
+    expect(layer.isFailureFor).toBeInstanceOf(Function);
     expect(layer.getStatusFor).toBeInstanceOf(Function);
+    expect(layer.getMessageFor).toBeInstanceOf(Function);
     expect(layer.getAsyncStatusFor).toBeInstanceOf(Function);
     expect(layer.getSubmissionStatus).toBeInstanceOf(Function);
     expect(layer.getDomIdFor).toBeInstanceOf(Function);
@@ -62,7 +64,7 @@ describe('layer', () => {
     expect(layer.notifyOnBlur).toBeInstanceOf(Function);
     expect(layer.handleSubmit).toBeInstanceOf(Function);
 
-    expect(Object.keys(layer).length).toBe(21);
+    expect(Object.keys(layer).length).toBe(23);
     expect(Object.keys(layer.__fields).length).toBe(2);
   });
 });

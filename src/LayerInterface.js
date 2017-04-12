@@ -208,6 +208,21 @@ export default class LayerInterface {
   };
 
 
+  isSuccessFor = (keyPath: KeyPath): boolean => {
+    const field = this.__getField(keyPath, 'isSuccessFor');
+    if (!field.props.value && field.props.value !== 0) {
+      return false;
+    }
+    return !!field.resolution && field.resolution.valid === true;
+  };
+
+
+  isFailureFor = (keyPath: KeyPath): boolean => {
+    const field = this.__getField(keyPath, 'isFailureFor');
+    return !!field.resolution && field.resolution.valid === false;
+  };
+
+
   getStatusFor = (keyPath: KeyPath): ?string => {
     const field = this.__getField(keyPath, 'getStatusFor');
     return (

@@ -533,6 +533,8 @@ And here is what you can get:
 * [`getCustomPropsFor`](#layergetcustompropsfor)
 * [`getSubmitButtonProps`](#layergetsubmitbuttonprops)
 * [`getValidityFor`](#layergetvalidityfor)
+* [`isSuccessFor`](#layerissuccessfor)
+* [`isFailureFor`](#layerisfailurefor)
 * [`getStatusFor`](#layergetstatusfor)
 * [`getMessageFor`](#layergetmessagefor)
 * [`getAsyncStatusFor`](#layergetasyncstatusfor)
@@ -641,7 +643,29 @@ Returns validity for the field. Keep in mind that in case if layer, according to
 type GetStatusFor = (attr: string | KeyPath) => string;
 ```
 
-Returns `status` for the field. The one that is passed (or not) via validation results. Keep in mind that in case if layer, according to strategy, isn't ready to provide feedback yet, it will return `null`.
+Returns `status` for a field. The one that is passed (or not) via validation results.
+
+Keep in mind that in case if layer, according to strategy, isn't ready to provide a feedback yet, it will return `null`.
+
+Also, in case if filed doesn't have a value, but still valid, status still is set to `null`. This is because the main use-case for `status` is CSS class name, but we don't want to paint everything green if field is empty.
+
+
+### `layer.isSuccessFor`
+
+```js
+type IsSuccessFor = (attr: string | KeyPath) => boolean;
+```
+
+Basically, it's a shorthand to get boolean result if success status is emitted for a field (instead of using comparison operators with [`layer.getStatusFor`](#layergetstatusfor)). Keep in mind, that emitting behavior is consistent with the [`layer.getStatusFor`](#layergetstatusfor) method: it will return `false` if, according to strategy, layer isn't ready to emit `status` or value is not present (even if it's a valid case for a field). To get the validity, use [`layer.getValidityFor`](#layergetvalidityfor)
+
+
+### `layer.isFailureFor`
+
+```js
+type IsFailureFor = (attr: string | KeyPath) => boolean;
+```
+
+Same as `layer.isSuccessFor`, but for the failure status.
 
 
 ### `layer.getMessageFor`
