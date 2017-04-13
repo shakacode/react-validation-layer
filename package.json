@@ -30,8 +30,8 @@
     "clean": "rm -rf lib",
     "validate": "yarn run flow && yarn run test && yarn run lint",
     "preversion": "yarn run validate && yarn run build",
-    "release": "scripts/release latest",
-    "release:next": "scripts/release next"
+    "prerelease": "rm -rf node_modules && yarn",
+    "release": "np --yolo"
   },
   "files": [
     "lib"
