@@ -26,13 +26,21 @@ import {
   buildIntermediateAsyncValidationResults,
   buildCompleteAsyncValidationResults,
 } from './utils';
-import { buildFieldValidationStateId, buildFieldIdFromUserKeyPath } from '../ids';
-import { getProp, setProp, isBlurEvent, isChangeEvent, isPromise } from '../utils';
+import {
+  buildFieldValidationStateId,
+  buildFieldIdFromUserKeyPath,
+} from '../ids';
+import {
+  getProp,
+  setProp,
+  isBlurEvent,
+  isChangeEvent,
+  isPromise,
+} from '../utils';
 import buildErrorMessage from '../buildErrorMessage';
 
 import strategies from './strategies';
 import asyncStrategies from './async-strategies';
-
 
 /**
  * @desc Performs synchronous single field validation.
@@ -46,86 +54,85 @@ function performSyncFieldValidation(
   event: ?SyntheticInputEvent,
   stateContainer: StateContainer,
 ): SyncValidationResults {
-  const {
-    ON_FIRST_BLUR,
-    ON_FIRST_SUCCESS_OR_FIRST_BLUR,
-    DEFAULT,
-  } = Strategy;
+  const { ON_FIRST_BLUR, ON_FIRST_SUCCESS_OR_FIRST_BLUR, DEFAULT } = Strategy;
 
   // Figuring out defined strategy
-  const strategy = field.strategy || stateContainer.getPropsLevelStrategy() || DEFAULT;
+  const strategy =
+    field.strategy || stateContainer.getPropsLevelStrategy() || DEFAULT;
 
   // Figuring out defined async strategy
   const asyncStrategy =
-    field.asyncStrategy
-    || stateContainer.getPropsLevelAsyncStrategy()
-    || AsyncStrategy.DEFAULT
-  ;
+    field.asyncStrategy ||
+    stateContainer.getPropsLevelAsyncStrategy() ||
+    AsyncStrategy.DEFAULT;
 
   // Ignoring blur event, if strategies don't care about blur
-  const blurConcernedStrategy = [ON_FIRST_BLUR, ON_FIRST_SUCCESS_OR_FIRST_BLUR].includes(strategy);
+  const blurConcernedStrategy = [
+    ON_FIRST_BLUR,
+    ON_FIRST_SUCCESS_OR_FIRST_BLUR,
+  ].includes(strategy);
   const blurConcernedAsyncStrategy =
-    !!field.validateAsync
-    && asyncStrategy === AsyncStrategy.ON_BLUR
-  ;
+    !!field.validateAsync && asyncStrategy === AsyncStrategy.ON_BLUR;
 
   if (
-    event
-    && isBlurEvent(event)
-    && !blurConcernedStrategy
-    && !blurConcernedAsyncStrategy
+    event &&
+    isBlurEvent(event) &&
+    !blurConcernedStrategy &&
+    !blurConcernedAsyncStrategy
   ) {
     return null;
   }
-
 
   // Also ignoring blur event, if:
   //   - field doesn't have async validation w/ ON_BLUR strategy
   //   - and sync strategy is concerned about the first blur,
   //     but it's not the first blur event for this field
   if (
-    event
-    && isBlurEvent(event)
-    && blurConcernedStrategy
-    && !blurConcernedAsyncStrategy
-    && (stateContainer.getBluredField(field.id) || stateContainer.getEmittedField(field.id))
+    event &&
+    isBlurEvent(event) &&
+    blurConcernedStrategy &&
+    !blurConcernedAsyncStrategy &&
+    (stateContainer.getBluredField(field.id) ||
+      stateContainer.getEmittedField(field.id))
   ) {
     return null;
   }
 
-
   // If form was subitted, then switching to ON_FIRST_SUBMIT strategy
   // Otherwise using provided strategy
-  const validateWithStrategy =
-    stateContainer.getFormWasSubmitted()
+  const validateWithStrategy = stateContainer.getFormWasSubmitted()
     ? strategies.onFirstSubmit
-    : strategies[strategy]
-  ;
+    : strategies[strategy];
 
   if (!validateWithStrategy) {
-    throw new Error(buildErrorMessage({
-      layerId: stateContainer.getLayerId(),
-      fieldId: field.id,
-      message: `Unknown strategy: ${strategy}. Most likely it's a spelling issue.`,
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId: stateContainer.getLayerId(),
+        fieldId: field.id,
+        message: `Unknown strategy: ${strategy}. Most likely it's a spelling issue.`,
+      }),
+    );
   }
 
   // Validating with the calculated strategy
-  const validatedWithStrategy = validateWithStrategy(field, value, data, event, stateContainer);
+  const validatedWithStrategy = validateWithStrategy(
+    field,
+    value,
+    data,
+    event,
+    stateContainer,
+  );
 
   // Before emit one more case must be handled:
   // if this is `change` event and validation was successful,
   // but field has also async validation w/ ON_BLUR stategy.
   // In this case not emitting anything until the blur.
-  return (
-    blurConcernedAsyncStrategy
-    && validatedWithStrategy.valid
-    && (event && isChangeEvent(event))
+  return blurConcernedAsyncStrategy &&
+  validatedWithStrategy.valid &&
+  (event && isChangeEvent(event))
     ? buildEmptyValidationResults()
-    : validatedWithStrategy
-  );
+    : validatedWithStrategy;
 }
-
 
 /**
  * @desc Performs asynchronous single field validation.
@@ -146,36 +153,31 @@ function performAsyncFieldValidation(
   //   - sync validation said `don't-provide-feedback-yet`
   const noAsyncValidator = !field.validateAsync;
   const noValue = !value && value !== 0;
-  const isSyncValidationInvalid = syncValidationResults && !syncValidationResults.valid;
+  const isSyncValidationInvalid =
+    syncValidationResults && !syncValidationResults.valid;
   const noEmittableSyncResults =
-    syncValidationResults
-    && syncValidationResults.valid === null
-    && syncValidationResults.status === null
-    && syncValidationResults.message === null
-  ;
+    syncValidationResults &&
+    syncValidationResults.valid === null &&
+    syncValidationResults.status === null &&
+    syncValidationResults.message === null;
 
   if (
-    noAsyncValidator
-    || noValue
-    || isSyncValidationInvalid
-    || noEmittableSyncResults
+    noAsyncValidator ||
+    noValue ||
+    isSyncValidationInvalid ||
+    noEmittableSyncResults
   ) {
     return syncValidationResults;
   }
 
   // Figuring out async strategy
   const asyncStrategy =
-    field.asyncStrategy
-    || stateContainer.getPropsLevelAsyncStrategy()
-    || AsyncStrategy.DEFAULT
-  ;
+    field.asyncStrategy ||
+    stateContainer.getPropsLevelAsyncStrategy() ||
+    AsyncStrategy.DEFAULT;
 
   // If it's ON_BLUR and event.type is blur -> validate
-  if (
-    event
-    && isBlurEvent(event)
-    && asyncStrategy === AsyncStrategy.ON_BLUR
-  ) {
+  if (event && isBlurEvent(event) && asyncStrategy === AsyncStrategy.ON_BLUR) {
     return asyncStrategies.onBlur(field, value, stateContainer);
   }
 
@@ -184,22 +186,15 @@ function performAsyncFieldValidation(
   //   - it's a change event, but async strategy is ON_BLUR
   const isSyncValidationSkipped = syncValidationResults === null;
   const isOnChangeEventButOnBlurStrategy =
-    event
-    && isChangeEvent(event)
-    && asyncStrategy === AsyncStrategy.ON_BLUR
-  ;
+    event && isChangeEvent(event) && asyncStrategy === AsyncStrategy.ON_BLUR;
 
-  if (
-    isSyncValidationSkipped
-    || isOnChangeEventButOnBlurStrategy
-  ) {
+  if (isSyncValidationSkipped || isOnChangeEventButOnBlurStrategy) {
     return syncValidationResults;
   }
 
   // Otherwise -> debounced ON_CHANGE
   return asyncStrategies.onChange(field, value, stateContainer);
 }
-
 
 /**
  * @desc Controller of sync & async validations.
@@ -212,11 +207,13 @@ export function performFieldValidation(
   stateContainer: StateContainer,
 ): FieldsValidationResults {
   if (parentField.linkedFields && !Array.isArray(parentField.linkedFields)) {
-    throw new Error(buildErrorMessage({
-      layerId: stateContainer.getLayerId(),
-      fieldId: parentField.id,
-      message: '`linkedFields` must be an Array.',
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId: stateContainer.getLayerId(),
+        fieldId: parentField.id,
+        message: '`linkedFields` must be an Array.',
+      }),
+    );
   }
 
   // Figuring out set of fields to validate:
@@ -225,16 +222,15 @@ export function performFieldValidation(
   //
   // NOTE: Theoretically linked field might has its own linked fields.
   //       Something to keep in mind, but ignoring until first use case.
-  const fields =
-    parentField.linkedFields
-    ?
-      parentField.linkedFields.reduce((allFields, keyPath) => {
-        const fieldId = buildFieldIdFromUserKeyPath(keyPath);
-        return allFields.concat(stateContainer.getNormalizedField(fieldId));
-      }, [parentField])
-    :
-      [parentField]
-  ;
+  const fields = parentField.linkedFields
+    ? parentField.linkedFields.reduce(
+        (allFields, keyPath) => {
+          const fieldId = buildFieldIdFromUserKeyPath(keyPath);
+          return allFields.concat(stateContainer.getNormalizedField(fieldId));
+        },
+        [parentField],
+      )
+    : [parentField];
 
   // As we (might) have multiple fields to validate,
   // we don't want to trigger state update for each field separately,
@@ -252,16 +248,16 @@ export function performFieldValidation(
     const currentData = stateContainer.getData();
 
     // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
-    const value: ?Value = isParentField ? parentValue : getProp(currentData, field.keyPath);
+    const value: ?Value = isParentField
+      ? parentValue
+      : getProp(currentData, field.keyPath);
     const event = isParentField ? parentEvent : null;
 
     // If it's a linked field, data must be updated w/ the next value of parent field.
     // Not doing this for parent field as it affects perf.
-    const data =
-      isParentField
+    const data = isParentField
       ? currentData
-      : setProp(currentData, parentField.keyPath, parentValue)
-    ;
+      : setProp(currentData, parentField.keyPath, parentValue);
 
     // Performing sync -> async validations
     const syncValidationResults = performSyncFieldValidation(
@@ -281,8 +277,8 @@ export function performFieldValidation(
 
     // If no results returned or it's a debounced results -> ignoring them
     if (
-      !finalValidationResults
-      || finalValidationResults.status === DebounceStatus.DEBOUNCED
+      !finalValidationResults ||
+      finalValidationResults.status === DebounceStatus.DEBOUNCED
     ) {
       return results;
     }
@@ -329,7 +325,6 @@ export function performFieldValidation(
   }, origin);
 }
 
-
 /**
  * @desc Performs fields validation on mount.
  *
@@ -347,82 +342,76 @@ export function performOnMountValidation(
 
   const origin = { nextSyncState: {}, ongoingAsyncValidations: {} };
 
-  return (
-    normalizedFields
-      .filter(field => (field.strategy || propsLevelStrategy) === Strategy.ON_MOUNT)
-      .reduce(({ nextSyncState, ongoingAsyncValidations }, field) => {
-        stateContainer.setEmittedField(field.id);
+  return normalizedFields
+    .filter(
+      field => (field.strategy || propsLevelStrategy) === Strategy.ON_MOUNT,
+    )
+    .reduce(({ nextSyncState, ongoingAsyncValidations }, field) => {
+      stateContainer.setEmittedField(field.id);
 
-        // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
-        const value: Value = getProp(data, field.keyPath);
-        const stateId = buildFieldValidationStateId(field.id);
+      // $FlowIgnoreMe: We're making sure that value at keyPath is not an object on normalization
+      const value: Value = getProp(data, field.keyPath);
+      const stateId = buildFieldValidationStateId(field.id);
 
-        const fieldNextSyncValidationState = buildCompleteSyncValidationResults(
-          field,
-          value,
-          data,
-          propsLevelStatuses,
-          layerId,
-        );
+      const fieldNextSyncValidationState = buildCompleteSyncValidationResults(
+        field,
+        value,
+        data,
+        propsLevelStatuses,
+        layerId,
+      );
 
-        // Don't perform async validation if:
-        //   - there is no async validator
-        //   - value is empty (no reason to validate empty value on remote)
-        //   - value is invalid localy (no reason to validate invalid value on remote)
-        const isAsync =
-          !!field.validateAsync
-          && (!!value || value === 0)
-          && fieldNextSyncValidationState.valid
-        ;
+      // Don't perform async validation if:
+      //   - there is no async validator
+      //   - value is empty (no reason to validate empty value on remote)
+      //   - value is invalid localy (no reason to validate invalid value on remote)
+      const isAsync =
+        !!field.validateAsync &&
+        (!!value || value === 0) &&
+        fieldNextSyncValidationState.valid;
 
-        if (!isAsync) {
-          return {
-            nextSyncState: {
-              ...nextSyncState,
-              [stateId]: fieldNextSyncValidationState,
-            },
-            ongoingAsyncValidations,
-          };
-        }
-
-        const asyncStrategy =
-          field.asyncStrategy
-          || propsLevelAsyncStrategy
-          || AsyncStrategy.DEFAULT
-        ;
-
-        // If asyncStrategy is ON_CHANGE,
-        // then validator on normalized field is debounced.
-        // We'll use original one.
-        const asyncValidator =
-          asyncStrategy === AsyncStrategy.ON_CHANGE
-          ? getProp(fields, field.keyPath).validateAsync
-          : field.validateAsync
-        ;
-
+      if (!isAsync) {
         return {
           nextSyncState: {
             ...nextSyncState,
-            [stateId]: buildIntermediateAsyncValidationResults(),
+            [stateId]: fieldNextSyncValidationState,
           },
-          ongoingAsyncValidations: {
-            ...ongoingAsyncValidations,
-            // $FlowFixMe: Not sure how to assure flow that it's not debounced validator
-            [stateId]: asyncValidator(value).then(results => ({
-              resolution: buildCompleteAsyncValidationResults(
-                field.id,
-                results,
-                propsLevelStatuses,
-                layerId,
-              ),
-              forValue: value,
-            })),
-          },
+          ongoingAsyncValidations,
         };
-      }, origin)
-  );
-}
+      }
 
+      const asyncStrategy =
+        field.asyncStrategy || propsLevelAsyncStrategy || AsyncStrategy.DEFAULT;
+
+      // If asyncStrategy is ON_CHANGE,
+      // then validator on normalized field is debounced.
+      // We'll use original one.
+      const asyncValidator =
+        asyncStrategy === AsyncStrategy.ON_CHANGE
+          ? getProp(fields, field.keyPath).validateAsync
+          : field.validateAsync;
+
+      return {
+        nextSyncState: {
+          ...nextSyncState,
+          [stateId]: buildIntermediateAsyncValidationResults(),
+        },
+        ongoingAsyncValidations: {
+          ...ongoingAsyncValidations,
+          // $FlowFixMe: Not sure how to assure flow that it's not debounced validator
+          [stateId]: asyncValidator(value).then(results => ({
+            resolution: buildCompleteAsyncValidationResults(
+              field.id,
+              results,
+              propsLevelStatuses,
+              layerId,
+            ),
+            forValue: value,
+          })),
+        },
+      };
+    }, origin);
+}
 
 /**
  * @desc Performs fields validation on form submission.
@@ -464,12 +453,11 @@ export function performOnSubmitValidation(
     );
 
     const fieldNextValidationState =
-      fieldCurrentValidationState
-      && fieldNextSyncValidationState.valid
-      && fieldCurrentValidationState.isAsync
-      ? fieldCurrentValidationState
-      : fieldNextSyncValidationState
-    ;
+      fieldCurrentValidationState &&
+      fieldNextSyncValidationState.valid &&
+      fieldCurrentValidationState.isAsync
+        ? fieldCurrentValidationState
+        : fieldNextSyncValidationState;
 
     return {
       isValid: !isValid ? isValid : !!fieldNextValidationState.valid,

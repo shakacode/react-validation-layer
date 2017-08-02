@@ -34,7 +34,11 @@ import {
   performOnSubmitValidation,
 } from './modules/validations';
 import { buildCompleteAsyncValidationResults } from './modules/validations/utils';
-import { parseFieldId, parseFieldStateId, buildFieldValidationStateId } from './modules/ids';
+import {
+  parseFieldId,
+  parseFieldStateId,
+  buildFieldValidationStateId,
+} from './modules/ids';
 import { getProp, isFunction } from './modules/utils';
 import normalizeFieldsFromProps from './modules/normalizeFieldsFromProps';
 import normalizeExternalErrors from './modules/normalizeExternalErrors';
@@ -43,13 +47,11 @@ import buildErrorMessage from './modules/buildErrorMessage';
 
 import LayerDomHandlers from './LayerDomHandlers';
 
-
 /**
  * @desc Core component. Container of the validation layer state.
  *
  */
 export default class ValidationLayer extends Component {
-
   props: Props;
   state: State = {};
 
@@ -62,7 +64,6 @@ export default class ValidationLayer extends Component {
 
   __isSubmitting: boolean = false;
   __formWasSubmitted: boolean = false;
-
 
   constructor(props: Props, ...rest: Array<*>): void {
     super(props, ...rest);
@@ -77,7 +78,6 @@ export default class ValidationLayer extends Component {
     );
   }
 
-
   /**
    * @desc Lifecycle hooks.
    *
@@ -87,12 +87,10 @@ export default class ValidationLayer extends Component {
     this.setNextFieldsPropsState();
   }
 
-
   componentDidMount(): void {
     // Performs validation of fields w/ `onMount` strategy
     this.validateOnMount();
   }
-
 
   componentWillReceiveProps(nextProps: Props): void {
     // Update normalized fields
@@ -101,7 +99,6 @@ export default class ValidationLayer extends Component {
     // Update fields props
     this.setNextFieldsPropsState(nextProps);
   }
-
 
   /**
    * @desc Internal getters.
@@ -113,7 +110,6 @@ export default class ValidationLayer extends Component {
   getPropsLevelStrategy = (): ?Strategy => this.props.strategy;
   getPropsLevelAsyncStrategy = (): ?AsyncStrategy => this.props.asyncStrategy;
   getPropsLevelStatuses = (): ?Statuses => this.props.statuses;
-
 
   /**
    * @desc Fields DOM props management.
@@ -139,7 +135,6 @@ export default class ValidationLayer extends Component {
     this.setState(nextState, callback);
   };
 
-
   /**
    * @desc Normalized fields management.
    *
@@ -147,23 +142,27 @@ export default class ValidationLayer extends Component {
   getNormalizedFields = (): NormalizedFields => this.__normalizedFields;
 
   getNormalizedField = (fieldId: FieldId): NormalizedField => {
-    const normalizedField = this.__normalizedFields.find(field => field.id === fieldId);
+    const normalizedField = this.__normalizedFields.find(
+      field => field.id === fieldId,
+    );
 
     if (!normalizedField) {
       const layerId = this.getLayerId();
 
-      throw new Error(buildErrorMessage({
-        layerId,
-        fieldId,
-        message: [
-          `Can't find \`field\` at key path: ${fieldId}`,
-          'Make sure it exists and has truthy value (e.g. object with options or just `true`).',
-        ],
-      }));
+      throw new Error(
+        buildErrorMessage({
+          layerId,
+          fieldId,
+          message: [
+            `Can't find \`field\` at key path: ${fieldId}`,
+            'Make sure it exists and has truthy value (e.g. object with options or just `true`).',
+          ],
+        }),
+      );
     }
 
     return normalizedField;
-  }
+  };
 
   setNextNormalizedFields = (nextProps?: Props): void => {
     const props = nextProps || this.props;
@@ -187,7 +186,6 @@ export default class ValidationLayer extends Component {
     this.__normalizedFields = normalizedFields;
   };
 
-
   /**
    * @desc Blured fields management.
    *
@@ -200,12 +198,12 @@ export default class ValidationLayer extends Component {
     }
   };
 
-
   /**
    * @desc Emitted fields management.
    *
    */
-  getEmittedField = (fieldId: FieldId): ?boolean => this.__emittedFields[fieldId];
+  getEmittedField = (fieldId: FieldId): ?boolean =>
+    this.__emittedFields[fieldId];
 
   setEmittedField = (fieldId: FieldId): void => {
     if (!this.__emittedFields[fieldId]) {
@@ -214,14 +212,10 @@ export default class ValidationLayer extends Component {
   };
 
   setAllFieldsEmitted = (): void => {
-    this.__emittedFields =
-      this
-        .__normalizedFields
-        .map(field => field.id)
-        .reduce((fields, fieldId) => ({ ...fields, [fieldId]: true }), {})
-    ;
+    this.__emittedFields = this.__normalizedFields
+      .map(field => field.id)
+      .reduce((fields, fieldId) => ({ ...fields, [fieldId]: true }), {});
   };
-
 
   /**
    * @desc Returns `true` if any ongoing async validation is happening.
@@ -233,7 +227,6 @@ export default class ValidationLayer extends Component {
     return Object.keys(state).some(stateId => state[stateId].isProcessing);
   };
 
-
   /**
    * @desc Get and set flag if form is submitting.
    *
@@ -243,7 +236,6 @@ export default class ValidationLayer extends Component {
   setIsSubmitting = (isSubmitting: boolean): void => {
     this.__isSubmitting = isSubmitting;
   };
-
 
   /**
    * @desc Get and set flag if form was submitted at least once.
@@ -257,28 +249,26 @@ export default class ValidationLayer extends Component {
     }
   };
 
-
   /**
    * @desc On mount fields validation.
    *
    */
   validateOnMount = (): void => {
     const { fields } = this.props;
-    const { nextSyncState, ongoingAsyncValidations } = performOnMountValidation(fields, this);
+    const { nextSyncState, ongoingAsyncValidations } = performOnMountValidation(
+      fields,
+      this,
+    );
 
     this.setNextValidationState(nextSyncState, ongoingAsyncValidations);
   };
-
 
   /**
    * @desc Field validation on `change` & `blur` events.
    *       This method is triggered from <LayerDomHandlers />.
    *
    */
-  validateField = (
-    field: NormalizedField,
-    domData: DomData,
-  ): void => {
+  validateField = (field: NormalizedField, domData: DomData): void => {
     const { nextSyncState, ongoingAsyncValidations } = performFieldValidation(
       field,
       domData.value,
@@ -288,7 +278,6 @@ export default class ValidationLayer extends Component {
 
     this.setNextValidationState(nextSyncState, ongoingAsyncValidations);
   };
-
 
   /**
    * @desc Async validation notifier.
@@ -318,7 +307,6 @@ export default class ValidationLayer extends Component {
     });
   };
 
-
   /**
    * @desc Sets next validation state from various validators.
    *
@@ -337,7 +325,6 @@ export default class ValidationLayer extends Component {
       });
     });
   };
-
 
   /**
    * @desc Sets next deferred validation state from async validator
@@ -366,7 +353,6 @@ export default class ValidationLayer extends Component {
     this.setState({ [stateId]: nextState.resolution });
   };
 
-
   /**
    * @desc Submission handler.
    *
@@ -383,7 +369,6 @@ export default class ValidationLayer extends Component {
     this.setAllFieldsEmitted();
     this.setNextFieldsPropsState(null, this.validateForm);
   };
-
 
   /**
    * @desc Form validation on submission.
@@ -402,10 +387,12 @@ export default class ValidationLayer extends Component {
       const { handlers } = this.props;
 
       if (!handlers || !handlers.onSubmit || !isFunction(handlers.onSubmit)) {
-        throw new Error(buildErrorMessage({
-          layerId: this.getLayerId(),
-          message: "Make sure `handlers.onSubmit` is exists and it's a function",
-        }));
+        throw new Error(
+          buildErrorMessage({
+            layerId: this.getLayerId(),
+            message: "Make sure `handlers.onSubmit` exists and it's a function",
+          }),
+        );
       }
 
       handlers.onSubmit({
@@ -416,7 +403,6 @@ export default class ValidationLayer extends Component {
       this.setState(validationState, this.handleFailurePostSubmitAction);
     }
   };
-
 
   /**
    * @desc Handler of form submission failure.
@@ -433,8 +419,8 @@ export default class ValidationLayer extends Component {
 
     const statuses = this.getPropsLevelStatuses();
     const normalizedErrors = normalizeExternalErrors(errors);
-    const nextFieldsValidationState: ValidationStateWithExternalErrors =
-      normalizedErrors.reduce((nextValidationState, error) => {
+    const nextFieldsValidationState: ValidationStateWithExternalErrors = normalizedErrors.reduce(
+      (nextValidationState, error) => {
         const stateId = buildFieldValidationStateId(error.fieldId);
 
         return {
@@ -443,14 +429,15 @@ export default class ValidationLayer extends Component {
             valid: false,
             status:
               statuses && statuses.failure
-              ? statuses.failure
-              : DefaultStatus.FAILURE,
+                ? statuses.failure
+                : DefaultStatus.FAILURE,
             message: error.message,
             isAsync: true,
           },
         };
-      }, {})
-    ;
+      },
+      {},
+    );
 
     const nextState = {
       ...nextFieldsPropsState,
@@ -459,7 +446,6 @@ export default class ValidationLayer extends Component {
 
     return this.setState(nextState);
   };
-
 
   /**
    * @desc State reset. Triggered from userland.
@@ -486,16 +472,17 @@ export default class ValidationLayer extends Component {
     this.setState({ ...resetedState, ...nextFieldsPropsState });
   };
 
-
   render() {
     const { props } = this;
     const layerId = this.getLayerId();
 
     if (typeof props.children !== 'function') {
-      throw new Error(buildErrorMessage({
-        layerId,
-        message: '`children` must be a function',
-      }));
+      throw new Error(
+        buildErrorMessage({
+          layerId,
+          message: '`children` must be a function',
+        }),
+      );
     }
 
     return (

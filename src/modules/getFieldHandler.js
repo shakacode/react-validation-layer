@@ -13,7 +13,6 @@ import type {
 import buildErrorMessage from './buildErrorMessage';
 import { isFunction } from './utils';
 
-
 /**
  * @desc It is possible to define DOM handler on the field level
  *       as well as on the props level for all the fields.
@@ -27,30 +26,35 @@ export function getFieldDomHandler(
   fieldLevelDomHandlers: ?FieldLevelDomHandlers,
   propsLevelDomHandlers: PropsLevelDomHandlers,
 ): ?OnChange | ?OnBlur {
-  const fieldLevelHandler = fieldLevelDomHandlers && fieldLevelDomHandlers[handlerKey];
-  const propsLevelHandler = propsLevelDomHandlers && propsLevelDomHandlers[handlerKey];
+  const fieldLevelHandler =
+    fieldLevelDomHandlers && fieldLevelDomHandlers[handlerKey];
+  const propsLevelHandler =
+    propsLevelDomHandlers && propsLevelDomHandlers[handlerKey];
 
   const handler = fieldLevelHandler || propsLevelHandler;
 
   if (handlerKey === 'onChange' && !handler) {
-    throw new Error(buildErrorMessage({
-      layerId,
-      fieldId,
-      message: `Looks like you forgot to provide \`${handlerKey}\` handler.`,
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId,
+        fieldId,
+        message: `Looks like you forgot to provide \`${handlerKey}\` handler.`,
+      }),
+    );
   }
 
   if (handler && !isFunction(handler)) {
-    throw new Error(buildErrorMessage({
-      layerId,
-      fieldId: fieldLevelHandler ? fieldId : null,
-      message: `\`${handlerKey}\` must be a function.`,
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId,
+        fieldId: fieldLevelHandler ? fieldId : null,
+        message: `\`${handlerKey}\` must be a function.`,
+      }),
+    );
   }
 
   return handler;
 }
-
 
 /**
  * @desc Same as function above, but for value handlers,
@@ -70,11 +74,13 @@ export function getFieldValueHandler(
   const handler = fieldLevelValueHandler || propsLevelValueHandler;
 
   if (handler && !isFunction(handler)) {
-    throw new Error(buildErrorMessage({
-      layerId,
-      fieldId: fieldLevelValueHandler ? fieldId : null,
-      message: `\`${handlerKey}\` must be a function.`,
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId,
+        fieldId: fieldLevelValueHandler ? fieldId : null,
+        message: `\`${handlerKey}\` must be a function.`,
+      }),
+    );
   }
 
   return handler;

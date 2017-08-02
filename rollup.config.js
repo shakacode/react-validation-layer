@@ -7,7 +7,9 @@ import commonjs from 'rollup-plugin-commonjs';
 const { BUILD_TARGET } = process.env;
 
 if (!BUILD_TARGET) {
-  throw new Error('Specify build target via BUILD_TARGET environment variable.');
+  throw new Error(
+    'Specify build target via BUILD_TARGET environment variable.',
+  );
 }
 
 export default {
@@ -17,9 +19,5 @@ export default {
   moduleName: 'ReactValidationLayer',
   external: ['react'],
   globals: { react: 'React' },
-  plugins: [
-    babel({ exclude: 'node_modules/**' }),
-    resolve(),
-    commonjs(),
-  ],
+  plugins: [babel({ exclude: 'node_modules/**' }), resolve(), commonjs()],
 };

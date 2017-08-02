@@ -5,7 +5,6 @@ import type { ExternalErrors, NormalizedExternalErrors } from '../types';
 import { buildFieldId } from './ids';
 import { isPlainObject } from './utils';
 
-
 /**
  * @desc Normalizes errors, received from `submitCallbacks.onFailure`.
  *       It happens when API rejected submission and responded w/ errors.
@@ -26,11 +25,7 @@ export default function normalizeExternalErrors(
     const keyPath = parentKeyPath.concat(key);
 
     if (isPlainObject(errorsBranch)) {
-      normalizeExternalErrors(
-        errorsBranch,
-        normalizedErrors,
-        keyPath,
-      );
+      normalizeExternalErrors(errorsBranch, normalizedErrors, keyPath);
     } else {
       normalizedErrors.push({
         fieldId: buildFieldId(keyPath),

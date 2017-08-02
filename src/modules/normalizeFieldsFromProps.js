@@ -14,7 +14,6 @@ import { buildFieldId } from './ids';
 import { getProp, isPlainObject } from './utils';
 import { debounce } from './validations/utils';
 
-
 /**
  * @desc Validation Layer accepts fields as Object w/ props
  *       (struture of this Object replicates the structure of the data object).
@@ -54,36 +53,32 @@ export default function normalizeFieldsFromProps(
 
       if (isPlainObject(fieldsBranch)) {
         const fieldAsyncStrategy =
-          propsAsyncStrategy
-          || fieldsBranch.asyncStrategy
-          || AsyncStrategy.DEFAULT
-        ;
+          propsAsyncStrategy ||
+          fieldsBranch.asyncStrategy ||
+          AsyncStrategy.DEFAULT;
         const debounceInterval =
-          propsDebounceInterval
-          || fieldsBranch.debounceInterval
-          || Constant.DEFAULT_DEBOUNCE_INTERVAL
-        ;
+          propsDebounceInterval ||
+          fieldsBranch.debounceInterval ||
+          Constant.DEFAULT_DEBOUNCE_INTERVAL;
         const isDebouncedAsyncValidation =
-          fieldsBranch.validateAsync
-          && fieldAsyncStrategy === AsyncStrategy.ON_CHANGE
-        ;
+          fieldsBranch.validateAsync &&
+          fieldAsyncStrategy === AsyncStrategy.ON_CHANGE;
 
-        const normalizedField =
-          isDebouncedAsyncValidation
-          ?
-            ({
+        const normalizedField = isDebouncedAsyncValidation
+          ? {
               ...fieldsBranch,
               id,
               keyPath,
-              validateAsync: debounce(fieldsBranch.validateAsync, debounceInterval),
-            })
-          :
-            ({
+              validateAsync: debounce(
+                fieldsBranch.validateAsync,
+                debounceInterval,
+              ),
+            }
+          : {
               ...fieldsBranch,
               id,
               keyPath,
-            })
-        ;
+            };
         normalizedFields.push(normalizedField);
       } else {
         normalizedFields.push({ id, keyPath });

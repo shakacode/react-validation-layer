@@ -7,7 +7,6 @@ import Constant from '../enums/Constant';
 import { parseFieldId } from './ids';
 import buildErrorMessage from './buildErrorMessage';
 
-
 /**
  * @desc When DOM handler is triggered from the view
  *       this function takes event (and some additional data)
@@ -26,10 +25,12 @@ export function getNextDataFromDom(
   const fieldId = domEl.getAttribute(Constant.FIELD_ID_DOM_DATA_ATTRIBUTE);
 
   if (!fieldId) {
-    throw new Error(buildErrorMessage({
-      layerId,
-      message: "Can't find field id.",
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId,
+        message: "Can't find field id.",
+      }),
+    );
   }
 
   const { attr, keyPath } = parseFieldId(fieldId);
@@ -44,7 +45,6 @@ export function getNextDataFromDom(
     event,
   };
 }
-
 
 /**
  * @desc Same as function above except it normalizes the data

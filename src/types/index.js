@@ -6,7 +6,6 @@ import React from 'react';
 import ValidationLayer from '../ValidationLayer';
 import LayerInterface from '../LayerInterface';
 
-
 export type LayerId = string;
 
 export type Props = {|
@@ -115,7 +114,10 @@ export type PropsLevelDomHandlers = {|
   onSubmit: OnSubmit,
 |};
 
-export type ValueHandler = ?Filter | ?TransformBeforeStore | ?TransformBeforeRender;
+export type ValueHandler =
+  | ?Filter
+  | ?TransformBeforeStore
+  | ?TransformBeforeRender;
 
 export type Strategy =
   | 'onMount'
@@ -123,13 +125,9 @@ export type Strategy =
   | 'onFirstBlur'
   | 'onFirstSuccess'
   | 'onFirstSuccessOrFirstBlur'
-  | 'onFirstSubmit'
-;
+  | 'onFirstSubmit';
 
-export type AsyncStrategy =
-  | 'onBlur'
-  | 'onChange'
-;
+export type AsyncStrategy = 'onBlur' | 'onChange';
 
 export type Statuses = {|
   success?: string,
@@ -180,13 +178,15 @@ export type OnSubmitValidationResults = {|
   isValid: boolean,
 |};
 
-export type SyncValidationResults = NormalizedValidationResults | EmptyValidationResults | null;
+export type SyncValidationResults =
+  | NormalizedValidationResults
+  | EmptyValidationResults
+  | null;
 export type AsyncValidationResults = Promise<InsuredAsyncValidationResults>;
 export type CompositeValidationResults =
   | SyncValidationResults
   | AsyncValidationResults
-  | DebounceStatusReport
-;
+  | DebounceStatusReport;
 export type OngoingAsyncValidations = {
   [stateKey: FieldValidationStateId]: AsyncValidationResults,
 };
@@ -206,27 +206,29 @@ export type DebouncedValidateAsync = (
 // Filter & TransformBeforeStore might accept Value,
 // b/c non-string values can be passed from custom handlers
 export type Filter = (value: DomValue | Value, data: Data) => boolean;
-export type TransformBeforeStore = (value: DomValue | Value, data: Data) => Value;
+export type TransformBeforeStore = (
+  value: DomValue | Value,
+  data: Data,
+) => Value;
 export type TransformBeforeRender = (value: Value, data: Data) => DomValue;
 
 export type StateContainer = ValidationLayer;
 
-export type FieldId = string;                // user.email
-export type FieldDomId = string;             // loginForm___user___email
-export type FieldPropsStateId = string;      // fieldPropsState---user.email
+export type FieldId = string; // user.email
+export type FieldDomId = string; // loginForm___user___email
+export type FieldPropsStateId = string; // fieldPropsState---user.email
 export type FieldValidationStateId = string; // fieldValidationState---user.email
 
 export type FieldPropsStateIdPrefix = 'fieldPropsState';
 export type FieldValidationStateIdPrefix = 'fieldValidationState';
 
 export type State = {
-  [key: FieldPropsStateId | FieldValidationStateId]: (
-      FieldBaseDomProps
+  [key: FieldPropsStateId | FieldValidationStateId]:
+    | FieldBaseDomProps
     | NormalizedValidationResults
     | NormalizedAsyncValidationResults
     | IntermediateAsyncValidationResults
-    | ValidationStateWithExternalErrors
-  ),
+    | ValidationStateWithExternalErrors,
 };
 
 export type FieldsPropsState = {
@@ -234,9 +236,9 @@ export type FieldsPropsState = {
 };
 
 export type FieldsValidationState = {
-  [stateId: FieldValidationStateId]: (
-    NormalizedValidationResults | IntermediateAsyncValidationResults
-  ),
+  [stateId: FieldValidationStateId]:
+    | NormalizedValidationResults
+    | IntermediateAsyncValidationResults,
 };
 
 export type ValidationStateWithExternalErrors = {
@@ -262,10 +264,7 @@ export type LayerField = {|
   resolution: NormalizedValidationResults | IntermediateAsyncValidationResults,
 |};
 
-export type LayerHandleChange = (
-  fieldId: FieldId,
-  value: Value,
-) => void;
+export type LayerHandleChange = (fieldId: FieldId, value: Value) => void;
 export type LayerHandleBlur = (
   fieldId: FieldId,
   value: Value,
@@ -354,7 +353,9 @@ export type AsyncDebouncedStrategyHandler = (
 
 export type StrategyHandlers = { [strategy: Strategy]: StrategyHandler };
 export type AsyncStrategyHandlers = {
-  [asyncStrategy: AsyncStrategy]: AsyncStrategyHandler | AsyncDebouncedStrategyHandler,
+  [asyncStrategy: AsyncStrategy]:
+    | AsyncStrategyHandler
+    | AsyncDebouncedStrategyHandler,
 };
 
 // Enums

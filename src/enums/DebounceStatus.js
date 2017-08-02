@@ -5,7 +5,7 @@ import type { DebounceStatusEnum } from '../types';
 
 const DebounceStatus: DebounceStatusEnum = Object.freeze({
   INITIALIZED: 'initialized',
-  DEBOUNCED  : 'debounced',
+  DEBOUNCED: 'debounced',
 });
 
 export default DebounceStatus;

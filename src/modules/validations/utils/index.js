@@ -25,7 +25,6 @@ import DebounceStatus from '../../../enums/DebounceStatus';
 import buildErrorMessage from '../../buildErrorMessage';
 import { isDefined, isFunction } from '../../utils';
 
-
 /**
  * @desc It is possible to return validation result as simple boolean,
  *       as well as Object w/ additional data (i.e. `message` & `status`).
@@ -44,14 +43,16 @@ export function normalizeValidationResults(
   }
 
   if (!isDefined(results.valid)) {
-    throw new Error(buildErrorMessage({
-      layerId,
-      fieldId,
-      message: [
-        "Can't find `valid` key in the results object from validator.",
-        "Make sure it's defined and its value is Boolean",
-      ],
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId,
+        fieldId,
+        message: [
+          "Can't find `valid` key in the results object from validator.",
+          "Make sure it's defined and its value is Boolean",
+        ],
+      }),
+    );
   }
 
   const normalizedResults: NormalizedValidationResults = {
@@ -63,7 +64,6 @@ export function normalizeValidationResults(
 
   return normalizedResults;
 }
-
 
 /**
  * @desc Applies sync validator and returns normalized validation results.
@@ -79,18 +79,19 @@ export function applySyncValidation(
   if (!validator) return { valid: true };
 
   if (validator && !isFunction(validator)) {
-    throw new Error(buildErrorMessage({
-      layerId,
-      fieldId,
-      message: 'Validator must be a function.',
-    }));
+    throw new Error(
+      buildErrorMessage({
+        layerId,
+        fieldId,
+        message: 'Validator must be a function.',
+      }),
+    );
   }
 
   const results = validator(value, data);
 
   return normalizeValidationResults(results, layerId, fieldId);
 }
-
 
 /**
  * @desc Calculates default success & failure statuses.
@@ -103,7 +104,6 @@ export function getDefaultStatuses(statuses?: Statuses = {}): Statuses {
     failure: statuses.failure || DefaultStatus.FAILURE,
   };
 }
-
 
 /**
  * @desc Builds Object w/ validation results from synchronous validation.
@@ -135,7 +135,6 @@ export function buildCompleteSyncValidationResults(
   return validationState;
 }
 
-
 /**
  * @desc Builds Object w/ validation results from asynchronous validation.
  *       This results will be emitted to the view component.
@@ -163,7 +162,6 @@ export function buildCompleteAsyncValidationResults(
   return validationState;
 }
 
-
 /**
  * @desc Builds Object w/ intermediate async validation results.
  *       These results will be emitted to the view component,
@@ -180,7 +178,6 @@ export function buildIntermediateAsyncValidationResults(): IntermediateAsyncVali
   };
 }
 
-
 /**
  * @desc Builds Object w/ empty validation results.
  *       These results will be emitted to the view component,
@@ -195,7 +192,6 @@ export function buildEmptyValidationResults(): EmptyValidationResults {
     message: null,
   };
 }
-
 
 /**
  * @desc Debounce async validation calls.
@@ -217,9 +213,9 @@ export function debounce(async: ValidateAsync, wait: number = 0) {
     const timeSinceLastCall = time - lastCallTime;
 
     return (
-      lastCallTime === undefined
-      || timeSinceLastCall >= wait
-      || timeSinceLastCall < 0
+      lastCallTime === undefined ||
+      timeSinceLastCall >= wait ||
+      timeSinceLastCall < 0
     );
   }
 

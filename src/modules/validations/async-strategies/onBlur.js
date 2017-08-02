@@ -8,11 +8,7 @@ import { buildCompleteAsyncValidationResults } from '../utils';
  * @desc Async validation will be triggered on each blur event.
  *
  */
-export const onBlur: AsyncStrategyHandler = (
-  field,
-  value,
-  stateContainer,
-) => {
+export const onBlur: AsyncStrategyHandler = (field, value, stateContainer) => {
   stateContainer.setBluredField(field.id);
   stateContainer.setEmittedField(field.id);
 

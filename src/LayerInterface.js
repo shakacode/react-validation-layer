@@ -29,13 +29,11 @@ import {
 
 import buildErrorMessage from './modules/buildErrorMessage';
 
-
 /**
  * @desc Interface to access validation layer data from the views.
  *
  */
 export default class LayerInterface {
-
   __layerId: LayerId;
   __fields: { [fieldId: string]: LayerField };
   __getField: (keyPath: KeyPath, methodName: string) => LayerField;
@@ -49,35 +47,27 @@ export default class LayerInterface {
   notifyOnChange: LayerHandleChange;
   handleSubmit: LayerHandleSubmit;
 
-
-  constructor(
-    stateContainer: StateContainer,
-    handlers: LayerHandlers,
-  ) {
+  constructor(stateContainer: StateContainer, handlers: LayerHandlers) {
     const state = stateContainer.getState();
 
     this.__layerId = stateContainer.getLayerId();
 
-    this.__fields = Object.keys(state).reduce(
-      (fieldsState, fieldStateId) => {
-        const { dataType, fieldId } = parseFieldStateId(fieldStateId);
+    this.__fields = Object.keys(state).reduce((fieldsState, fieldStateId) => {
+      const { dataType, fieldId } = parseFieldStateId(fieldStateId);
 
-        const nextFieldState =
-          dataType === Constant.FIELD_PROPS_STATE_ID_PREFIX
+      const nextFieldState =
+        dataType === Constant.FIELD_PROPS_STATE_ID_PREFIX
           ? { props: state[fieldStateId] }
-          : { resolution: state[fieldStateId] }
-        ;
+          : { resolution: state[fieldStateId] };
 
-        return {
-          ...fieldsState,
-          [fieldId]: {
-            ...fieldsState[fieldId],
-            ...nextFieldState,
-          },
-        };
-      },
-      {},
-    );
+      return {
+        ...fieldsState,
+        [fieldId]: {
+          ...fieldsState[fieldId],
+          ...nextFieldState,
+        },
+      };
+    }, {});
 
     this.__getField = (keyPath, methodName) => {
       const layerId = this.__layerId;
@@ -85,15 +75,19 @@ export default class LayerInterface {
       const field = this.__fields[fieldId];
 
       if (!field) {
-        throw new Error(buildErrorMessage({
-          layerId,
-          fieldId,
-          message: [
-            `Can't find data for field at provided keyPath: ${JSON.stringify(keyPath)}`,
-            `Use string to fetch data for non-nested attributes: e.g. \`layer.${methodName}('email')\``,
-            `Use array to fetch data for nested attributes: e.g. \`layer.${methodName}(['user', 'email'])\``,
-          ],
-        }));
+        throw new Error(
+          buildErrorMessage({
+            layerId,
+            fieldId,
+            message: [
+              `Can't find data for field at provided keyPath: ${JSON.stringify(
+                keyPath,
+              )}`,
+              `Use string to fetch data for non-nested attributes: e.g. \`layer.${methodName}('email')\``,
+              `Use array to fetch data for nested attributes: e.g. \`layer.${methodName}(['user', 'email'])\``,
+            ],
+          }),
+        );
       }
 
       return field;
@@ -109,7 +103,6 @@ export default class LayerInterface {
     this.handleSubmit = handlers.handleSubmit;
   }
 
-
   getPropsFor = (keyPath: KeyPath): FieldDomProps => {
     const field = this.__getField(keyPath, 'getPropsFor');
 
@@ -120,7 +113,6 @@ export default class LayerInterface {
       onChange: this.__handleDomChange,
     };
   };
-
 
   getCheckboxPropsFor = (keyPath: KeyPath): FieldDomPropsWithChecked => {
     const field = this.__getField(keyPath, 'getCheckboxPropsFor');
@@ -133,7 +125,6 @@ export default class LayerInterface {
       onChange: this.__handleDomChange,
     };
   };
-
 
   getRadioButtonPropsFor = (
     keyPath: KeyPath,
@@ -152,7 +143,6 @@ export default class LayerInterface {
       onChange: this.__handleDomChange,
     };
   };
-
 
   getCustomPropsFor = (
     keyPath: KeyPath,
@@ -191,22 +181,17 @@ export default class LayerInterface {
     return customProps;
   };
 
-
   getSubmitButtonProps = (): SubmitButtonDomProps => ({
     type: 'submit',
     disabled: this.__isSubmitting,
   });
 
-
   getValidityFor = (keyPath: KeyPath): boolean | null => {
     const field = this.__getField(keyPath, 'getValidityFor');
-    return (
-      field.resolution && typeof field.resolution.valid !== 'undefined'
+    return field.resolution && typeof field.resolution.valid !== 'undefined'
       ? field.resolution.valid
-      : null
-    );
+      : null;
   };
-
 
   isSuccessFor = (keyPath: KeyPath): boolean => {
     const field = this.__getField(keyPath, 'isSuccessFor');
@@ -216,60 +201,43 @@ export default class LayerInterface {
     return !!field.resolution && field.resolution.valid === true;
   };
 
-
   isFailureFor = (keyPath: KeyPath): boolean => {
     const field = this.__getField(keyPath, 'isFailureFor');
     return !!field.resolution && field.resolution.valid === false;
   };
 
-
   getStatusFor = (keyPath: KeyPath): ?string => {
     const field = this.__getField(keyPath, 'getStatusFor');
-    return (
-      field.resolution && field.resolution.status
+    return field.resolution && field.resolution.status
       ? field.resolution.status
-      : null
-    );
+      : null;
   };
-
 
   getMessageFor = (keyPath: KeyPath): ?string => {
     const field = this.__getField(keyPath, 'getMessageFor');
-    return (
-      field.resolution && field.resolution.message
+    return field.resolution && field.resolution.message
       ? field.resolution.message
-      : null
-    );
+      : null;
   };
-
 
   getAsyncStatusFor = (keyPath: KeyPath): boolean => {
     const field = this.__getField(keyPath, 'getAsyncStatusFor');
-    return (
-      field.resolution && typeof field.resolution.isProcessing !== 'undefined'
+    return field.resolution &&
+    typeof field.resolution.isProcessing !== 'undefined'
       ? field.resolution.isProcessing
-      : false
-    );
+      : false;
   };
-
 
   getSubmissionStatus = (): boolean => this.__isSubmitting;
 
-
-  getDomIdFor = (
-    keyPath: KeyPath,
-    value?: EnumerableValue,
-  ): FieldDomId => {
+  getDomIdFor = (keyPath: KeyPath, value?: EnumerableValue): FieldDomId => {
     const layerId = this.__layerId;
     const field = this.__getField(keyPath, 'getStatusFor');
 
-    return (
-      value
+    return value
       ? buildFieldDomIdWithValue(layerId, keyPath, value)
-      : field.props.id
-    );
+      : field.props.id;
   };
-
 
   getFieldIdFor = (keyPath: KeyPath): FieldId => {
     const field = this.__getField(keyPath, 'getFieldIdFor');

@@ -2,19 +2,19 @@
 
 import React from 'react';
 
-import type {
-  FieldId,
-  Value,
-  DomData,
-  LayerDomHandlersProps,
-} from './types';
+import type { FieldId, Value, DomData, LayerDomHandlersProps } from './types';
 
-import { getFieldDomHandler, getFieldValueHandler } from './modules/getFieldHandler';
-import { getNextDataFromDom, getNextDataFromCustomHandler } from './modules/getNextData';
+import {
+  getFieldDomHandler,
+  getFieldValueHandler,
+} from './modules/getFieldHandler';
+import {
+  getNextDataFromDom,
+  getNextDataFromCustomHandler,
+} from './modules/getNextData';
 import buildErrorMessage from './modules/buildErrorMessage';
 
 import LayerInterface from './LayerInterface';
-
 
 /**
  * @desc Stateless container of DOM event handlers:
@@ -24,9 +24,7 @@ import LayerInterface from './LayerInterface';
  *
  */
 export default class LayerDomHandlers extends React.Component {
-
   props: LayerDomHandlersProps;
-
 
   /**
    * @desc Change handlers.
@@ -34,15 +32,10 @@ export default class LayerDomHandlers extends React.Component {
    */
   handleDomChange = (event: SyntheticInputEvent): void => {
     const { props } = this;
-    const domData = getNextDataFromDom(
-      props.layerId,
-      props.data,
-      event,
-    );
+    const domData = getNextDataFromDom(props.layerId, props.data, event);
 
     this.handleChange(domData);
   };
-
 
   handleCustomChange = (fieldId: FieldId, value: Value): void => {
     const { props } = this;
@@ -50,7 +43,6 @@ export default class LayerDomHandlers extends React.Component {
 
     this.handleChange(domData);
   };
-
 
   handleChange = (domData: DomData): void => {
     const { props } = this;
@@ -66,11 +58,11 @@ export default class LayerDomHandlers extends React.Component {
     );
 
     if (
-      filter                                // if filter is provided
-      && domData.value                      // & there's a value is not an empty string
-      && !filter(domData.value, props.data) // & filter function returned false
+      filter && // if filter is provided
+      domData.value && // & there's a value is not an empty string
+      !filter(domData.value, props.data) // & filter function returned false
     ) {
-      return;                               // then ignoring this update
+      return; // then ignoring this update
     }
 
     const transformBeforeStore = getFieldValueHandler(
@@ -81,11 +73,9 @@ export default class LayerDomHandlers extends React.Component {
       props.transformBeforeStore,
     );
 
-    const processedValue =
-      transformBeforeStore
+    const processedValue = transformBeforeStore
       ? transformBeforeStore(domData.value, props.data)
-      : domData.value
-    ;
+      : domData.value;
 
     const processedDomData = { ...domData, value: processedValue };
 
@@ -105,22 +95,16 @@ export default class LayerDomHandlers extends React.Component {
     stateContainer.validateField(field, processedDomData);
   };
 
-
   /**
    * @desc Blur handlers.
    *
    */
   handleDomBlur = (event: SyntheticInputEvent): void => {
     const { props } = this;
-    const domData = getNextDataFromDom(
-      props.layerId,
-      props.data,
-      event,
-    );
+    const domData = getNextDataFromDom(props.layerId, props.data, event);
 
     this.handleBlur(domData);
   };
-
 
   handleCustomBlur = (
     fieldId: FieldId,
@@ -138,11 +122,7 @@ export default class LayerDomHandlers extends React.Component {
     this.handleBlur(domData, true);
   };
 
-
-  handleBlur = (
-    domData: DomData,
-    isCustom?: boolean = false,
-  ): void => {
+  handleBlur = (domData: DomData, isCustom?: boolean = false): void => {
     const { props } = this;
     const { stateContainer } = props;
 
@@ -163,11 +143,9 @@ export default class LayerDomHandlers extends React.Component {
       props.transformBeforeStore,
     );
 
-    const processedValue =
-      transformBeforeStore
+    const processedValue = transformBeforeStore
       ? transformBeforeStore(domData.value, props.data)
-      : domData.value
-    ;
+      : domData.value;
 
     const processedDomData = { ...domData, value: processedValue };
 
@@ -175,7 +153,6 @@ export default class LayerDomHandlers extends React.Component {
 
     stateContainer.validateField(field, processedDomData);
   };
-
 
   /**
    * @desc Submit handler.
@@ -189,7 +166,6 @@ export default class LayerDomHandlers extends React.Component {
     this.props.stateContainer.triggerSubmission();
   };
 
-
   render() {
     const { props } = this;
 
@@ -202,10 +178,12 @@ export default class LayerDomHandlers extends React.Component {
     });
 
     if (typeof props.children !== 'function') {
-      throw new Error(buildErrorMessage({
-        layerId: props.layerId,
-        message: '`children` must be a function',
-      }));
+      throw new Error(
+        buildErrorMessage({
+          layerId: props.layerId,
+          message: '`children` must be a function',
+        }),
+      );
     }
 
     return props.children(layer);

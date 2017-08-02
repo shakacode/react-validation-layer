@@ -2,7 +2,10 @@
 
 import type { StrategyHandler } from '../../../types';
 
-import { buildCompleteSyncValidationResults, buildEmptyValidationResults } from '../utils';
+import {
+  buildCompleteSyncValidationResults,
+  buildEmptyValidationResults,
+} from '../utils';
 
 /**
  * @desc According to this strategy Layer won't emit any results
