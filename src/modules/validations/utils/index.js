@@ -235,7 +235,7 @@ export function debounce(async: ValidateAsync, wait: number = 0) {
     const time = Date.now();
 
     if (shouldInvoke(time)) {
-      return invokeAsync(time);
+      return invokeAsync();
     }
 
     timerId = setTimeout(timerExpired, remainingWait(time));
@@ -284,7 +284,7 @@ export function debounce(async: ValidateAsync, wait: number = 0) {
 
     // Initialize if it's a first ivokation
     if (isInvoking && timerId === undefined) {
-      return initAsync(lastCallTime);
+      return initAsync();
     }
 
     // Start timer if it's not done yet
