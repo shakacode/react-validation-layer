@@ -544,6 +544,7 @@ And here is what you can get:
 * [`notifyOnChange`](#layernotifyonchange)
 * [`notifyOnBlur`](#layernotifyonblur)
 * [`handleSubmit`](#layerhandlesubmit)
+* [`resetState`](#layerresetstate)
 
 **Providing paths to field data**<br>
 Usually you _`getSomething`_ for specific field. In case if your `fields` object is flat, just pass attribute name to getter:
@@ -758,6 +759,17 @@ Same as `layer.notifyOnChange`, but to notify layer about `blur` events. You mig
 ```
 
 ^ That's all you need to do with it.
+
+
+### `layer.resetState`
+
+```js
+<button onClick={layer.resetState}>
+  Reset
+</button>
+```
+
+Resets validation layer internal state.
 
 
 ## Lifecycles

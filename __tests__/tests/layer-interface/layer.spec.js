@@ -9,7 +9,6 @@ import { mockStrictLayerProps } from '../../helpers';
 
 import ValidationLayer from '../../../src';
 
-
 describe('layer', () => {
   it('contains fields data and methods', () => {
     const layerProps = mockStrictLayerProps({
@@ -63,8 +62,9 @@ describe('layer', () => {
     expect(layer.notifyOnChange).toBeInstanceOf(Function);
     expect(layer.notifyOnBlur).toBeInstanceOf(Function);
     expect(layer.handleSubmit).toBeInstanceOf(Function);
+    expect(layer.resetState).toBeInstanceOf(Function);
 
-    expect(Object.keys(layer).length).toBe(23);
+    expect(Object.keys(layer).length).toBe(24);
     expect(Object.keys(layer.__fields).length).toBe(2);
   });
 });

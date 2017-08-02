@@ -23,16 +23,6 @@ export type Props = {|
   children?: (layer: LayerInterface) => React.Element<*>,
 |};
 
-export type LayerDomHandlersProps = {|
-  layerId: LayerId,
-  stateContainer: StateContainer,
-  data: Data,
-  filter?: Filter,
-  transformBeforeStore?: TransformBeforeStore,
-  handlers: PropsLevelDomHandlers,
-  children?: (layer: LayerInterface) => React.Element<*>,
-|};
-
 export type Data = { [attr: string]: Value | Data };
 
 export type PlainField = boolean;
@@ -270,7 +260,8 @@ export type LayerHandleBlur = (
   value: Value,
   event: SyntheticInputEvent,
 ) => void;
-export type LayerHandleSubmit = (event: SyntheticInputEvent) => void;
+export type LayerHandleSubmit = (event: SyntheticEvent) => void;
+export type LayerResetState = () => void;
 
 export type LayerHandlers = {|
   handleDomBlur: DomHandler,
@@ -278,6 +269,7 @@ export type LayerHandlers = {|
   handleCustomBlur: LayerHandleBlur,
   handleCustomChange: LayerHandleChange,
   handleSubmit: LayerHandleSubmit,
+  resetState: LayerResetState,
 |};
 
 // NOTE: Don't forget to update `FieldDomProps` & `FieldPropsWithChecked` as well

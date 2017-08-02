@@ -16,6 +16,7 @@ import type {
   LayerHandleChange,
   LayerHandleBlur,
   LayerHandleSubmit,
+  LayerResetState,
   LayerHandlers,
 } from './types';
 
@@ -46,6 +47,7 @@ export default class LayerInterface {
   notifyOnBlur: LayerHandleBlur;
   notifyOnChange: LayerHandleChange;
   handleSubmit: LayerHandleSubmit;
+  resetState: LayerResetState;
 
   constructor(stateContainer: StateContainer, handlers: LayerHandlers) {
     const state = stateContainer.getState();
@@ -101,6 +103,7 @@ export default class LayerInterface {
     this.notifyOnBlur = handlers.handleCustomBlur;
     this.notifyOnChange = handlers.handleCustomChange;
     this.handleSubmit = handlers.handleSubmit;
+    this.resetState = handlers.resetState;
   }
 
   getPropsFor = (keyPath: KeyPath): FieldDomProps => {

@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { Component } from 'react';
+import React from 'react';
 
 import type {
   Props,
@@ -39,19 +39,27 @@ import {
   parseFieldStateId,
   buildFieldValidationStateId,
 } from './modules/ids';
+import {
+  getFieldDomHandler,
+  getFieldValueHandler,
+} from './modules/getFieldHandler';
+import {
+  getNextDataFromDom,
+  getNextDataFromCustomHandler,
+} from './modules/getNextData';
 import { getProp, isFunction } from './modules/utils';
 import normalizeFieldsFromProps from './modules/normalizeFieldsFromProps';
 import normalizeExternalErrors from './modules/normalizeExternalErrors';
 import getFieldsPropsState from './modules/getFieldsPropsState';
 import buildErrorMessage from './modules/buildErrorMessage';
 
-import LayerDomHandlers from './LayerDomHandlers';
+import LayerInterface from './LayerInterface';
 
 /**
  * @desc Core component. Container of the validation layer state.
  *
  */
-export default class ValidationLayer extends Component {
+export default class ValidationLayer extends React.Component {
   props: Props;
   state: State = {};
 
@@ -82,23 +90,23 @@ export default class ValidationLayer extends Component {
    * @desc Lifecycle hooks.
    *
    */
-  componentWillMount(): void {
+  componentWillMount = (): void => {
     // Set fields props
     this.setNextFieldsPropsState();
-  }
+  };
 
-  componentDidMount(): void {
+  componentDidMount = (): void => {
     // Performs validation of fields w/ `onMount` strategy
     this.validateOnMount();
-  }
+  };
 
-  componentWillReceiveProps(nextProps: Props): void {
+  componentWillReceiveProps = (nextProps: Props): void => {
     // Update normalized fields
     this.setNextNormalizedFields(nextProps);
 
     // Update fields props
     this.setNextFieldsPropsState(nextProps);
-  }
+  };
 
   /**
    * @desc Internal getters.
@@ -448,6 +456,147 @@ export default class ValidationLayer extends Component {
   };
 
   /**
+   * @desc Change handlers.
+   *
+   */
+  handleDomChange = (event: SyntheticInputEvent): void => {
+    const domData = getNextDataFromDom(
+      this.getLayerId(),
+      this.props.data,
+      event,
+    );
+    this.handleChange(domData);
+  };
+
+  handleCustomChange = (fieldId: FieldId, value: Value): void => {
+    const domData = getNextDataFromCustomHandler(
+      fieldId,
+      value,
+      this.props.data,
+    );
+    this.handleChange(domData);
+  };
+
+  handleChange = (domData: DomData): void => {
+    const layerId = this.getLayerId();
+    const field = this.getNormalizedField(domData.fieldId);
+    const filter = getFieldValueHandler(
+      this.getLayerId(),
+      field.id,
+      'filter',
+      field.filter,
+      this.props.filter,
+    );
+
+    if (
+      filter && // if filter is provided
+      domData.value && // & there's a value is not an empty string
+      !filter(domData.value, this.props.data) // & filter function returned false
+    ) {
+      return; // then ignoring this update
+    }
+
+    const transformBeforeStore = getFieldValueHandler(
+      layerId,
+      field.id,
+      'transformBeforeStore',
+      field.transformBeforeStore,
+      this.props.transformBeforeStore,
+    );
+
+    const processedValue = transformBeforeStore
+      ? transformBeforeStore(domData.value, this.props.data)
+      : domData.value;
+
+    const processedDomData = { ...domData, value: processedValue };
+
+    if (domData.event) {
+      const handleChange = getFieldDomHandler(
+        layerId,
+        field.id,
+        'onChange',
+        field.handlers,
+        this.props.handlers,
+      );
+
+      // $FlowIgnoreMe: Even getFieldDomHandler throws if onChange is missing, flow can't infer it
+      handleChange(processedDomData);
+    }
+
+    // $FlowIgnoreMe: Exact type and spread
+    this.validateField(field, processedDomData);
+  };
+
+  /**
+   * @desc Blur handlers.
+   *
+   */
+  handleDomBlur = (event: SyntheticInputEvent): void => {
+    const domData = getNextDataFromDom(
+      this.getLayerId(),
+      this.props.data,
+      event,
+    );
+    this.handleBlur(domData);
+  };
+
+  handleCustomBlur = (
+    fieldId: FieldId,
+    value: Value,
+    event: SyntheticInputEvent,
+  ): void => {
+    const domData = getNextDataFromCustomHandler(
+      fieldId,
+      value,
+      this.props.data,
+      event,
+    );
+    this.handleBlur(domData, true);
+  };
+
+  handleBlur = (domData: DomData, isCustom?: boolean = false): void => {
+    const layerId = this.getLayerId();
+    const field = this.getNormalizedField(domData.fieldId);
+    const handleBlur = getFieldDomHandler(
+      layerId,
+      field.id,
+      'onBlur',
+      field.handlers,
+      this.props.handlers,
+    );
+
+    const transformBeforeStore = getFieldValueHandler(
+      layerId,
+      field.id,
+      'transformBeforeStore',
+      field.transformBeforeStore,
+      this.props.transformBeforeStore,
+    );
+
+    const processedValue = transformBeforeStore
+      ? transformBeforeStore(domData.value, this.props.data)
+      : domData.value;
+
+    const processedDomData = { ...domData, value: processedValue };
+
+    if (!isCustom && handleBlur) handleBlur(processedDomData);
+
+    // $FlowIgnoreMe: Exact type and spread
+    this.validateField(field, processedDomData);
+  };
+
+  /**
+   * @desc Submit handler.
+   *
+   */
+  handleSubmit = (event: SyntheticEvent): void => {
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
+    this.triggerSubmission();
+  };
+
+  /**
    * @desc State reset. Triggered from userland.
    *       Back to origins on successful form submission.
    *
@@ -472,30 +621,25 @@ export default class ValidationLayer extends Component {
     this.setState({ ...resetedState, ...nextFieldsPropsState });
   };
 
-  render() {
-    const { props } = this;
-    const layerId = this.getLayerId();
-
-    if (typeof props.children !== 'function') {
+  render = () => {
+    if (typeof this.props.children !== 'function') {
       throw new Error(
         buildErrorMessage({
-          layerId,
+          layerId: this.getLayerId(),
           message: '`children` must be a function',
         }),
       );
     }
 
-    return (
-      <LayerDomHandlers
-        layerId={layerId}
-        stateContainer={this}
-        data={props.data}
-        filter={props.filter}
-        handlers={props.handlers}
-        transformBeforeStore={props.transformBeforeStore}
-      >
-        {layer => props.children && props.children(layer)}
-      </LayerDomHandlers>
-    );
-  }
+    const layer = new LayerInterface(this, {
+      handleDomBlur: this.handleDomBlur,
+      handleDomChange: this.handleDomChange,
+      handleCustomBlur: this.handleCustomBlur,
+      handleCustomChange: this.handleCustomChange,
+      handleSubmit: this.handleSubmit,
+      resetState: this.resetState,
+    });
+
+    return this.props.children(layer);
+  };
 }
