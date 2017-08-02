@@ -16,7 +16,6 @@ describe('utils.setProp()', () => {
     expect(data).not.toBe(nextData);
   });
 
-
   it('sets prop on nested vanilla JS Object w/o mutation', () => {
     const data = { nested: { attr: 1 } };
     const keyPath = ['nested', 'attr'];
@@ -27,7 +26,6 @@ describe('utils.setProp()', () => {
     expect(nextData.nested.attr).toBe(2);
     expect(data).not.toBe(nextData);
   });
-
 
   it('sets prop on Immutable Record', () => {
     const Data = Record({ attr: null });

@@ -10,11 +10,10 @@ describe('case.emitConsistentValidationResults', () => {
       data: { password: null },
       fields: {
         password: {
-          validate: password => (
+          validate: password =>
             password.length < 4
-            ? { valid: false, message: 'Password is too short' }
-            : true
-          ),
+              ? { valid: false, message: 'Password is too short' }
+              : true,
         },
       },
     });
@@ -46,18 +45,16 @@ describe('case.emitConsistentValidationResults', () => {
     expect(Form.find('.password-validity').text()).toBe('valid');
   });
 
-
   it('emits consistent results onFirstSuccess when invalid state reported as object & valid as boolean', () => {
     const Form = mountPasswordForm({
       strategy: 'onFirstSuccess',
       data: { password: null },
       fields: {
         password: {
-          validate: password => (
+          validate: password =>
             password.length < 4
-            ? { valid: false, message: 'Password is too short' }
-            : true
-          ),
+              ? { valid: false, message: 'Password is too short' }
+              : true,
         },
       },
     });

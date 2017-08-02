@@ -7,23 +7,23 @@ describe('asyncStrategy.onChange()', () => {
   const DEBOUNCE_INTERVAL = 20;
   const WAIT_BEFORE_RESOLVED = 100;
 
-  const mountForm = (strategy, validateAsync) => mountSignupForm({
-    strategy,
-    asyncStrategy: 'onChange',
-    debounceInterval: DEBOUNCE_INTERVAL,
-    fields: {
-      email: {
-        ...validatePresenceAndShapeWithMessages({
-          presence: 'Email is required',
-          shape: 'Email is invalid',
-        }),
-        validateAsync,
+  const mountForm = (strategy, validateAsync) =>
+    mountSignupForm({
+      strategy,
+      asyncStrategy: 'onChange',
+      debounceInterval: DEBOUNCE_INTERVAL,
+      fields: {
+        email: {
+          ...validatePresenceAndShapeWithMessages({
+            presence: 'Email is required',
+            shape: 'Email is invalid',
+          }),
+          validateAsync,
+        },
+        password: true,
+        passwordConfirmation: true,
       },
-      password: true,
-      passwordConfirmation: true,
-    },
-  });
-
+    });
 
   it('does not trigger async validation on blur', () => {
     const validateAsync = jest.fn();
@@ -36,7 +36,6 @@ describe('asyncStrategy.onChange()', () => {
     // validateAsync wasn't triggered
     expect(validateAsync).toHaveBeenCalledTimes(0);
   });
-
 
   it('does not trigger async validation if sync validation was not emitted', () => {
     const validateAsync = jest.fn();
@@ -56,7 +55,6 @@ describe('asyncStrategy.onChange()', () => {
     expect(validateAsync).toHaveBeenCalledTimes(0);
   });
 
-
   it('does not trigger async validation if sync validation failed with no value', () => {
     const validateAsync = jest.fn();
 
@@ -74,7 +72,6 @@ describe('asyncStrategy.onChange()', () => {
     // validateAsync wasn't triggered
     expect(validateAsync).toHaveBeenCalledTimes(0);
   });
-
 
   it('does not trigger async validation if sync validation failed with invalid value', () => {
     const validateAsync = jest.fn();
@@ -94,8 +91,7 @@ describe('asyncStrategy.onChange()', () => {
     expect(validateAsync).toHaveBeenCalledTimes(0);
   });
 
-
-  it('triggers debounced async validation on change', (done) => {
+  it('triggers debounced async validation on change', done => {
     const validateAsync = jest.fn();
 
     const Form = mountForm('onFirstChange', validateAsync);
@@ -119,12 +115,14 @@ describe('asyncStrategy.onChange()', () => {
     }, DEBOUNCE_INTERVAL + 10);
   });
 
-
-  it('triggers debounced async validation on change and it provides interm and final feedback', (done) => {
-    const validateAsync = jest.fn(() => new Promise(resolve => {
-      const results = { valid: true, message: 'Nice!' };
-      setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
-    }));
+  it('triggers debounced async validation on change and it provides interm and final feedback', done => {
+    const validateAsync = jest.fn(
+      () =>
+        new Promise(resolve => {
+          const results = { valid: true, message: 'Nice!' };
+          setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
+        }),
+    );
 
     const Form = mountForm('onFirstSuccess', validateAsync);
 
@@ -165,12 +163,14 @@ describe('asyncStrategy.onChange()', () => {
     }, DEBOUNCE_INTERVAL + 10);
   });
 
-
-  it('does not replase newer results with obsolete ones from async validation ', (done) => {
-    const validateAsync = jest.fn(() => new Promise(resolve => {
-      const results = { valid: true, message: 'Nice!' };
-      setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
-    }));
+  it('does not replase newer results with obsolete ones from async validation ', done => {
+    const validateAsync = jest.fn(
+      () =>
+        new Promise(resolve => {
+          const results = { valid: true, message: 'Nice!' };
+          setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
+        }),
+    );
 
     const Form = mountForm('onFirstSuccess', validateAsync);
 
@@ -200,7 +200,9 @@ describe('asyncStrategy.onChange()', () => {
         setTimeout(() => {
           try {
             // Error for `email` is still there
-            expect(Form.find('.email-message').text()).toBe('Email is required');
+            expect(Form.find('.email-message').text()).toBe(
+              'Email is required',
+            );
             expect(Form.find('.email-wrapper').hasClass('failure')).toBe(true);
             expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
             done();

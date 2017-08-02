@@ -10,7 +10,6 @@ describe('modules.ids.buildFieldId()', () => {
     expect(fieldId).toBe('email');
   });
 
-
   it('builds correct field id from multiple attributes', () => {
     const keyPath = ['user', 'email'];
     const fieldId = buildFieldId(keyPath);

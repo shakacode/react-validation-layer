@@ -16,7 +16,6 @@ import type {
 
 import LayerInterface from '../../src/LayerInterface';
 
-
 export type TestValidity = 'valid' | 'invalid' | 'none';
 
 export type TestProps = {

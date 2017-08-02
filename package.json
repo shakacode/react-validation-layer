@@ -27,23 +27,15 @@
     "test": "BABEL_ENV=test jest --config .jest.json",
     "flow": "flow --show-all-errors",
     "flow:up": "rm -rf flow-typed && flow-typed install",
-    "prettier": "prettier --print-width 80 --tab-width 2 --single-quote --trailing-comma all --parser babylon --write \"{rollup.config.js,src/**/*.js}\"",
+    "prettier": "prettier --print-width 80 --tab-width 2 --single-quote --trailing-comma all --parser babylon --write \"{rollup.config.js,{src,__tests__}/**/*.js}\"",
     "clean": "rm -rf lib",
     "validate": "yarn run flow && yarn run test && yarn run lint",
     "preversion": "yarn run validate && yarn run build",
     "prerelease": "rm -rf node_modules && yarn",
     "release": "np --yolo"
   },
-  "files": [
-    "lib"
-  ],
-  "keywords": [
-    "react",
-    "flux",
-    "redux",
-    "forms",
-    "validation"
-  ],
+  "files": ["lib"],
+  "keywords": ["react", "flux", "redux", "forms", "validation"],
   "dependencies": {
     "lodash.clonedeep": "^4.5.0",
     "lodash.set": "^4.3.2"
@@ -76,12 +68,14 @@
     "babel-plugin-transform-react-jsx": "6.23.0",
     "classnames": "2.2.5",
     "enzyme": "2.8.0",
-    "eslint": "3.19.0",
-    "eslint-config-shakacode": "14.1.1",
-    "eslint-plugin-flowtype": "2.30.4",
-    "eslint-plugin-import": "2.2.0",
-    "eslint-plugin-jsx-a11y": "4.0.0",
-    "eslint-plugin-react": "6.10.3",
+    "eslint": "4.3.0",
+    "eslint-config-prettier": "2.3.0",
+    "eslint-config-shakacode": "15.0.0-1",
+    "eslint-plugin-flowtype": "2.35.0",
+    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-jsx-a11y": "5.1.1",
+    "eslint-plugin-prettier": "2.1.2",
+    "eslint-plugin-react": "7.1.0",
     "flow-bin": "0.51.1",
     "flow-typed": "2.1.5",
     "immutable": "3.8.1",

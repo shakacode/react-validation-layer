@@ -60,7 +60,7 @@ describe('utils.isPlainObject()', () => {
     expect(isPlainObject).toBe(false);
   });
 
-  it('returns `false` for `\'string\'`', () => {
+  it("returns `false` for `'string'`", () => {
     const isPlainObject = utils.isPlainObject('string');
     expect(isPlainObject).toBe(false);
   });

@@ -17,7 +17,6 @@ import { mockStrictLayerProps } from '../../helpers';
 
 import ValidationLayer from '../../../src';
 
-
 const defaultData = {
   email: null,
   password: null,
@@ -44,7 +43,7 @@ const SignupForm = ({
   // $FlowIgnoreMe
   handlers = undefined,
   ...otherProps
-}: Props) => (
+}: Props) =>
   <ValidationLayer
     {...mockStrictLayerProps({
       strategy,
@@ -57,39 +56,38 @@ const SignupForm = ({
       ...otherProps,
     })}
   >
-    {layer => (
+    {layer =>
       <form className="form" onSubmit={layer.handleSubmit}>
-        <div className={classNames('email-wrapper', layer.getStatusFor('email'))}>
+        <div
+          className={classNames('email-wrapper', layer.getStatusFor('email'))}
+        >
           <input
             type="text"
             className="email-input"
             {...layer.getPropsFor('email')}
           />
-          {
-            layer.getMessageFor('email') &&
+          {layer.getMessageFor('email') &&
             <span className="email-message">
               {layer.getMessageFor('email')}
-            </span>
-          }
-          {
-            layer.getAsyncStatusFor('email') &&
-            <span className="email-message">
-              Checking...
-            </span>
-          }
+            </span>}
+          {layer.getAsyncStatusFor('email') &&
+            <span className="email-message">Checking...</span>}
         </div>
-        <div className={classNames('password-wrapper', layer.getStatusFor('password'))}>
+        <div
+          className={classNames(
+            'password-wrapper',
+            layer.getStatusFor('password'),
+          )}
+        >
           <input
             type="text"
             className="password-input"
             {...layer.getPropsFor('password')}
           />
-          {
-            layer.getMessageFor('password') &&
+          {layer.getMessageFor('password') &&
             <span className="password-message">
               {layer.getMessageFor('password')}
-            </span>
-          }
+            </span>}
         </div>
         <div
           className={classNames(
@@ -102,25 +100,19 @@ const SignupForm = ({
             className="password-confirmation-input"
             {...layer.getPropsFor('passwordConfirmation')}
           />
-          {
-            layer.getMessageFor('passwordConfirmation') &&
+          {layer.getMessageFor('passwordConfirmation') &&
             <span className="password-confirmation-message">
               {layer.getMessageFor('passwordConfirmation')}
-            </span>
-          }
+            </span>}
         </div>
         <div className="submit-button-wrapper">
-          <button
-            {...layer.getSubmitButtonProps()}
-            className="submit-button"
-          >
+          <button {...layer.getSubmitButtonProps()} className="submit-button">
             Submit
           </button>
         </div>
-      </form>
-    )}
-  </ValidationLayer>
-);
+      </form>}
+  </ValidationLayer>;
 
 /* eslint-disable new-cap */
-export const mountSignupForm = (...args: Array<Props>): * => mount(SignupForm(...args));
+export const mountSignupForm = (...args: Array<Props>): * =>
+  mount(SignupForm(...args));

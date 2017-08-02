@@ -17,21 +17,13 @@ describe('layer.isSuccessFor()', () => {
           onSubmit: () => undefined,
         }}
       >
-        {layer => (
+        {layer =>
           <div>
-            <input
-              className="input"
-              {...layer.getPropsFor('email')}
-            />
+            <input className="input" {...layer.getPropsFor('email')} />
             <div className="result">
-              {
-                layer.isSuccessFor('email')
-                ? 'success'
-                : 'not-success'
-              }
+              {layer.isSuccessFor('email') ? 'success' : 'not-success'}
             </div>
-          </div>
-        )}
+          </div>}
       </ValidationLayer>,
     );
 
@@ -49,7 +41,6 @@ describe('layer.isSuccessFor()', () => {
     expect(Form.find('.result').text()).toBe('not-success');
   });
 
-
   it('returns false if validation succeeded, but field has no value', () => {
     const Form = mount(
       <ValidationLayer
@@ -61,21 +52,13 @@ describe('layer.isSuccessFor()', () => {
           onSubmit: () => undefined,
         }}
       >
-        {layer => (
+        {layer =>
           <div>
-            <input
-              className="input"
-              {...layer.getPropsFor('email')}
-            />
+            <input className="input" {...layer.getPropsFor('email')} />
             <div className="result">
-              {
-                layer.isSuccessFor('email')
-                ? 'success'
-                : 'not-success'
-              }
+              {layer.isSuccessFor('email') ? 'success' : 'not-success'}
             </div>
-          </div>
-        )}
+          </div>}
       </ValidationLayer>,
     );
 

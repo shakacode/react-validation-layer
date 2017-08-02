@@ -10,7 +10,6 @@ describe('modules.ids.buildFieldPropsStateId()', () => {
     expect(fieldPropsStateId).toBe('fieldPropsState---email');
   });
 
-
   it('builds correct `fieldPropsStateId` from `fieldId` w/ multiple attributes', () => {
     const fieldId = 'user.email';
     const fieldPropsStateId = buildFieldPropsStateId(fieldId);

@@ -13,7 +13,6 @@ describe('utils.getProp()', () => {
     expect(value).toBe(1);
   });
 
-
   it('gets prop of nested vanilla JS Object', () => {
     const data = { nested: { attr: 1 } };
     const keyPath = ['nested', 'attr'];
@@ -21,7 +20,6 @@ describe('utils.getProp()', () => {
 
     expect(value).toBe(1);
   });
-
 
   it('gets prop of Immutable Record', () => {
     const Data = Record({ attr: null });

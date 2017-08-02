@@ -22,7 +22,6 @@ describe('modules.getFieldValueHandler()', () => {
     expect(filter).toBe(field.filter);
   });
 
-
   it('returns props-level `filter` when field-level handler is not provided', () => {
     const layerId = 'dummyLayerId';
     const fieldId = 'dummyFieldId';
@@ -39,7 +38,6 @@ describe('modules.getFieldValueHandler()', () => {
 
     expect(filter).toBe(props.filter);
   });
-
 
   it('returns undefined when no `filter` is provided', () => {
     const layerId = 'dummyLayerId';
@@ -58,22 +56,22 @@ describe('modules.getFieldValueHandler()', () => {
     expect(filter).toBe(undefined);
   });
 
-
   it('throws if `filter` is not a function', () => {
     const layerId = 'dummyLayerId';
     const fieldId = 'dummyFieldId';
     const handlerKey = 'filter';
     const field = mockNormalizedField({ filter: 'not-a-function' });
     const props = mockDummyLayerProps({ filter: undefined });
-    const handlerGetter = () => getFieldValueHandler(
-      layerId,
-      fieldId,
-      handlerKey,
-      // $FlowIgnoreMe: Intentional
-      field.handlers,
-      // $FlowIgnoreMe: Intentional
-      props.handlers,
-    );
+    const handlerGetter = () =>
+      getFieldValueHandler(
+        layerId,
+        fieldId,
+        handlerKey,
+        // $FlowIgnoreMe: Intentional
+        field.handlers,
+        // $FlowIgnoreMe: Intentional
+        props.handlers,
+      );
 
     expect(handlerGetter).toThrow();
   });

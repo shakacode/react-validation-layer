@@ -11,7 +11,6 @@ import { mockStrictLayerProps } from '../../helpers';
 
 import ValidationLayer from '../../../src';
 
-
 const defaultData = { frequency: null, permit: null };
 const defaultFields = { frequency: true, permit: true };
 
@@ -27,11 +26,16 @@ const SubscriptionForm = ({
   id = 'subscriptionForm',
   data = defaultData,
   fields = defaultFields,
-}: Props) => (
+}: Props) =>
   <ValidationLayer {...mockStrictLayerProps({ strategy, id, data, fields })}>
-    {layer => (
+    {layer =>
       <form className="form" onSubmit={layer.handleSubmit}>
-        <div className={classNames('frequency-wrapper', layer.getStatusFor('frequency'))}>
+        <div
+          className={classNames(
+            'frequency-wrapper',
+            layer.getStatusFor('frequency'),
+          )}
+        >
           <input
             type="radio"
             className="frequency-radio-weekly"
@@ -43,7 +47,9 @@ const SubscriptionForm = ({
             {...layer.getRadioButtonPropsFor('frequency', 'monthly')}
           />
         </div>
-        <div className={classNames('permit-wrapper', layer.getStatusFor('permit'))}>
+        <div
+          className={classNames('permit-wrapper', layer.getStatusFor('permit'))}
+        >
           <input
             type="checkbox"
             className="permit-checkbox"
@@ -51,17 +57,13 @@ const SubscriptionForm = ({
           />
         </div>
         <div className="submit-button-wrapper">
-          <button
-            {...layer.getSubmitButtonProps()}
-            className="submit-button"
-          >
+          <button {...layer.getSubmitButtonProps()} className="submit-button">
             Submit
           </button>
         </div>
-      </form>
-    )}
-  </ValidationLayer>
-);
+      </form>}
+  </ValidationLayer>;
 
 /* eslint-disable new-cap */
-export const mountSubscriptionForm = (...args: Array<Props>): * => mount(SubscriptionForm(...args));
+export const mountSubscriptionForm = (...args: Array<Props>): * =>
+  mount(SubscriptionForm(...args));

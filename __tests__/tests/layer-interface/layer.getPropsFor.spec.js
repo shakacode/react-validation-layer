@@ -3,13 +3,13 @@
 import { mountPasswordForm } from '../../factories/forms/PasswordForm';
 
 describe('layer.getPropsFor()', () => {
-  const mountForm = () => mountPasswordForm({
-    id: 'passwordForm',
-    strategy: 'onFirstSubmit',
-    data: { password: '1234' },
-    fields: { password: true },
-  });
-
+  const mountForm = () =>
+    mountPasswordForm({
+      id: 'passwordForm',
+      strategy: 'onFirstSubmit',
+      data: { password: '1234' },
+      fields: { password: true },
+    });
 
   it('returns props for common input element', () => {
     const Form = mountForm();
@@ -23,7 +23,6 @@ describe('layer.getPropsFor()', () => {
     expect(inputProps.onChange).toBeInstanceOf(Function);
     expect(inputProps.onBlur).toBeInstanceOf(Function);
   });
-
 
   it('returns props w/ disabled input while form is being submitted', () => {
     const Form = mountForm();

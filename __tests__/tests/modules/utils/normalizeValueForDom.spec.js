@@ -10,14 +10,12 @@ describe('utils.normalizeValueForDom()', () => {
     expect(normalizedValue).toBe('value');
   });
 
-
   it('returns value if value is 0', () => {
     const value = 0;
     const normalizedValue = utils.normalizeValueForDom(value);
 
     expect(normalizedValue).toBe(0);
   });
-
 
   it('returns empty string if value is empty string', () => {
     const value = '';
@@ -26,14 +24,12 @@ describe('utils.normalizeValueForDom()', () => {
     expect(normalizedValue).toBe('');
   });
 
-
   it('returns empty string if value is null', () => {
     const value = null;
     const normalizedValue = utils.normalizeValueForDom(value);
 
     expect(normalizedValue).toBe('');
   });
-
 
   it('returns empty string if value is undefined', () => {
     const value = undefined;

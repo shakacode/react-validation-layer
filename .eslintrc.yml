@@ -2,9 +2,13 @@
 extends:
   - "eslint-config-shakacode"
   - "plugin:flowtype/recommended"
+  - "prettier"
+  - "prettier/flowtype"
+  - "prettier/react"
 
 plugins:
   - "flowtype"
+  - "prettier"
 
 env:
   jest: true
@@ -17,6 +21,13 @@ rules:
   arrow-body-style: "off"
   no-underscore-dangle: "off"
   no-multi-assign: "off"
+
+  prettier/prettier:
+    - "error"
+    - printWidth: 80
+      tabWidth: 2
+      trailingComma: "all"
+      singleQuote: true
 
   react/sort-comp: "off"
   react/jsx-filename-extension:

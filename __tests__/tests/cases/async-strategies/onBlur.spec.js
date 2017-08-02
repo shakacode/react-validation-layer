@@ -6,22 +6,22 @@ import { mountSignupForm } from '../../../factories/forms/SignupForm';
 describe('asyncStrategy.onBlur()', () => {
   const WAIT_BEFORE_RESOLVED = 20;
 
-  const mountForm = (strategy, validateAsync) => mountSignupForm({
-    strategy,
-    asyncStrategy: 'onBlur',
-    fields: {
-      email: {
-        ...validatePresenceAndShapeWithMessages({
-          presence: 'Email is required',
-          shape: 'Email is invalid',
-        }),
-        validateAsync,
+  const mountForm = (strategy, validateAsync) =>
+    mountSignupForm({
+      strategy,
+      asyncStrategy: 'onBlur',
+      fields: {
+        email: {
+          ...validatePresenceAndShapeWithMessages({
+            presence: 'Email is required',
+            shape: 'Email is invalid',
+          }),
+          validateAsync,
+        },
+        password: true,
+        passwordConfirmation: true,
       },
-      password: true,
-      passwordConfirmation: true,
-    },
-  });
-
+    });
 
   it('does not trigger async validation on change', () => {
     const validateAsync = jest.fn();
@@ -34,7 +34,6 @@ describe('asyncStrategy.onBlur()', () => {
     // validateAsync wasn't triggered
     expect(validateAsync).toHaveBeenCalledTimes(0);
   });
-
 
   it('does not trigger async validation if sync validation is failed with no value', () => {
     const validateAsync = jest.fn(() => new Promise(() => null));
@@ -55,7 +54,6 @@ describe('asyncStrategy.onBlur()', () => {
     // validateAsync wasn't triggered
     expect(validateAsync).toHaveBeenCalledTimes(0);
   });
-
 
   it('does not trigger async validation if sync validation is failed with invalid value', () => {
     const validateAsync = jest.fn(() => new Promise(() => null));
@@ -82,12 +80,14 @@ describe('asyncStrategy.onBlur()', () => {
     expect(Form.find('.email-wrapper').hasClass('success')).toBe(false);
   });
 
-
-  it('triggers async validation on blur and it provides interm and final feedback', (done) => {
-    const validateAsync = jest.fn(() => new Promise(resolve => {
-      const results = { valid: true, message: 'Nice!' };
-      setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
-    }));
+  it('triggers async validation on blur and it provides interm and final feedback', done => {
+    const validateAsync = jest.fn(
+      () =>
+        new Promise(resolve => {
+          const results = { valid: true, message: 'Nice!' };
+          setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
+        }),
+    );
 
     const Form = mountForm('onFirstBlur', validateAsync);
 
@@ -122,12 +122,14 @@ describe('asyncStrategy.onBlur()', () => {
     }, WAIT_BEFORE_RESOLVED + 10);
   });
 
-
-  it('does not replase newer results with obsolete ones from async validation ', (done) => {
-    const validateAsync = jest.fn(() => new Promise(resolve => {
-      const results = { valid: true, message: 'Nice!' };
-      setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
-    }));
+  it('does not replase newer results with obsolete ones from async validation ', done => {
+    const validateAsync = jest.fn(
+      () =>
+        new Promise(resolve => {
+          const results = { valid: true, message: 'Nice!' };
+          setTimeout(() => resolve(results), WAIT_BEFORE_RESOLVED);
+        }),
+    );
 
     const Form = mountForm('onFirstChange', validateAsync);
 
@@ -165,7 +167,6 @@ describe('asyncStrategy.onBlur()', () => {
       }
     }, WAIT_BEFORE_RESOLVED + 10);
   });
-
 
   it('does not emit results on change if there is async validator w/ onBlur strategy', () => {
     const validateAsync = jest.fn(() => new Promise(() => null));

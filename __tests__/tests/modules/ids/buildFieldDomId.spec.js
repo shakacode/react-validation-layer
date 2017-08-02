@@ -11,7 +11,6 @@ describe('modules.ids.buildFieldDomId()', () => {
     expect(fieldDomId).toBe('loginForm___email');
   });
 
-
   it('builds correct `fieldDomId` from multiple attributes', () => {
     const layerId = 'loginForm';
     const keyPath = ['user', 'email'];

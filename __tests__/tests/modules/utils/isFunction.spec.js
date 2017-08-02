@@ -60,7 +60,7 @@ describe('utils.isFunction()', () => {
     expect(isFunction).toBe(false);
   });
 
-  it('returns `false` for `\'string\'`', () => {
+  it("returns `false` for `'string'`", () => {
     const isFunction = utils.isFunction('string');
     expect(isFunction).toBe(false);
   });

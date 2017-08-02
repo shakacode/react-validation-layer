@@ -13,7 +13,6 @@ describe('modules.ids.parseFieldStateId()', () => {
     });
   });
 
-
   it('parses fieldValidationStateId', () => {
     const fieldValidationStateId = 'fieldValidationState---user.email';
     const parsedFieldStateId = parseFieldStateId(fieldValidationStateId);

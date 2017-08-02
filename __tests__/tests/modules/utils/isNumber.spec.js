@@ -60,7 +60,7 @@ describe('utils.isNumber()', () => {
     expect(isNumber).toBe(false);
   });
 
-  it('returns `false` for `\'string\'`', () => {
+  it("returns `false` for `'string'`", () => {
     const isNumber = utils.isNumber('string');
     expect(isNumber).toBe(false);
   });

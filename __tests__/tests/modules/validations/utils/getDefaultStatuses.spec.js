@@ -10,7 +10,6 @@ describe('modules.validation.utils.getDefaultStatuses()', () => {
     expect(statuses).toEqual(statusesFromProps);
   });
 
-
   it('returns default statuses when no custom statuses provided', () => {
     const statusesFromProps = undefined;
     const statuses = getDefaultStatuses(statusesFromProps);
@@ -18,14 +17,12 @@ describe('modules.validation.utils.getDefaultStatuses()', () => {
     expect(statuses).toEqual({ success: 'success', failure: 'failure' });
   });
 
-
   it('returns default success status when no custom success statuses provided', () => {
     const statusesFromProps = { failure: 'failed' };
     const statuses = getDefaultStatuses(statusesFromProps);
 
     expect(statuses).toEqual({ success: 'success', failure: 'failed' });
   });
-
 
   it('returns default failure status when no custom failure statuses provided', () => {
     const statusesFromProps = { success: 'succeeded' };

@@ -8,7 +8,9 @@ describe('layer.getValidityFor()', () => {
     const Form = mountPasswordForm({
       strategy: 'onFirstChange',
       data: { password: null },
-      fields: { password: passwordField.validatePresenceAndLengthWithBoolOutput() },
+      fields: {
+        password: passwordField.validatePresenceAndLengthWithBoolOutput(),
+      },
     });
 
     // No validity reported on mount

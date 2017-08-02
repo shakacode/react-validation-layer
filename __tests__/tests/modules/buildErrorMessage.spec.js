@@ -14,14 +14,10 @@ describe('modules.buildErrorMessage()', () => {
     );
   });
 
-
   it('builds multi-line error message from array', () => {
     const layerId = 'loginForm';
     const fieldId = 'email';
-    const message = [
-      'Look Ma!',
-      'Multi-line!',
-    ];
+    const message = ['Look Ma!', 'Multi-line!'];
     const errorMessage = buildErrorMessage({ layerId, fieldId, message });
 
     expect(errorMessage).toBe(
@@ -29,8 +25,7 @@ describe('modules.buildErrorMessage()', () => {
     );
   });
 
-
-  it('builds error message without layerId when it\'s not provided', () => {
+  it("builds error message without layerId when it's not provided", () => {
     const fieldId = 'email';
     const message = 'Boom!';
     const errorMessage = buildErrorMessage({ fieldId, message });
@@ -40,8 +35,7 @@ describe('modules.buildErrorMessage()', () => {
     );
   });
 
-
-  it('builds error message without layerId when it\'s default', () => {
+  it("builds error message without layerId when it's default", () => {
     const layerId = 'form';
     const fieldId = 'email';
     const message = 'Boom!';
@@ -52,7 +46,7 @@ describe('modules.buildErrorMessage()', () => {
     );
   });
 
-  it('builds error message without fieldId when it\'s not provided', () => {
+  it("builds error message without fieldId when it's not provided", () => {
     const layerId = 'loginForm';
     const message = 'Boom!';
     const errorMessage = buildErrorMessage({ layerId, message });
@@ -62,13 +56,10 @@ describe('modules.buildErrorMessage()', () => {
     );
   });
 
-
   it('builds error message without debug info when layerId & fieldId are not provided', () => {
     const message = 'Boom!';
     const errorMessage = buildErrorMessage({ message });
 
-    expect(errorMessage).toBe(
-      '[react-validation-layer]: Boom!',
-    );
+    expect(errorMessage).toBe('[react-validation-layer]: Boom!');
   });
 });

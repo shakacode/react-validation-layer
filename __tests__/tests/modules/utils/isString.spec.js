@@ -3,7 +3,7 @@
 import * as utils from '../../../../src/modules/utils';
 
 describe('utils.isString()', () => {
-  it('returns `true` for `\'string\'`', () => {
+  it("returns `true` for `'string'`", () => {
     const isString = utils.isString('string');
     expect(isString).toBe(true);
   });

@@ -11,7 +11,6 @@ describe('modules.ids.parseFieldId()', () => {
     expect(keyPath).toEqual(['email']);
   });
 
-
   it('parses nested field id', () => {
     const fieldId = 'user.email';
     const { attr, keyPath } = parseFieldId(fieldId);

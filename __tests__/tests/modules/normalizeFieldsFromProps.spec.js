@@ -6,7 +6,6 @@ import { fromJS } from 'immutable';
 import { dummyFunction } from '../../helpers';
 import normalizeFieldsFromProps from '../../../src/modules/normalizeFieldsFromProps';
 
-
 describe('modules.normalizeFieldsFromProps()', () => {
   it('combines correct array of flat fields', () => {
     const asyncStrategy = undefined;
@@ -37,7 +36,6 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'password', keyPath: ['password'], validate: dummyFunction },
     ]);
   });
-
 
   it('combines correct array of 1 level nested fields', () => {
     const asyncStrategy = undefined;
@@ -83,12 +81,23 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'avatar.url', keyPath: ['avatar', 'url'], validate: dummyFunction },
       { id: 'avatar.title', keyPath: ['avatar', 'title'] },
-      { id: 'coverPhoto.url', keyPath: ['coverPhoto', 'url'], validate: dummyFunction },
-      { id: 'coverPhoto.width', keyPath: ['coverPhoto', 'width'], transformBeforeStore: dummyFunction },
-      { id: 'coverPhoto.height', keyPath: ['coverPhoto', 'height'], transformBeforeStore: dummyFunction },
+      {
+        id: 'coverPhoto.url',
+        keyPath: ['coverPhoto', 'url'],
+        validate: dummyFunction,
+      },
+      {
+        id: 'coverPhoto.width',
+        keyPath: ['coverPhoto', 'width'],
+        transformBeforeStore: dummyFunction,
+      },
+      {
+        id: 'coverPhoto.height',
+        keyPath: ['coverPhoto', 'height'],
+        transformBeforeStore: dummyFunction,
+      },
     ]);
   });
-
 
   it('combines correct array of 2 level nested fields', () => {
     const asyncStrategy = undefined;
@@ -139,14 +148,29 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'username', keyPath: ['username'] },
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'photos.private', keyPath: ['photos', 'private'] },
-      { id: 'photos.avatar.url', keyPath: ['photos', 'avatar', 'url'], validate: dummyFunction },
+      {
+        id: 'photos.avatar.url',
+        keyPath: ['photos', 'avatar', 'url'],
+        validate: dummyFunction,
+      },
       { id: 'photos.avatar.title', keyPath: ['photos', 'avatar', 'title'] },
-      { id: 'photos.coverPhoto.url', keyPath: ['photos', 'coverPhoto', 'url'], validate: dummyFunction },
-      { id: 'photos.coverPhoto.width', keyPath: ['photos', 'coverPhoto', 'width'], transformBeforeStore: dummyFunction },
-      { id: 'photos.coverPhoto.height', keyPath: ['photos', 'coverPhoto', 'height'], transformBeforeStore: dummyFunction },
+      {
+        id: 'photos.coverPhoto.url',
+        keyPath: ['photos', 'coverPhoto', 'url'],
+        validate: dummyFunction,
+      },
+      {
+        id: 'photos.coverPhoto.width',
+        keyPath: ['photos', 'coverPhoto', 'width'],
+        transformBeforeStore: dummyFunction,
+      },
+      {
+        id: 'photos.coverPhoto.height',
+        keyPath: ['photos', 'coverPhoto', 'height'],
+        transformBeforeStore: dummyFunction,
+      },
     ]);
   });
-
 
   it('combines correct array of 2 level nested fields with immutable data', () => {
     const asyncStrategy = undefined;
@@ -197,14 +221,29 @@ describe('modules.normalizeFieldsFromProps()', () => {
       { id: 'username', keyPath: ['username'] },
       { id: 'email', keyPath: ['email'], validate: dummyFunction },
       { id: 'photos.private', keyPath: ['photos', 'private'] },
-      { id: 'photos.avatar.url', keyPath: ['photos', 'avatar', 'url'], validate: dummyFunction },
+      {
+        id: 'photos.avatar.url',
+        keyPath: ['photos', 'avatar', 'url'],
+        validate: dummyFunction,
+      },
       { id: 'photos.avatar.title', keyPath: ['photos', 'avatar', 'title'] },
-      { id: 'photos.coverPhoto.url', keyPath: ['photos', 'coverPhoto', 'url'], validate: dummyFunction },
-      { id: 'photos.coverPhoto.width', keyPath: ['photos', 'coverPhoto', 'width'], transformBeforeStore: dummyFunction },
-      { id: 'photos.coverPhoto.height', keyPath: ['photos', 'coverPhoto', 'height'], transformBeforeStore: dummyFunction },
+      {
+        id: 'photos.coverPhoto.url',
+        keyPath: ['photos', 'coverPhoto', 'url'],
+        validate: dummyFunction,
+      },
+      {
+        id: 'photos.coverPhoto.width',
+        keyPath: ['photos', 'coverPhoto', 'width'],
+        transformBeforeStore: dummyFunction,
+      },
+      {
+        id: 'photos.coverPhoto.height',
+        keyPath: ['photos', 'coverPhoto', 'height'],
+        transformBeforeStore: dummyFunction,
+      },
     ]);
   });
-
 
   it('debounces async validator w/ ON_CHANGE asyncStrategy', () => {
     const asyncStrategy = 'onChange';
@@ -225,7 +264,6 @@ describe('modules.normalizeFieldsFromProps()', () => {
     expect(normalizedValidateAsync).not.toBe(dummyFunction);
   });
 
-
   it('does not debounce async validator w/ ON_BLUR asyncStrategy', () => {
     const asyncStrategy = 'onBlur';
     const debounceInterval = undefined;
@@ -244,6 +282,8 @@ describe('modules.normalizeFieldsFromProps()', () => {
     expect(normalizedValidateAsync).toBe(dummyFunction);
   });
 
-
-  xit('combines correct array of 1 level nested collection of fields', () => {});
+  xit(
+    'combines correct array of 1 level nested collection of fields',
+    () => {},
+  );
 });

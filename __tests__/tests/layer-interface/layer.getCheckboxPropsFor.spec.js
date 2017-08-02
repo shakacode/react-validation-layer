@@ -3,13 +3,13 @@
 import { mountSubscriptionForm } from '../../factories/forms/SubscriptionForm';
 
 describe('layer.getCheckboxPropsFor()', () => {
-  const mountForm = () => mountSubscriptionForm({
-    id: 'subscriptionForm',
-    strategy: 'onFirstSubmit',
-    data: { frequency: null, permit: true },
-    fields: { frequency: true, permit: true },
-  });
-
+  const mountForm = () =>
+    mountSubscriptionForm({
+      id: 'subscriptionForm',
+      strategy: 'onFirstSubmit',
+      data: { frequency: null, permit: true },
+      fields: { frequency: true, permit: true },
+    });
 
   it('returns props for checkbox', () => {
     const Form = mountForm();
@@ -24,7 +24,6 @@ describe('layer.getCheckboxPropsFor()', () => {
     expect(checkboxProps.onChange).toBeInstanceOf(Function);
     expect(checkboxProps.onBlur).toBeInstanceOf(Function);
   });
-
 
   it('returns props w/ disabled checkbox while form is being submitted', () => {
     const Form = mountForm();

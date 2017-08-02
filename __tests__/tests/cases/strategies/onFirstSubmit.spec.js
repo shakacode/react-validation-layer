@@ -18,7 +18,6 @@ describe('strategy.onFirstSubmit', () => {
     expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
   });
 
-
   it('does not emits results on first blur', () => {
     const Form = mountForm();
 
@@ -34,7 +33,6 @@ describe('strategy.onFirstSubmit', () => {
     expect(Form.find('.password-wrapper').hasClass('failure')).toBe(false);
     expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
   });
-
 
   it('does not emit results on invalid data', () => {
     const Form = mountForm();
@@ -53,7 +51,6 @@ describe('strategy.onFirstSubmit', () => {
     expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
   });
 
-
   it('does not emit results on valid data', () => {
     const Form = mountForm();
 
@@ -70,7 +67,6 @@ describe('strategy.onFirstSubmit', () => {
     expect(Form.find('.password-wrapper').hasClass('failure')).toBe(false);
     expect(Form.find('.password-wrapper').hasClass('success')).toBe(false);
   });
-
 
   it('emits results instantly on and after submit', () => {
     const Form = mountForm();

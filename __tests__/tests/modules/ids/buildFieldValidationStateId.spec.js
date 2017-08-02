@@ -10,7 +10,6 @@ describe('modules.ids.buildFieldValidationStateId()', () => {
     expect(fieldValidationStateId).toBe('fieldValidationState---email');
   });
 
-
   it('builds correct `fieldValidationStateId` from `fieldId` w/ multiple attributes', () => {
     const fieldId = 'user.email';
     const fieldValidationStateId = buildFieldValidationStateId(fieldId);

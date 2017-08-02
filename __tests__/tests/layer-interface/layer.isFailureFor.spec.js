@@ -17,21 +17,13 @@ describe('layer.isFailureFor()', () => {
           onSubmit: () => undefined,
         }}
       >
-        {layer => (
+        {layer =>
           <div>
-            <input
-              className="input"
-              {...layer.getPropsFor('email')}
-            />
+            <input className="input" {...layer.getPropsFor('email')} />
             <div className="result">
-              {
-                layer.isFailureFor('email')
-                ? 'failure'
-                : 'not-failure'
-              }
+              {layer.isFailureFor('email') ? 'failure' : 'not-failure'}
             </div>
-          </div>
-        )}
+          </div>}
       </ValidationLayer>,
     );
 
